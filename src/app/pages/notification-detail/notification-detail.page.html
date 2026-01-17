@@ -1,0 +1,300 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">推送通知</ion-title>
+
+    <ng-container *ngIf="notification_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(notification_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <!-- <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons> -->
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="notification_id == null">
+      <ion-button fill="clear" (click)="createNewNotificationTemplate()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立預設通知
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" *ngIf="notification_id == null">
+      <ion-button fill="clear" (click)="createNewNotification()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        傳送通知
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="notification_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container" *ngIf="notification_id == null">
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="notification_id == null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">傳送sms短訊</ion-label>
+            <ion-checkbox (ionChange)="smsChange($event)" [disabled]="readonly" [(ngModel)]="send_sms_notification" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="notification_id == null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">傳送APP通知</ion-label>
+            <ion-checkbox (ionChange)="pushNotificationChange($event)" [disabled]="readonly" [(ngModel)]="send_push_notification" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇預設通知</ion-label>
+            <ionic-selectable #portComponent2 (onChange)="notificationTemplateChange($event)" itemValueField="id"
+              shouldStoreItemValue="id" itemTextField="plate" [items]="all_notification_template_data_list"
+              [canClear]="true" [canSearch]="false" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+              closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port?.create_date | date : 'yyyy-MM-dd HH:mm'}}, {{port?.zh_title}}, {{port?.zh_content}}
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="notification_id == null ">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇傳送的用戶（必選）</ion-label>
+            <ionic-selectable #portComponent (onSearch)="commonService?.searchUser($event)" [disabled]="readonly"
+              [(ngModel)]="notification_data.user_id_list" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port?.zh_full_name || port?.username}} - {{port?.phone}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+
+                <ng-container *ngIf="notification_data.user_id_list.length <= 10">
+                  <div class="ionic-selectable-value-item"
+                    *ngFor="let port of notification_data.user_id_list;  let i=index;">
+                    {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username}} -
+                    {{getUserDataById(port)?.phone}}
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="notification_data.user_id_list.length > 10">
+                  已選取{{notification_data.user_id_list.length}}個用戶
+                </ng-container>
+              </ng-template>
+              <ng-template ionicSelectableFooterTemplate>
+                <ion-toolbar>
+                  <ion-row>
+                    <ion-col *ngIf="portComponent.canClear">
+                      <ion-button color="secondary" [disabled]="!portComponent.itemsToConfirm.length" (click)="clear()"
+                        expand="block" fill="outline" shape="round">
+                        全部反選
+                      </ion-button>
+                    </ion-col>
+                    <ion-col>
+                      <ion-button color="secondary" (click)="selectAll()" expand="block" fill="outline" shape="round">
+                        全選
+                      </ion-button>
+                    </ion-col>
+                    <ion-col>
+                      <ion-button color="secondary" (click)="confirm()" expand="block" fill="outline" shape="round">
+                        確認
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-toolbar>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="notification_id == null ">
+          <ion-button color="dark" (click)="notification_data.user_id_list = having_deposit_user_id_list" fill="solid">
+            選擇按金客戶
+          </ion-button>
+          <ion-button color="dark" (click)="notification_data.user_id_list = all_user_id_list_exluding_having_deposit"
+            fill="solid">
+            選擇所有客戶（不包括按金客戶）
+          </ion-button>
+          <ion-button color="dark" (click)="notification_data.user_id_list = having_past_order_user_id_list"
+            fill="solid">
+            選擇過往客戶
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container" *ngIf="notification_id == null && send_sms_notification">
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">SMS內容</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="sms_content" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+      <br>
+      <ion-row class="default-container"
+        *ngIf="notification_id != null || (notification_id == null && send_push_notification)">
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="notification_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="notification_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文標題</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="notification_data.zh_title" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文標題</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="notification_data.en_title" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">網站</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="notification_data.website" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"></ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文內容</ion-label>
+            <!-- <ion-input [readonly]="readonly" [(ngModel)]="notification_data.zh_content" type="text"></ion-input> -->
+            <ion-textarea [readonly]="readonly" [(ngModel)]="notification_data.zh_content" rows="10"></ion-textarea>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文內容（必須）</ion-label>
+            <!-- <ion-input [readonly]="readonly" [(ngModel)]="notification_data.en_content" type="text"></ion-input> -->
+            <ion-textarea [readonly]="readonly" [(ngModel)]="notification_data.en_content" rows="10"></ion-textarea>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <p>Android用戶圖片</p>
+          <ion-button
+            [style.--background]="notification_data.image_url_android != null && notification_data.image_url_android != '' ? ('url('+('media_url' | env)+notification_data.image_url_android+') no-repeat center center / cover') : '#c7c7c7'"
+            class="big-upload-btn" (click)="triggerImgUpload('image_url_android')" fill="clear">
+            <ion-icon slot="start" name="cloud-upload"></ion-icon>
+            {{notification_data.image_url_android != null && notification_data.image_url_android != '' ? '重新上載' : '上載'}}
+          </ion-button>
+          <ion-button *ngIf="notification_data.image_url_android != null && notification_data.image_url_android != ''"
+            class="default-ion-btn" download expand="full"
+            [href]="('media_url' | env)+notification_data.image_url_android"
+            fill="clear">
+            <ion-icon slot="start" name="cloud-download"></ion-icon>
+            下載
+          </ion-button>
+          <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <p>ios用戶圖片</p>
+          <ion-button
+            [style.--background]="notification_data.image_url_ios != null && notification_data.image_url_ios != '' ? ('url('+('media_url' | env)+notification_data.image_url_ios+') no-repeat center center / cover') : '#c7c7c7'"
+            class="big-upload-btn" (click)="triggerImgUpload('image_url_ios')" fill="clear">
+            <ion-icon slot="start" name="cloud-upload"></ion-icon>
+            {{notification_data.image_url_ios != null && notification_data.image_url_ios != '' ? '重新上載' : '上載'}}
+          </ion-button>
+          <ion-button *ngIf="notification_data.image_url_ios != null && notification_data.image_url_ios != ''"
+            class="default-ion-btn" download expand="full"
+            [href]="('media_url' | env)+notification_data.image_url_android"
+            fill="clear">
+            <ion-icon slot="start" name="cloud-download"></ion-icon>
+            下載
+          </ion-button>
+          <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="notification_id != null ">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇傳送的用戶（必選）</ion-label>
+            <ionic-selectable #portComponent (onSearch)="commonService?.searchUser($event)" [disabled]="readonly"
+              [(ngModel)]="notification_data.user_id_list" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_full_name || port.username}} - {{port.phone}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{notification_data.user_id_list.length}}個用戶
+                <!-- <div class="ionic-selectable-value-item" *ngFor="let port of notification_data.user_id_list">
+                  {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username }} ({{getUserDataById(port)?.phone}})
+                </div> -->
+              </ng-template>
+              <ng-template ionicSelectableFooterTemplate>
+                <ion-toolbar>
+                  <ion-row>
+                    <ion-col *ngIf="portComponent.canClear">
+                      <ion-button color="secondary" [disabled]="!portComponent.itemsToConfirm.length" (click)="clear()"
+                        expand="block" fill="outline" shape="round">
+                        全部反選
+                      </ion-button>
+                    </ion-col>
+                    <ion-col>
+                      <ion-button color="secondary" (click)="selectAll()" expand="block" fill="outline" shape="round">
+                        全選
+                      </ion-button>
+                    </ion-col>
+                    <ion-col>
+                      <ion-button color="secondary" (click)="confirm()" expand="block" fill="outline" shape="round">
+                        確認
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-toolbar>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

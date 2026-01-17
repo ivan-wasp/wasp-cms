@@ -1,0 +1,450 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">易通行收費</ion-title>
+
+        <ng-container *ngIf="charge_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(charge_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; charge_data = checking_charge_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="charge_id == null">
+            <ion-button fill="clear" (click)="createNewCharge()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立易通行收費
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <input style="display: none;" type="file" #upload_img
+        accept="image/x-png,image/jpeg,application,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="charge_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="charge_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="charge_data.disabled"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="charge_id != null">
+                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                        <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">用戶</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(charge_data.user_id)?.zh_full_name"
+                                type="text"></ion-input>
+                            <ion-icon class="clickable"
+                                (click)="commonService?.openCMSPage('/user-detail?user_id='+charge_data.user_id, 'blank')"
+                                slot="end" name="eye"></ion-icon>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(charge_data.user_id)?.phone"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(charge_data.user_id)?.email"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">選擇車輛（必選）</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+                            [(ngModel)]="charge_data.car_id" itemValueField="id" shouldStoreItemValue="id"
+                            itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true"
+                            [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                            closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                {{port.model}} - {{port.plate}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                <img class="select-end-img"
+                                    *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0"
+                                    [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                {{getCarDataById(charge_data.car_id)?.plate}}
+                                ({{getCarDataById(charge_data.car_id)?.model}})
+                            </ng-template>
+
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="charge_id == null">
+                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap">選擇用戶（必選）</ion-label>
+                            <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly"
+                                [(ngModel)]="charge_data.user_id" itemValueField="id" shouldStoreItemValue="id"
+                                itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true"
+                                [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                                closeButtonText="取消" [hasVirtualScroll]="true">
+                                <ng-template ionicSelectableItemTemplate let-port="item"
+                                    let-isPortSelected="isItemSelected">
+                                    {{port.zh_full_name || port.username}} - {{port.phone}}
+                                </ng-template>
+                                <ng-template ionicSelectableValueTemplate let-ports="item">
+                                    {{getUserDataById(charge_data.user_id)?.zh_full_name}}
+                                    ({{getUserDataById(charge_data.user_id)?.phone}})
+                                </ng-template>
+                            </ionic-selectable>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="charge_data.status" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="awaiting_payment">未付款</ion-select-option>
+                            <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+                            <ion-select-option value="paid">已繳付</ion-select-option>
+                            <ion-select-option value="cancelled">已取消</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">類型</ion-label>
+                        <!-- <ion-select [disabled]="readonly" [(ngModel)]="charge_data.type" multiple="false" cancelText="取消" okText="確認">
+                        <ion-select-option *ngFor="let item of chargeTypeList" [value]="item">
+                            <ng-container *ngIf="item == chargeType.ev_charing_fee">EV充電收費</ng-container>
+                            <ng-container *ngIf="item == chargeType.hketoll_fee">易通行收費</ng-container>
+                        </ion-select-option>
+                    </ion-select> -->
+                        <ion-select [disabled]="readonly || charge_data?.id != null" [(ngModel)]="charge_data.type"
+                            multiple="false" cancelText="取消" okText="確認">
+                            <ion-select-option *ngFor="let item of chargeTypeList" [value]="item">
+                                <ng-container *ngIf="item == chargeType.hketoll_fee">易通行</ng-container>
+                                <ng-container *ngIf="item == chargeType.odometer_fee">公里費</ng-container>
+                                <ng-container *ngIf="item == chargeType.late_drop_off_penalty">遲還車罰款</ng-container>
+                                <ng-container
+                                    *ngIf="item == chargeType.insufficient_battery_or_oil_penalty">電/油量不足罰款</ng-container>
+                                <ng-container
+                                    *ngIf="item == chargeType.incorrect_drop_off_location_penalty">非正確地點還車罰款</ng-container>
+                                <ng-container *ngIf="item == chargeType.super_charge_idle_fee">超級充電站超時佔用費</ng-container>
+                            </ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">金額</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="charge_data.amount"
+                            (ionInput)="amountChange($event)" type="number" min="1"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">罰款</ion-label>
+                        <ion-input
+                            [readonly]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                            [(ngModel)]="charge_data.penalty" (ionChange)="amountChange($event)" type="number"
+                            min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">總額</ion-label>
+                        <ion-input [readonly]="readonly" [disabled]="true" [(ngModel)]="charge_data.total_amount"
+                            type="number" min="1"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">參考編號</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="charge_data.reference_number"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">描述</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="charge_data.description" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <!-- <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #date matInput [matDatepicker]="picker3"
+                            (dateChange)="selectionDateChanged('date', date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker3></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">日期</ion-label>
+                        <ion-input readonly [(ngModel)]="charge_data.date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker3"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col> -->
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <mat-label>日期時間</mat-label>
+                        <input matInput [ngxMatDatetimePicker]="picker3" [value]="charge_data.date"
+                            (dateChange)="dateChange($event)">
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <ngx-mat-datetime-picker #picker3 showSpinners="true" [showSeconds]='showSeconds'
+                            [stepHour]="stepHour" [stepMinute]="stepMinute" touchUi="true" color="primary"
+                            [enableMeridian]="enableMeridian" disableMinute="false" hideTime="false">
+                        </ngx-mat-datetime-picker>
+                    </mat-form-field>
+
+                    <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">日期時間</ion-label>
+                        <ion-input *ngIf="charge_data.date != null && charge_data.date != ''" readonly
+                            value="{{charge_data.date | date : 'yyyy-MM-dd HH:mm'}}" type="text">
+                        </ion-input>
+                        <ion-input *ngIf="!(charge_data.date != null && charge_data.date != '')" readonly value=""
+                            type="text"></ion-input>
+                        <ion-icon *ngIf="!readonly && (charge_data.date != null && charge_data.date != '')"
+                            (click)="resetDate()" slot="end" name="close-outline"></ion-icon>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker3"></mat-datepicker-toggle>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #payment_deadline_date matInput [matDatepicker]="picker"
+                            (dateChange)="selectionDateChanged('payment_deadline_date', payment_deadline_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">繳付到期日</ion-label>
+                        <ion-input readonly [(ngModel)]="charge_data.payment_deadline_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #notification_date matInput [matDatepicker]="picker2"
+                            (dateChange)="selectionDateChanged('notification_date', notification_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">通知繳付日</ion-label>
+                        <ion-input readonly [(ngModel)]="charge_data.notification_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker2"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="charge_data.payment_method" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="credit_card">信用卡</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="fps">FPS(AirWallex)</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="alipayhk">AlipayHK</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                    *ngIf="charge_data.payment_method != null && charge_data.payment_method != '' && charge_data.payment_method == 'bank_transfer'">
+                    <ion-button *ngIf="charge_data.payment_order_data != null && charge_data.payment_order_data != ''"
+                        download (click)="commonService?.openPage(charge_data.payment_order_data, true, true)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        下載轉帳證明
+                    </ion-button>
+                    <ion-img *ngIf="charge_data.payment_order_data != null && charge_data.payment_order_data != ''"
+                        [src]="commonService.media_url()+charge_data.payment_order_data"></ion-img>
+                    <ion-button *ngIf="!readonly" expand="block" fill="outline" shape="round" color="secondary"
+                        (click)="triggerImgUpload('payment_order_data')">
+                        上載轉帳證明
+                    </ion-button>
+                    <ion-button
+                        *ngIf="!readonly && charge_data.payment_order_data != null && charge_data.payment_order_data != ''"
+                        expand="block" fill="outline" shape="round" color="danger" (click)="removeImg(charge_data)">
+                        移除轉帳證明
+                    </ion-button>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                    *ngIf="charge_data.payment_method != null && charge_data.payment_method != '' && (charge_data.payment_method == 'credit_card' || charge_data.payment_method == 'alipayhk') && charge_data.payment_order_data != null && charge_data.payment_order_data != ''">
+                    <ion-item *ngIf="charge_data?.payment_order_data?.receipt_url" class="input-item readonly" mode="md"
+                        lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">Stripe參考編號</ion-label>
+                        <ion-input readonly [value]="charge_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                    <ion-button *ngIf="charge_data?.payment_order_data?.receipt_url"
+                        (click)="commonService?.openPage(charge_data.payment_order_data.receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-button *ngIf="charge_data?.payment_order_data?.charges?.data[0].receipt_url"
+                        (click)="commonService?.openPage(charge_data.payment_order_data.charges?.data[0].receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-item *ngIf="charge_data?.payment_order_data?.pspReference" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+                        <ion-input readonly [value]="charge_data?.payment_order_data?.pspReference"
+                            type="text"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="charge_data?.payment_order_data?.additionalData?.cardSummary"
+                        class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+                        <ion-input readonly
+                            [value]="charge_data?.payment_order_data?.additionalData?.cardSummary+' ('+charge_data?.payment_order_data?.additionalData?.paymentMethod+')'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="charge_data.payment_method != null && charge_data.payment_method != '' && (charge_data.payment_method == 'fps' || charge_data.payment_method == 'alipayhk') && !charge_data.payment_order_data.hasOwnProperty('pspReference')">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+                        <ion-input readonly [value]="charge_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                        <ion-input readonly
+                            [value]="charge_data?.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+            </ion-row>
+
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                            <ion-label>文件</ion-label>
+                        </div>
+                        <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('other_doc_url_list')" class="clickable"
+                            slot="start" name="cloud-upload"></ion-icon>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                    *ngFor="let item of charge_data.other_doc_url_list; let i = index">
+                    <ng-container *ngIf="item.includes('.png') || item.includes('.jpg') || item.includes('.jpeg')">
+                        <div class="img-container">
+                            <ion-img [src]="('media_url' | env)+item"></ion-img>
+                            <ion-button *ngIf="!readonly" (click)="charge_data.other_doc_url_list.splice(i, 1)"
+                                fill="clear">
+                                <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+                            </ion-button>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!item.includes('.png') && !item.includes('.jpg') && !item.includes('.jpeg')">
+                        <ion-row>
+                            <ion-button (click)="commonService.openPage(item,'blank',true)">
+                                {{item}}
+                            </ion-button>
+                            <ion-button *ngIf="!readonly" (click)="charge_data.other_doc_url_list.splice(i, 1)"
+                                fill="clear">
+                                <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+                            </ion-button>
+                        </ion-row>
+                    </ng-container>
+                </ion-col>
+
+            </ion-row>
+
+        </ion-grid>
+    </div>
+
+
+</ion-content>

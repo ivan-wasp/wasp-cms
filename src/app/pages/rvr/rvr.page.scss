@@ -1,0 +1,31 @@
+canvas {
+    border: 3px dashed gray;
+}
+
+.img-item {
+    // position: relative;
+    // .remove-icon{
+    //     position: absolute;
+    //     right: 12px;
+    //     top: 12px;
+    //     font-size: 1.6rem;
+    //     cursor: pointer;
+    // }
+    .remove-icon {
+        font-size: 1.6rem;
+        cursor: pointer;
+    }
+}
+
+.slider-img-container {
+    position: relative;
+    ion-icon {
+        font-size: 1.8rem;
+        cursor: pointer;
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        background: #ffffff47;
+        border-radius: 50%;
+    }
+}

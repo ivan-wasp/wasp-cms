@@ -1,0 +1,383 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">違例事項</ion-title>
+
+        <ng-container *ngIf="violation_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(violation_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; violation_data = checking_violation_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="violation_id == null">
+            <ion-button fill="clear" (click)="createNewViolation()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立違例事項
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <input style="display: none;" type="file" #upload_img
+        accept="image/x-png,image/jpeg,application,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="violation_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="violation_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="violation_data.disabled"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">公司已代繳，客人需付款給公司</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="violation_data.pay_to_wasp"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="violation_id != null">
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">用戶</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(violation_data.user_id)?.zh_full_name"
+                                type="text"></ion-input>
+                            <ion-icon class="clickable"
+                                (click)="commonService?.openCMSPage('/user-detail?user_id='+violation_data.user_id, 'blank')"
+                                slot="end" name="eye"></ion-icon>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(violation_data.user_id)?.phone"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                            <ion-input [readonly]="true" [value]="getUserDataById(violation_data.user_id)?.email"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="violation_data.status" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="cancelled">已取消</ion-select-option>
+                            <ion-select-option value="awaiting_payment">未付款</ion-select-option>
+                            <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+                            <ion-select-option value="paid">已繳付</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">選擇車輛（必選）</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+                            [(ngModel)]="violation_data.car_id" itemValueField="id" shouldStoreItemValue="id"
+                            itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true"
+                            [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                            closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                {{port.model}} - {{port.plate}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                <img class="select-end-img"
+                                    *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0"
+                                    [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                {{getCarDataById(violation_data.car_id)?.plate}}
+                                ({{getCarDataById(violation_data.car_id)?.model}})
+                            </ng-template>
+
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="violation_id == null">
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap">選擇用戶（必選）</ion-label>
+                            <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly"
+                                [(ngModel)]="violation_data.user_id" itemValueField="id" shouldStoreItemValue="id"
+                                itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true"
+                                [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                                closeButtonText="取消" [hasVirtualScroll]="true">
+                                <ng-template ionicSelectableItemTemplate let-port="item"
+                                    let-isPortSelected="isItemSelected">
+                                    {{port.zh_full_name || port.username}} - {{port.phone}}
+                                </ng-template>
+                                <ng-template ionicSelectableValueTemplate let-ports="item">
+                                    {{getUserDataById(violation_data.user_id)?.zh_full_name}}
+                                    ({{getUserDataById(violation_data.user_id)?.phone}})
+                                </ng-template>
+                            </ionic-selectable>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">違例類型</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="violation_data.contravention_type"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">罰款</ion-label>
+                        <ion-input
+                            [readonly]="readonly && (!('production' | env) || ((admin_data | async) && (admin_data | async)?.authority_list.includes(authority.offer_discount)))"
+                            [(ngModel)]="violation_data.amount" type="number"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">參考編號</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="violation_data.reference_number"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #violation_date matInput [matDatepicker]="picker3"
+                            (dateChange)="selectionDateChanged('violation_date', violation_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker3></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">違例日期</ion-label>
+                        <ion-input readonly [(ngModel)]="violation_data.violation_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker3"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #payment_deadline_date matInput [matDatepicker]="picker"
+                            (dateChange)="selectionDateChanged('payment_deadline_date', payment_deadline_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">繳付到期日</ion-label>
+                        <ion-input readonly [(ngModel)]="violation_data.payment_deadline_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #notification_date matInput [matDatepicker]="picker2"
+                            (dateChange)="selectionDateChanged('notification_date', notification_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">通知繳付日</ion-label>
+                        <ion-input readonly [(ngModel)]="violation_data.notification_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker2"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="violation_data.payment_method" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="credit_card">信用卡</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="fps">FPS(AirWallex)</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="alipayhk">AlipayHK</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                    *ngIf="violation_data.payment_method != null && violation_data.payment_method != '' && (violation_data.payment_method == 'credit_card' || violation_data.payment_method == 'alipayhk') && violation_data.payment_order_data != null && violation_data.payment_order_data != ''">
+                    <ion-item *ngIf="violation_data?.payment_order_data?.receipt_url" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">stripe參考編號</ion-label>
+                        <ion-input readonly [value]="violation_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                    <ion-button *ngIf="violation_data?.payment_order_data?.receipt_url"
+                        (click)="commonService?.openPage(violation_data.payment_order_data.receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-button *ngIf="violation_data?.payment_order_data?.charges?.data[0].receipt_url"
+                        (click)="commonService?.openPage(violation_data.payment_order_data.charges?.data[0].receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-item *ngIf="violation_data?.payment_order_data?.pspReference" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+                        <ion-input readonly [value]="violation_data?.payment_order_data?.pspReference"
+                            type="text"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="violation_data?.payment_order_data?.additionalData?.cardSummary"
+                        class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+                        <ion-input readonly
+                            [value]="violation_data?.payment_order_data?.additionalData?.cardSummary+' ('+violation_data?.payment_order_data?.additionalData?.paymentMethod+')'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                    *ngIf="violation_data.payment_method != null && violation_data.payment_method != '' && (violation_data.payment_method == 'fps' || violation_data.payment_method == 'alipayhk') && !violation_data.payment_order_data.hasOwnProperty('pspReference') ">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+                        <ion-input readonly [value]="violation_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+            </ion-row>
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                            <ion-label>繳款圖片</ion-label>
+                        </div>
+                        <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('payment_img_url_list')" class="clickable"
+                            slot="start" name="cloud-upload"></ion-icon>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                    *ngFor="let item of violation_data.payment_img_url_list; let i = index">
+                    <div class="img-container">
+                        <ion-img [src]="('media_url' | env)+item"></ion-img>
+                        <ion-button *ngIf="!readonly" (click)="violation_data.payment_img_url_list.splice(i, 1)"
+                            fill="clear">
+                            <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+                        </ion-button>
+                    </div>
+                </ion-col>
+
+            </ion-row>
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                        <ion-label>其他文件</ion-label>
+                    </div>
+
+                    <div class="other-doc-upload-div">
+                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                            <ion-label position="stacked">文件名（可不輸入）</ion-label>
+                            <ion-input [(ngModel)]="other_doc_file_name" type="text"></ion-input>
+                        </ion-item>
+                        <ion-button *ngIf="!readonly" (click)="triggerImgUpload('other_doc_url_list')" slot="end"
+                            class="default-ion-btn" fill="clear">
+                            <ion-icon slot="start" name="cloud-download"></ion-icon>
+                            上載文件
+                        </ion-button>
+                    </div>
+                    <br><br>
+                    <ion-item class="other-doc-item input-item" [ngClass]="{'readonly': readonly}" lines="none"
+                        *ngFor="let item of violation_data.other_doc_url_list; let i = index;">
+                        <!-- <ion-label>{{item.name}}</ion-label> -->
+                        <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name"></ion-input>
+                        <ion-icon *ngIf="!readonly" class="delete-icon"
+                            (click)="violation_data.other_doc_url_list.splice(i, 1)" name="trash" slot="end">
+                        </ion-icon>
+                        <ion-icon class="download-icon"
+                            (click)="commonService.downloadMedia(violation_data.other_doc_url_list[i].url, true)"
+                            name="cloud-download" slot="end"></ion-icon>
+
+                    </ion-item>
+
+                </ion-col>
+
+            </ion-row>
+
+
+        </ion-grid>
+    </div>
+
+
+</ion-content>

@@ -1,0 +1,211 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">車房</ion-title>
+
+    <ng-container *ngIf="factory_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(factory_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; factory_data = checking_factory_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="factory_id == null">
+      <ion-button fill="clear" (click)="createNewFactory()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立車房
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="factory_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="factory_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="factory_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">只限管理員預約</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="factory_data.admin_only" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文名</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="factory_data.zh_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文名</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="factory_data.en_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <mat-form-field class="input-mat-form full-width" [ngClass]="{'readonly': readonly}" appearance="outline"
+            floatLabel="never">
+            <mat-label>電話</mat-label>
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let phone of factory_data.phone_list" (removed)="remove(phone, 'phone')">
+                {{phone}}
+                <mat-icon *ngIf="!readonly" matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <input [readonly]="readonly" [placeholder]="readonly ? '' : '輸入電話後按enter...'" [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (matChipInputTokenEnd)="add($event, 'phone')">
+            </mat-chip-list>
+          </mat-form-field>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <mat-form-field class="input-mat-form full-width" [ngClass]="{'readonly': readonly}" appearance="outline"
+            floatLabel="never">
+            <mat-label>電郵</mat-label>
+            <mat-chip-list #chipList2>
+              <mat-chip *ngFor="let email of factory_data.email_list" (removed)="remove(email, 'email')">
+                {{email}}
+                <mat-icon *ngIf="!readonly" matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <input [readonly]="readonly" [placeholder]="readonly ? '' : '輸入電郵後按enter...'"
+                [matChipInputFor]="chipList2" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="add($event, 'email')">
+            </mat-chip-list>
+          </mat-form-field>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文地址</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="factory_data.zh_address" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文地址</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="factory_data.en_address" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇可預約車輛（如不選將全部可預約）</ion-label>
+            <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+              [(ngModel)]="factory_data.applicable_car_id_list" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                <div class="ionic-selectable-value-item" *ngFor="let port of factory_data.applicable_car_id_list">
+                  {{getCarDataById(port)?.plate}} ({{getCarDataById(port)?.model}})
+                </div>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngFor="let item of factory_data.working_hour_list; let i = index;">
+          <div class="working-hour-div">
+            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label *ngIf="i == 0" class="ion-text-wrap" position="stacked">星期日及公眾假期營業時間<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 1" class="ion-text-wrap" position="stacked">星期一<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 2" class="ion-text-wrap" position="stacked">星期二<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 3" class="ion-text-wrap" position="stacked">星期三<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 4" class="ion-text-wrap" position="stacked">星期四<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 5" class="ion-text-wrap" position="stacked">星期五<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-label *ngIf="i == 6" class="ion-text-wrap" position="stacked">星期六<br>(日期格式必須為24小時制 e.g. 13:05-19:00)</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="item.time" type="text">
+              </ion-input>
+            </ion-item>
+            &nbsp;&nbsp;
+            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap">可預約</ion-label>
+              <ion-checkbox [disabled]="readonly" [(ngModel)]="item.allow_booking"
+                slot="end"></ion-checkbox>
+            </ion-item>
+            &nbsp;&nbsp;
+            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap">配額</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="item.quota" type="number" min="0" max="999">
+              </ion-input>
+            </ion-item>
+          </div>
+        </ion-col>
+
+      </ion-row>
+
+      <br>
+      <ion-row class="default-container">
+        <ion-col size="12">
+          <div class="title-with-two-icon">
+            <div class="">
+              <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+              <ion-label>封面圖片</ion-label>
+            </div>
+            <ion-icon *ngIf="!readonly" (click)="triggerImgUpload()" class="clickable" slot="start"
+              name="cloud-upload"></ion-icon>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+          *ngFor="let item of factory_data.cover_img_url_list; let i = index">
+          <div class="img-container">
+            <ion-img [src]="('media_url' | env)+item"></ion-img>
+            <ion-button (click)="factory_data.cover_img_url_list.splice(i, 1)" fill="clear">
+              <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

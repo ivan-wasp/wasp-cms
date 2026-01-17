@@ -1,0 +1,209 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">加購品</ion-title>
+
+    <ng-container *ngIf="product_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(product_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; product_data = checking_product_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="product_id == null">
+      <ion-button fill="clear" (click)="createNewProduct()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立加購品
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf=" product_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="product_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="product_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文名稱</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="product_data.zh_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文名稱</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="product_data.en_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">分類</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="product_data.category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">公司</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="product_data.company" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">售價</ion-label>
+            <ion-input min="1" [readonly]="readonly" [(ngModel)]="product_data.price" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">貨存</ion-label>
+            <ion-input min="0" [readonly]="readonly" [(ngModel)]="product_data.inventory" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">最少租車日數
+              <span *ngIf="product_data.minimum_booking_days != null">
+                (至少租用{{product_data.minimum_booking_days}}日以上才可以加購)
+              </span>
+            </ion-label>
+            <ion-input min="1" [readonly]="readonly" [(ngModel)]="product_data.minimum_booking_days" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">最多租車日數
+              <span *ngIf="product_data.maximum_booking_days != null">
+                (租用{{product_data.maximum_booking_days}}日以上不可以加購)
+              </span>
+            </ion-label>
+            <ion-input min="1" [readonly]="readonly" [(ngModel)]="product_data.maximum_booking_days" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">配額
+            </ion-label>
+            <ion-input min="1" [readonly]="readonly" [(ngModel)]="product_data.quota" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item [ngClass]="{'readonly': readonly}" class="input-item" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">不可同時加購品</ion-label>
+            <ion-select [disabled]="readonly" multiple="true" cancelText="取消" okText="確認"
+              [(ngModel)]="product_data.incompatible_product_id_list">
+              <ion-select-option *ngFor="let item of all_product_data_list" [value]="item.id">{{item?.zh_name}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+
+        <!-- <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇限定使用的車輛（如不選將全部可用）</ion-label>
+            <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly" [(ngModel)]="product_data.applicable_car_id_list" itemValueField="id"
+              shouldStoreItemValue="id" itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true"
+              [canSearch]="true" [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                <div class="ionic-selectable-value-item" *ngFor="let port of product_data.applicable_car_id_list">
+                  {{getCarDataById(port)?.plate}} ({{getCarDataById(port)?.model}})
+                </div>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col> -->
+
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+        <ion-col size="12">
+          <div class="title-with-two-icon">
+            <div class="">
+              <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+              <ion-label>圖片</ion-label>
+            </div>
+            <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('img_url_list')" class="clickable" slot="start"
+              name="cloud-upload"></ion-icon>
+          </div>
+        </ion-col>
+        <!-- <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngFor="let item of product_data.img_url_list">
+          <ion-img [src]="('media_url' | env)+item"></ion-img>
+        </ion-col> -->
+
+
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+          <ion-reorder-group (ionItemReorder)="doReorder($event)" disabled="false">
+            <ion-item class="img-item" lines="none" *ngFor="let item of product_data.img_url_list; let i = index">
+              <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
+              <ion-img [src]="('media_url' | env)+item">
+              </ion-img>
+              <ion-icon slot="end" *ngIf="!readonly" (click)="product_data.img_url_list.splice(i, 1)" color="danger"
+                class="clickable remove-icon" name="trash-outline"></ion-icon>
+            </ion-item>
+          </ion-reorder-group>
+        </ion-col>
+
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

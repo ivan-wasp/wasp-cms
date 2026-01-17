@@ -1,0 +1,523 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <!-- 12312312321312 -->
+        <!-- <mat-select (selectionChange)="limitChange($event)" class="table_limit" [value]="limit.toString()"> -->
+        <ion-buttons slot="end">
+            <mat-select (selectionChange)="getRefresh()" class=""
+                [placeholder]="year_month == '' ? '選擇其他月份' : year_month" [(ngModel)]="year_month">
+                <mat-option *ngFor="let item of year_month_list" [value]="item">{{item}}</mat-option>
+            </mat-select>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <ion-button (click)="getRefresh()" fill="clear">
+                <ion-icon slot="start" name="refresh"></ion-icon>
+                更新
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-grid>
+
+        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="neutral" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/car-overview', 'root')">
+                    <!-- <ion-icon slot="start" src="assets/icon/bar_chart.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 *ngIf="year_month == ''" class="amount" color="light">{{occupancy_rate*100 | number : '1.0-1'}}%</h2>
+
+                        <h2 class="subtitle" color="light">
+                            現時出租率
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="neutral" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/car-overview', 'root')">
+                    <!-- <ion-icon slot="start" src="assets/icon/bar_chart.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{this_month_occupancy_rate*100 | number : '1.0-1'}}%</h2>
+
+                        <h2 class="subtitle" color="light">
+                            本月出租率
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="revenue" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{this_month_paid_rental_revenue?.rental_revenue |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}
+                            <span
+                                style="font-size: 1rem;">({{this_month_paid_rental_revenue?.rental_revenue_before_discount
+                                |
+                                currency:'HKD':'symbol-narrow':'1.0-0'}})
+                            </span>
+                        </h2>
+                        <h2 class="subtitle" color="light">
+                            本月已收
+                            <br>
+                            租金收入(折扣前)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="revenue" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{this_month_rental_revenue_account_receviable?.rental_revenue
+                            |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}
+                            <span
+                                style="font-size: 1rem;">({{next_month_rental_revenue_account_receviable?.rental_revenue
+                                |
+                                currency:'HKD':'symbol-narrow':'1.0-0'}})</span>
+                        </h2>
+
+                        <h2 class="subtitle" color="light">
+                            本月應收(下月)
+                            <br>
+                            租金收入
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-button class="revenue" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">
+                            {{paid_rental_revenue_group_by_rental_plan?.daily?.rental_revenue |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}/
+                            {{paid_rental_revenue_group_by_rental_plan?.weekly?.rental_revenue |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}/
+                            {{paid_rental_revenue_group_by_rental_plan?.monthly?.rental_revenue |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}
+                            <span style="font-size: 1rem;">(
+                                {{paid_rental_revenue_group_by_rental_plan?.daily?.count | number}}/
+                                {{paid_rental_revenue_group_by_rental_plan?.weekly?.count | number}}/
+                                {{paid_rental_revenue_group_by_rental_plan?.monthly?.count | number}}
+                                )</span>
+                        </h2>
+
+                        <h2 class="subtitle" color="light">
+                            本月已收
+                            <br>
+                            日租/週租/月租
+                            <br>
+                            收入(訂單數)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="revenue" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">
+                            {{rent_with_park_paid_number_of_order | number}}
+                            <span style="font-size: 1rem;">(
+                                {{six_plus_one_paid_number_of_order | number}}
+                                )</span>
+                        </h2>
+
+                        <h2 class="subtitle" color="light">
+                            本月已收
+                            <br>
+                            租車連車位訂單數(6+1訂單數)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="neutral" expand="block" fill="clear">
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_maintenane_cost |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}
+                            <span style="font-size: 1rem;">(
+                                {{total_compensation_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-0'}}
+                                )</span>
+                        </h2>
+
+                        <h2 class="subtitle" color="light">
+                            本月
+                            <br>
+                            維修及保養開支(賠償收入)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="outstanding" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/outstanding-payment', 'root')">
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_unpaid_rental_revenue?.rental_revenue_before_discount |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}</h2>
+
+                        <h2 class="subtitle" color="light">
+                            累積本月租金欠款
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="outstanding" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/violation?page=1&limit=10&sorting=null&direction=null&status=awaiting_payment&user_id=&car_id=', 'root')">
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_unpaid_violation |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}</h2>
+
+                        <h2 class="subtitle" color="light">
+                            累積交通違例欠款
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="outstanding" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/charge?page=1&limit=10&sorting=null&direction=null&status=awaiting_payment&user_id=&car_id=', 'root')">
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_unpaid_hketoll_without_penalty |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}
+                            <span style="font-size: 1rem;">
+                                ({{total_unpaid_hketoll |
+                                currency:'HKD':'symbol-narrow':'1.0-0'}})
+                            </span>
+                        </h2>
+
+                        <h2 class="subtitle" color="light">
+                            累積易通行欠款(連罰款)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                <ion-button class="outstanding" expand="block" fill="clear"
+                    (click)="commonService?.openCMSPage('/compensation-payment?page=1&limit=10&sorting=null&direction=null&status=awaiting_payment&user_id=&car_id=', 'root')">
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_unpaid_compensation_payment |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}</h2>
+
+                        <h2 class="subtitle" color="light">
+                            累積賠償欠款
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                *ngIf="authService.adminData.value?.type != adminType.sales">
+                <ion-button class="deposit" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit2.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{total_deposit |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}} <span
+                                style="font-size: 1rem;">({{total_deposit_valid_to_refund |
+                                currency:'HKD':'symbol-narrow':'1.0-0'}})</span> </h2>
+
+                        <h2 class="subtitle" color="light">
+                            <!-- 計算現有按金的總數 -->
+                            現有按金(可退還按金)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+            <!-- 計算下月退還按金的總數 -->
+            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                *ngIf="authService.adminData.value?.type != adminType.sales">
+                <ion-button class="deposit" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+                        <h2 class="amount" color="light">{{awaiting_execution_deposit |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}</h2>
+                        <h2 class="subtitle" color="light">
+                            已申請退還按金(airwallex未匯出)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                *ngIf="authService.adminData.value?.type != adminType.sales">
+                <ion-button class="deposit" expand="block" fill="clear">
+                    <!-- <ion-icon slot="start" src="assets/icon/profit2.svg"></ion-icon> -->
+                    <ion-label class="ion-text-left ion-text-wrap">
+
+                        <h2 class="amount" color="light">{{this_month_deposit |
+                            currency:'HKD':'symbol-narrow':'1.0-0'}}</h2>
+
+                        <h2 class="subtitle" color="light">
+                            <!-- 計算本月已退還按金的總數 -->
+                            本月退還按金(airwallex本月匯出)
+                        </h2>
+                    </ion-label>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+        <br>
+        <ion-row>
+            <ion-col size="12">
+                <ion-row class="default-container">
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                        <ion-row>
+                            <ion-col size="6">
+                                <div class="title-with-two-icon">
+                                    <div class="">
+                                        <ion-icon slot="start" src="assets/icon/calendar_dark.svg"></ion-icon>
+                                        <ion-label>汽車預約月歷 (<ng-container
+                                                *ngIf="current_year_month != null && current_year_month != ''">{{current_year_month.split('-')[0]}}年{{current_year_month.split('-')[1]}}月</ng-container>)</ion-label>
+                                    </div>
+                                </div>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <mat-form-field appearance="outline" style="display: none;">
+                                    <mat-label>Month and Year</mat-label>
+                                    <input matInput [matDatepicker]="dp" [formControl]="date">
+                                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #dp startView="multi-year"
+                                        (yearSelected)="chosenYearHandler($event)"
+                                        (monthSelected)="chosenMonthHandler($event, dp)"
+                                        panelClass="example-month-picker">
+                                    </mat-datepicker>
+                                </mat-form-field>
+
+                                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                                    <ion-input style="visibility: hidden;" class="ion-text-right" placeholder=""
+                                        *ngIf="current_year_month != null && current_year_month != ''" readonly
+                                        value="{{current_year_month.split('-')[0]+'年'+current_year_month.split('-')[1]+'月'}}"
+                                        type="text">
+                                    </ion-input>
+                                    <mat-datepicker-toggle slot="end" matSuffix [for]="dp"></mat-datepicker-toggle>
+                                    <ion-icon class="clickable" (click)="slidePrev()" slot="end"
+                                        name="chevron-back-outline"></ion-icon>
+                                    <ion-icon class="clickable" (click)="slideNext()" slot="end"
+                                        name="chevron-forward-outline">
+                                    </ion-icon>
+                                </ion-item>
+
+                            </ion-col>
+                        </ion-row>
+
+                        <ng-template #month_template let-view="view" let-row="row" let-col="col">
+                            {{view.dates[row*7+col].label}}
+                            <div *ngIf="view.dates[row*7+col].events.length > 0">
+                                <div [style.color]="item.color" style="display: inline-flex;"
+                                    *ngFor="let item of view.dates[row*7+col].events ">
+                                    ●
+                                </div>
+                            </div>
+                        </ng-template>
+                        <div>
+                            <ion-button color="dark" fill="clear">
+                                <ion-icon style="color: #F2C828" slot="start" name="ellipse"></ion-icon>
+                                取車
+                            </ion-button>
+                            <ion-button color="dark" fill="clear">
+                                <ion-icon style="color: #43A5D1" slot="start" name="ellipse"></ion-icon>
+                                還車
+                            </ion-button>
+                            <ion-button color="dark" fill="clear">
+                                <ion-icon style="color: #000000" slot="start" name="ellipse"></ion-icon>
+                                空置車輛(未來10日)
+                            </ion-button>
+                            <ion-button color="dark" fill="clear">
+                                <ion-icon style="color: #7000a4" slot="start" name="ellipse"></ion-icon>
+                                預約睇車
+                            </ion-button>
+                            <ion-button color="dark" fill="clear"
+                                *ngIf="authService.adminData.value?.type == adminType.admin">
+                                <ion-icon style="color: #F7688F" slot="start" name="ellipse"></ion-icon>
+                                文件到期
+                            </ion-button>
+                            <ion-button color="dark" fill="clear"
+                                *ngIf="authService.adminData.value?.type == adminType.admin">
+                                <ion-icon style="color: #74D143" slot="start" name="ellipse"></ion-icon>
+                                估計按金退還日
+                            </ion-button>
+                            <ion-button color="dark" fill="clear">
+                                <!-- <ion-icon style="color: #FE9D24" slot="start" name="ellipse"></ion-icon> -->
+                                <ion-icon style="color: #95601f" slot="start" name="ellipse"></ion-icon>
+                                待繳租金到期日
+                            </ion-button>
+                        </div>
+                        <calendar #myCalendar [monthviewDisplayEventTemplate]="month_template"
+                            [eventSource]="eventSource" lockSwipes="true" [calendarMode]="calendar.mode"
+                            [currentDate]="calendar.currentDate" (onCurrentDateChanged)="onCurrentDateChanged($event)"
+                            (onEventSelected)="onEventSelected($event)" (onTitleChanged)="onViewTitleChanged($event)"
+                            (onTimeSelected)="onTimeSelected($event)" [showEventDetail]="showEventDetail" step="30">
+                        </calendar>
+
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+                        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+                            <ion-col size="6">
+                                <h2>{{selected_date | date : 'yyyy-MM-dd'}}</h2>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <ion-button (click)="getVacancyCarDataList()" size="small" color="secondary"
+                                    fill="outline">
+                                    獲取空置車輛數據
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                        <br>
+                        <ng-container *ngFor="let item of selected_date_event_list">
+                            <ion-item *ngIf="item?.title == '取車' || item?.title == '還車'"
+                                (click)="commonService?.openCMSPage('/order-detail?order_id='+item.order_id, 'blank')"
+                                class="event-item ion-margin-bottom" lines="none">
+                                <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+                                <img style="width: 60px;" slot="start" *ngIf="item?.car_cover_img_url"
+                                    [src]="('media_url' | env)+item.car_cover_img_url" />
+                                <ion-label class="ion-text-wrap">
+                                    {{item?.zh_full_name}}&nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.car_model}}&nbsp;&nbsp;&nbsp;</span>
+                                    <span style="font-size: 0.9rem;">{{item?.car_plate}}&nbsp;&nbsp;&nbsp;</span>
+                                    <span style="font-size: 0.9rem;">{{item?.time}}&nbsp;&nbsp;&nbsp;</span>
+                                    <br>
+                                    <span style="font-size: 0.9rem;">{{item?.address}}&nbsp;&nbsp;&nbsp;</span>
+                                </ion-label>
+                            </ion-item>
+
+                            <ion-item
+                                *ngIf="item?.title == '文件到期(保險)' || item?.title == '文件到期(車牌)' || item?.title == '文件到期(驗車)' "
+                                (click)="commonService?.openCMSPage('/car-detail?car_id='+item.car_id, 'blank')"
+                                class="event-item ion-margin-bottom" lines="none">
+                                <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+
+                                <img style="width: 60px;" slot="start" *ngIf="item?.car_cover_img_url"
+                                    [src]="('media_url' | env)+item.car_cover_img_url" />
+
+                                <ion-label class="ion-text-wrap">{{item?.car_model}}&nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.car_plate}}</span> &nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;" *ngIf="item?.title == '文件到期(保險)'">保險到期</span>
+                                    <span style="font-size: 0.9rem;" *ngIf="item?.title == '文件到期(車牌)'">車牌到期</span>
+                                    <span style="font-size: 0.9rem;" *ngIf="item?.title == '文件到期(驗車)'">驗車到期</span>
+                                    <!-- <span style="font-size: 0.9rem;" *ngIf="item?.title == '空置車輛'">空置車輛</span> -->
+                                </ion-label>
+                            </ion-item>
+
+                            <ion-item *ngIf="item?.title == '估計按金退還日'"
+                                (click)="commonService?.openCMSPage('/deposit-detail?deposit_id='+item.deposit_id, 'blank')"
+                                class="event-item ion-margin-bottom" lines="none">
+                                <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+                                <ion-label class="ion-text-wrap">{{item?.user_data?.zh_full_name}}&nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.user_data?.phone}}</span>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.amount | currency : 'HKD'
+                                        :'symbol':'1.0-1'}}</span>
+                                </ion-label>
+                            </ion-item>
+
+                            <ion-item *ngIf="item?.title == '待繳租金到期日'"
+                                (click)="commonService?.openCMSPage('/order-detail?order_id='+item.order_id, 'blank')"
+                                class="event-item ion-margin-bottom" lines="none">
+                                <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+                                <img style="width: 60px;" slot="start" *ngIf="item?.car_cover_img_url"
+                                    [src]="('media_url' | env)+item.car_cover_img_url" />
+                                <ion-label class="ion-text-wrap">{{item?.car_model}}&nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.car_plate}}</span> &nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.total_amount | currency : 'HKD'
+                                        :'symbol':'1.0-1'}}</span>
+                                </ion-label>
+                            </ion-item>
+
+                            <ion-item *ngIf="item?.title == '預約睇車'"
+                                (click)="commonService?.openCMSPage('/car-viewing-detail?car_viewing_id='+item.car_viewing_id, 'blank')"
+                                class="event-item ion-margin-bottom" lines="none">
+                                <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+                                <img style="width: 60px;" slot="start" *ngIf="item?.car_cover_img_url"
+                                    [src]="('media_url' | env)+item.car_cover_img_url" />
+                                <ion-label class="ion-text-wrap">{{item?.car_model}}&nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.car_plate}}</span> &nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.user_data?.zh_full_name}}</span>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <span style="font-size: 0.9rem;">{{item?.appointment_datetime | date : 'yyyy-MM-dd
+                                        HH:mm'}}</span>
+                                </ion-label>
+                            </ion-item>
+
+                            <ng-container *ngIf="item?.title == '空置車輛'">
+                                <ion-item *ngFor="let car_data of item.vacant_car_data_list"
+                                    (click)="commonService?.openCMSPage('/car-detail?car_id='+car_data.id, 'blank')"
+                                    class="event-item ion-margin-bottom" lines="none">
+                                    <ion-icon [style.color]="item.color" name="ellipse" slot="start"></ion-icon>
+
+                                    <img style="width: 60px;" slot="start" *ngIf="car_data?.cover_img_url_list[0]"
+                                        [src]="('media_url' | env)+car_data?.cover_img_url_list[0]" />
+
+                                    <ion-label class="ion-text-wrap">{{car_data?.model}}&nbsp;&nbsp;&nbsp;
+                                        <span style="font-size: 0.9rem;">{{car_data?.plate}}</span> &nbsp;&nbsp;&nbsp;
+                                        <span style="font-size: 0.9rem;" *ngIf="item?.title == '空置車輛'">空置車輛</span>
+                                    </ion-label>
+                                </ion-item>
+                            </ng-container>
+
+
+                        </ng-container>
+
+                    </ion-col>
+                </ion-row>
+            </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+            <ion-col size-xs="12" size-sm="12" size-md="5" size-lg="5">
+
+                <ion-row class="default-container">
+                    <ion-col size="12">
+                        <div class="title-with-two-icon">
+                            <div class="">
+                                <ion-icon slot="start" src="assets/icon/menu_car.svg"></ion-icon>
+                                <ion-label>租車狀態</ion-label>
+                            </div>
+                        </div>
+                    </ion-col>
+                    <ion-col size="12">
+                        <div #ContainerRef>
+                            <ngx-charts-pie-chart [view]="[ContainerRef.offsetWidth/2, ContainerRef.offsetWidth/2]"
+                                tooltipDisabled="true" [scheme]="colorScheme" [results]="pie_data_list"
+                                [gradient]="gradient" [legend]="showLegend" [legendPosition]="legendPosition"
+                                [labels]="showLabels" [doughnut]="isDoughnut" [arcWidth]="arcWidth">
+                            </ngx-charts-pie-chart>
+                        </div>
+                        <ion-text color="secondary">
+                            <h1 class="ion-text-bold">總車輛{{original_car_data_list?.length}}</h1>
+                        </ion-text>
+                    </ion-col>
+
+                    <ion-col size="12">
+                        <div class="ion-padding-start">
+                            <ng-container *ngFor="let item of pie_data_list">
+                                <ion-item class="ion-padding-start" style="--padding-start: 0;" lines="none">
+                                    <ion-icon *ngIf="item.name == '已出租'" style="color: #F2C828" slot="start"
+                                        name="ellipse"></ion-icon>
+                                    <ion-icon *ngIf="item.name == '待出租'" style="color: #43A5D1" slot="start"
+                                        name="ellipse"></ion-icon>
+                                    <ion-icon *ngIf="item.name == '已預留'" style="color: #F7688F" slot="start"
+                                        name="ellipse"></ion-icon>
+                                    <ion-icon *ngIf="item.name == '已預留(維修)'" style="color: #7b4a2b;" slot="start"
+                                        name="ellipse"></ion-icon>
+                                    <ion-label class="ion-text-nowrap">{{item?.name}}</ion-label>
+                                    <ion-label color="medium" slot="end">{{item?.value}}</ion-label>
+                                </ion-item>
+                            </ng-container>
+                        </div>
+                    </ion-col>
+                </ion-row>
+
+            </ion-col>
+        </ion-row>
+
+    </ion-grid>
+</ion-content>

@@ -1,0 +1,107 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">管理員</ion-title>
+
+    <ng-container *ngIf="admin_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(admin_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; admin_data = checking_admin_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="admin_id == null">
+      <ion-button fill="clear" (click)="createNewAdmin()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立管理員
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <div class="ion-margin" *ngIf="admin_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="admin_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+            <ion-input [readonly]="readonly || (admin_data.id != undefined && admin_data.id != null)"
+              [(ngModel)]="admin_data.username" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="admin_data.email" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="admin_data.phone" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label position="stacked">類別</ion-label>
+              <ion-select [disabled]="readonly" [(ngModel)]="admin_data.type" multiple="false" cancelText="取消" okText="確認">
+                  <ion-select-option [value]="admin_type.admin">Admin</ion-select-option>
+                  <ion-select-option [value]="admin_type.sales">Sales</ion-select-option>
+                  <ion-select-option [value]="admin_type.maintainer">Maintainer</ion-select-option>
+                  <ion-select-option [value]="admin_type.buyer">Buyer</ion-select-option>
+                  <ion-select-option [value]="admin_type.patrol">Patrol</ion-select-option>
+                  <ion-select-option [value]="admin_type.owner">Owner</ion-select-option>
+              </ion-select>
+          </ion-item>
+      </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="admin_id == null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">密碼</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="password" type="password"></ion-input>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

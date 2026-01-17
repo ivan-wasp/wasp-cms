@@ -1,0 +1,292 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <!-- <ion-title class="hidden-xs-down">{{order_data?.plate}}</ion-title> -->
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="ion-margin" *ngIf="form_data != null">
+        <ion-row *ngIf="form_data.type == 'inquiry'">
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">類別</ion-label>
+                    <ion-input readonly [value]="typeName(form_data?.type)" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                    <ion-input readonly [value]="form_data?.phone" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                    <ion-input readonly [value]="form_data?.email" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">公司名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.company_name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">公司地區</ion-label>
+                    <ion-input readonly [value]="form_data?.region" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngIf="form_data?.content != undefined && form_data?.content != null">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">內容</ion-label>
+                    <ion-textarea auto-grow="true" [(ngModel)]="form_data.content" type="text"></ion-textarea>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+
+
+        <ion-row *ngIf="form_data.type == 'sell_car'">
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">類別</ion-label>
+                    <ion-input readonly [value]="typeName(form_data?.type)" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                    <ion-input readonly [value]="form_data?.phone" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                    <ion-input readonly [value]="form_data?.email" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">車輛型號</ion-label>
+                    <ion-input readonly [value]="form_data?.model" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">年份</ion-label>
+                    <ion-input readonly [value]="form_data?.year" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-img *ngIf="form_data.image != null && form_data.image != ''" [src]="commonService.media_url()+form_data.image"></ion-img>
+            </ion-col>
+        </ion-row>
+
+
+        <ion-row *ngIf="form_data.type == 'repair'">
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">類別</ion-label>
+                    <ion-input readonly [value]="typeName(form_data?.type)" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                    <ion-input readonly [value]="form_data?.phone" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                    <ion-input readonly [value]="form_data?.email" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">車輛型號</ion-label>
+                    <ion-input readonly [value]="form_data?.model" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="form_data?.is_dealer != undefined && form_data?.is_dealer != null">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">內容</ion-label>
+                    <ion-checkbox [(ngModel)]="form_data.is_dealer" slot="end"></ion-checkbox>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">公司名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.company_name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">車房地址</ion-label>
+                    <ion-input readonly [value]="form_data?.address" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">商業登記證號碼</ion-label>
+                    <ion-input readonly [value]="form_data?.br" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-img *ngIf="form_data.image != null && form_data.image != ''" [src]="commonService.media_url()+form_data.image"></ion-img>
+            </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="form_data.type == 'seller'">
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">類別</ion-label>
+                    <ion-input readonly [value]="typeName(form_data?.type)" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                    <ion-input readonly [value]="form_data?.phone" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                    <ion-input readonly [value]="form_data?.email" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">公司名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.company_name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">公司地區</ion-label>
+                    <ion-input readonly [value]="form_data?.region" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">商業登記證號碼</ion-label>
+                    <ion-input readonly [value]="form_data?.br" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">產品類型</ion-label>
+                    <ion-input readonly [value]="form_data?.product_type" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="form_data.type == 'sponsor'">
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">類別</ion-label>
+                    <ion-input readonly [value]="typeName(form_data?.type)" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                    <ion-input readonly [value]="form_data?.phone" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                    <ion-input readonly [value]="form_data?.email" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">機構名稱</ion-label>
+                    <ion-input readonly [value]="form_data?.company_name" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">機構地區</ion-label>
+                    <ion-input readonly [value]="form_data?.region" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap" position="stacked">希望獲得贊助類型</ion-label>
+                    <ion-input readonly [value]="form_data?.sponsor_type" type="text"></ion-input>
+                </ion-item>
+            </ion-col>
+        </ion-row>
+
+    </div>
+</ion-content>

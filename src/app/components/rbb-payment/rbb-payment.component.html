@@ -1,0 +1,187 @@
+<input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+<div style="margin: 4px;" *ngIf="rbb_payment_data != null">
+    <ion-row class="full-width">
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
+                            <ion-label>帳單詳情</ion-label>
+                        </div>
+                        <ion-button fill="clear" (click)="readonly = false" *ngIf="readonly">
+                            <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                            <ion-text color="secondary">修改</ion-text>
+                        </ion-button>
+                        <ion-button fill="clear" (click)="resetEdit()" *ngIf="!readonly">
+                            <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                            <ion-text color="secondary">取消修改</ion-text>
+                        </ion-button>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">帳單編號</ion-label>
+                        <ion-input readonly [value]="rbb_payment_data?.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="rbb_payment_data.payment_method" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="credit_card">信用卡</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="fps">FPS(AirWallex)</ion-select-option>
+                            <ion-select-option [disabled]="('production' | env)"
+                                value="alipayhk">AlipayHK</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="rbb_payment_data.payment_method != null && rbb_payment_data.payment_method != '' && rbb_payment_data.payment_method == 'bank_transfer'">
+                    <ion-button
+                        *ngIf="rbb_payment_data.payment_order_data != null && rbb_payment_data.payment_order_data != ''"
+                        download [href]="('media_url' | env)+rbb_payment_data.payment_order_data" expand="block"
+                        fill="outline" shape="round" color="secondary">
+                        下載轉帳證明
+                    </ion-button>
+                    <ion-button *ngIf="readonly == false" expand="block" fill="outline" shape="round" color="secondary"
+                        (click)="triggerImgUpload()">
+                        上載轉帳證明
+                    </ion-button>
+                </ion-col>
+                <!-- receipt_url -->
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="rbb_payment_data.payment_method != null && rbb_payment_data.payment_method != '' && (rbb_payment_data.payment_method == 'credit_card' || rbb_payment_data.payment_method == 'alipayhk') && rbb_payment_data.payment_order_data != null && rbb_payment_data.payment_order_data != ''">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">stripe參考編號</ion-label>
+                        <ion-input readonly [value]="rbb_payment_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                    <ion-button *ngIf="rbb_payment_data?.payment_order_data?.receipt_url"
+                        (click)="commonService?.openPage(rbb_payment_data.payment_order_data.receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-button *ngIf="rbb_payment_data?.payment_order_data?.charges?.data[0].receipt_url"
+                        (click)="commonService?.openPage(rbb_payment_data.payment_order_data.charges?.data[0].receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <ion-item *ngIf="rbb_payment_data?.payment_order_data?.pspReference" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+                        <ion-input readonly [value]="rbb_payment_data?.payment_order_data?.pspReference"
+                            type="text"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="rbb_payment_data?.payment_order_data?.additionalData?.cardSummary"
+                        class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+                        <ion-input readonly
+                            [value]="rbb_payment_data?.payment_order_data?.additionalData?.cardSummary+' ('+rbb_payment_data?.payment_order_data?.additionalData?.paymentMethod+')'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="rbb_payment_data.payment_method != null && rbb_payment_data.payment_method != '' && (rbb_payment_data.payment_method == 'fps' || rbb_payment_data.payment_method == 'alipayhk') && !rbb_payment_data.payment_order_data.hasOwnProperty('pspReference')">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+                        <ion-input readonly [value]="rbb_payment_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">訂單狀態</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="rbb_payment_data.status" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="awaiting_payment">未付款</ion-select-option>
+                            <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+                            <ion-select-option value="paid">已繳付</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="rbb_payment_data.remark" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" class="ion-text-right" *ngIf="!readonly">
+                    <ion-button (click)="updateRbbPaymentData()" color="secondary" fill="outline" shape="round">
+                        儲存
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <h2>帳單詳情</h2>
+                </ion-col>
+                <!-- <ion-col size="6">
+          車價
+        </ion-col>
+        <ion-col size="6" class="bolder ion-text-right">
+          HK${{rbb_data?.car_price | number}}
+        </ion-col> -->
+
+                <ion-col size="6">
+                    車牌
+                </ion-col>
+                <ion-col size="6" class="bolder ion-text-right">
+                    HK${{rbb_payment_data?.plate_amount | number}}
+                </ion-col>
+
+                <ion-col size="6">
+                    Hybrid care
+                </ion-col>
+                <ion-col size="6" class="bolder ion-text-right">
+                    HK${{rbb_payment_data?.hybrid_care_amount | number}}
+                </ion-col>
+
+                <ng-container *ngFor="let item of rbb_payment_data?.equipment_data_list">
+                    <ion-col size="6">
+                        {{ item?.zh_name }}
+                    </ion-col>
+                    <ion-col size="6" class="bolder ion-text-right">
+                        HK${{item?.price | number}}
+                    </ion-col>
+                </ng-container>
+
+                <div class="divider"></div>
+
+                <!-- <ion-col size="6">
+          {{translateService.currentLang == 'en' ? 'Loan amount' : '貸款金額'}}
+        </ion-col>
+        <ion-col size="6" class="bolder ion-text-right">
+          -HK${{rbb_data?.car_price | number}}
+        </ion-col> -->
+
+                <ion-col size="6">
+                    信用卡收費
+                </ion-col>
+                <ion-col size="6" class="bolder ion-text-right">
+                    HK${{rbb_payment_data?.credit_card_extra_charge_amount | number}}
+                </ion-col>
+
+                <div class="divider"></div>
+
+                <ion-col size="6">
+                    總額
+                </ion-col>
+                <ion-col size="6" class="ion-text-right">
+                    <h1 class="total-amount">HK${{rbb_payment_data?.total_amount | number}}</h1>
+                </ion-col>
+            </ion-row>
+        </ion-col>
+    </ion-row>
+</div>

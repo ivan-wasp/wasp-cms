@@ -1,0 +1,53 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">Blog</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="commonService?.openCMSPage('/custom-page-detail', 'root')" fill="clear">
+        <!-- <ion-icon slot="start" src="assets/icon/menu_product.svg"></ion-icon> -->
+        新增Blog
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="end">
+      <ion-button fill="clear" class="export-excel-btn">
+        <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
+        輸出至Excel
+      </ion-button>
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <ion-grid>
+    <ion-row class="">
+      <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngFor="let item of all_custom_page_data_list">
+        <ion-card>
+          <img [src]="('media_url' | env) + item?.banner_img_url_list[0]" alt="">
+          <ion-card-header>
+            <ion-card-title>{{item?.zh_title}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-chip *ngIf="item?.zh_category != ''" color="secondary" mode="ios" outline="true">
+              <ion-label>{{item?.zh_category}}</ion-label>
+            </ion-chip>
+            <div class="ion-padding">
+              <ion-button  expand="block" color="secondary"
+              (click)="commonService?.openCMSPage('/custom-page-detail?custom_page_id='+item.id, 'root')"
+              class="default-ion-btn" fill="sold">
+              查看或更改
+            </ion-button>
+            </div>
+          </ion-card-content>
+ 
+        </ion-card>
+
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

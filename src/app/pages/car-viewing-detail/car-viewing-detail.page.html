@@ -1,0 +1,126 @@
+
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">預約睇車</ion-title>
+
+    <ng-container *ngIf="car_viewing_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(car_viewing_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear"
+          (click)="readonly = true ; car_viewing_data = checking_car_viewing_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <div class="ion-margin" *ngIf="car_viewing_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2" *ngIf="car_viewing_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="car_viewing_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="car_viewing_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+            <ion-input readonly [value]="car_viewing_data.create_date | date : 'yyyy-MM-dd HH:mm'" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2" *ngIf="car_viewing_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="car_viewing_data.disabled" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="5" size-lg="5" *ngIf="user_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">用戶 (電話)</ion-label>
+            <ion-input readonly [value]="user_data.zh_full_name+ ' ('+user_data.phone+')'" type="text"></ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/user-detail?user_id='+user_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="car_viewing_data.car_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">車輛 (車牌)</ion-label>
+            <ion-input readonly [value]="car_viewing_data.car_data.brand+' '+car_viewing_data.car_data.model+' ('+car_viewing_data.car_data.plate+')'" type="text">
+            </ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/car-detail?car_id='+car_viewing_data.car_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="car_viewing_data.parking_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">停車場</ion-label>
+            <ion-input readonly [value]="car_viewing_data.parking_data.zh_address" type="text">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="car_viewing_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="car_viewing_data.status" multiple="false"
+              cancelText="取消" okText="確認">
+              <ion-select-option [value]="carViewingStatus.accepted">已接受</ion-select-option>
+              <ion-select-option [value]="carViewingStatus.completed">已完成</ion-select-option>
+              <ion-select-option [value]="carViewingStatus.cancelled">已取消</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item class="input-item ion-margin-top" [ngClass]="{'readonly': readonly}" *ngIf="car_viewing_data.status == carViewingStatus.cancelled && checking_car_viewing_data.status != carViewingStatus.cancelled" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">傳送取消預約通知給客人(sms, in-app, email)</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="send_cancel_notification_to_user" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">預約日期</ion-label>
+            <ion-input [readonly]="readonly" [value]="car_viewing_data.appointment_datetime | date : 'yyyy-MM-dd HH:mm'" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="car_viewing_data.remark" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

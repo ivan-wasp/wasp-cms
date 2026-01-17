@@ -1,0 +1,30 @@
+ion-chip{
+    font-weight: bold;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.order-awaiting-payment, .payment-awaiting-payment, .violation-awaiting-payment, .compensation-payment-awaiting-payment, .charge-awaiting-payment, .prerent-order-awaiting-payment, .inspection-expired{
+    --color: white;
+    --background: #890A0A;
+}
+.order-awaiting-verification, .payment-awaiting-verification, .violation-awaiting-verification, .compensation-payment-awaiting-verification, .charge-awaiting-verification, .prerent-order-awaiting-verification, .appointment-awaiting-verification, .inspection-in-progress{
+    --color: black;
+    --background: var(--ion-color-tertiary);
+}
+.order-awaiting-pick-up, .car-viewing-accpeted, .appointment-accpeted, .inspection-pending{
+    --color: black;
+    --background: var(--ion-color-success);
+}
+.order-rendering, .compensation-payment-awaiting-quotation, .inspection-result-generated{
+    --color: black;
+    --background: var(--ion-color-primary);
+}
+.order-completed, .payment-paid, .violation-paid, .car-viewing-completed, .compensation-payment-paid, .charge-paid, .prerent-order-paid, .appointment-completed, .inspection-completed{
+    --color: black;
+    --background: var(--ion-color-medium);
+}
+.order-cancelled, .payment-cancelled, .car-viewing-cancelled, .violation-cancelled, .compensation-payment-cancelled, .prerent-order-cancelled, .appointment-cancelled, .charge-cancelled, .inspection-expired{
+    --color: white;
+    --background: var(--ion-color-dark);
+}

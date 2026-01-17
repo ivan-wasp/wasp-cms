@@ -1,0 +1,1156 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">{{car_data?.plate}}
+      <ng-container *ngIf="jimi_device_location != null">
+        - 網絡
+        <span
+          [style.color]="jimi_device_location?.status == '0' ? 'var(--ion-color-danger)' : 'var(--ion-color-success)'">{{jimi_device_location?.status
+          == '0' ? '離線' : '上線'}}</span>
+        - 引擎
+        <span
+          [style.color]="jimi_device_location?.accStatus == '0' ? 'var(--ion-color-danger)' : 'var(--ion-color-success)'">{{jimi_device_location?.accStatus
+          == '0' ? '停止' : '轉動中'}}</span>
+      </ng-container>
+    </ion-title>
+
+    <ng-container *ngIf="car_id != null && (admin_data | async)?.type != adminType.owner">
+      <!-- <ion-buttons slot="end"
+                *ngIf="(system_data$ | async) != undefined && (system_data$ | async) != null && ((system_data$ | async).favorite_car_id == undefined || (system_data$ | async).favorite_car_id == null || (system_data$ | async).favorite_car_id != car_id)">
+                <ion-button color="clear" fill="clear" (click)="setFavoriteCar(car_id)">
+                    <ion-icon slot="start" name="heart"></ion-icon>
+                    設定為最受歡迎車款
+                </ion-button>
+            </ion-buttons> -->
+
+      <ion-buttons slot="end"
+        *ngIf="readonly && auth.adminData.value != null && auth.adminData.value.type != adminType.buyer && auth.adminData.value.type != adminType.sales">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(car_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end"
+        *ngIf="readonly && auth.adminData.value != null && auth.adminData.value.type == adminType.admin">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; car_data = checking_car_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="car_id == null">
+      <ion-button fill="clear" (click)="createNewCar()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立汽車
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <input style="display: none" multiple type="file" #upload_img
+    accept="image/x-png,image/jpeg,application,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    (change)="uploadImg()" />
+
+  <div class="ion-margin" *ngIf="car_data != null">
+    <ion-grid>
+      <ion-row *ngIf="auth.adminData.value != null && auth.adminData.value.type != adminType.buyer && car_id != null">
+        <ion-col size="12">
+          <div *ngIf="car_data?.sold" class="sold-alert-div ion-padding">
+            <ion-icon name="warning"></ion-icon>
+            <h2>車輛已出售</h2>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+          <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+            [disabled]="(admin_data | async)?.type == adminType.pickup_dropoff"
+            (click)="commonService?.openCMSPage('/order?page=1&limit=10&sorting=null&direction=null&key_word=&status=&create_date_start=&create_date_end=&booking_date_start=&booking_date_end=&user_id=&car_id='+car_id, 'blank')">
+            <ion-icon slot="start" src="assets/icon/menu_order_selected.svg"></ion-icon>
+            租務紀錄
+          </ion-button>
+        </ion-col>
+        <!-- <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+            [disabled]="(admin_data | async)?.type == adminType.owner"
+            (click)="commonService?.openCMSPage('/favorite-car?car_id='+car_id, 'blank')">
+            <ion-icon slot="start" src="assets/icon/menu_user_selected.svg"></ion-icon>
+            有期通知
+          </ion-button>
+        </ion-col> -->
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+          <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+            [disabled]="(admin_data | async)?.type == adminType.owner"
+            (click)="commonService?.openCMSPage('/blocking?car_id='+car_id, 'blank')">
+            <ion-icon slot="start" src="assets/icon/menu_blocking_selected.svg"></ion-icon>
+            禁止預約
+          </ion-button>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+          <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+            [disabled]="(admin_data | async)?.type == adminType.owner"
+            (click)="commonService?.openCMSPage('/appointment?car_id='+car_id, 'blank')">
+            <ion-icon slot="start" src="assets/icon/menu_maintenance_selected.svg"></ion-icon>
+            維修紀錄
+          </ion-button>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+          <ion-button [disabled]="car_data?.dashcam_imei == ''" class="top-btn2" expand="block" fill="clear"
+            (click)="openJimiMap()">
+            <ion-icon slot="start" name="map-sharp"></ion-icon>
+            實時地圖
+          </ion-button>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <!-- <ion-button
+            [disabled]="car_data?.dashcam_imei == '' || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.dashcam_function))"
+            class="top-btn2" expand="block" fill="clear" (click)="openJimiSreaming(1)">
+            <ion-icon slot="start" name="videocam-sharp"></ion-icon>
+            實時行車記錄儀
+          </ion-button> -->
+        </ion-col>
+
+        <!-- <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <ion-button [disabled]="car_data?.dashcam_imei == ''" class="top-btn2" expand="block" fill="clear"
+                        (click)="openJimiSreaming(2)">
+                        <ion-icon slot="start" name="videocam-sharp"></ion-icon>
+                        過去行車記錄儀
+                    </ion-button>
+                </ion-col> -->
+      </ion-row>
+
+      <ion-row class="default-container" style="max-height: 400px; overflow: hidden;">
+        <ion-col size="12" class="ion-text-center"
+          *ngIf="car_data?.dashcam_imei != '' && (admin_data | async) && (admin_data | async)?.authority_list.includes(authority.dashcam_function)">
+          <iframe *ngIf="streaming_url != ''" [src]="streaming_url" width="900px" height="715px"
+            frameborder="0"></iframe>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                  <ion-label>封面圖片</ion-label>
+                </div>
+                <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('cover_img_url_list')" class="clickable"
+                  slot="start" name="cloud-upload"></ion-icon>
+              </div>
+              <div class="ion-text-center">
+                <ion-img class="fit-content cover-img" *ngIf="car_data.cover_img_url_list.length > 0"
+                  [src]="('media_url' | env)+car_data?.cover_img_url_list[0]">
+                </ion-img>
+              </div>
+            </ion-col>
+          </ion-row>
+          <br />
+
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-icon slot="start" src="assets/icon/document_dark.svg"></ion-icon>
+                <ion-label>文件</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #car_licence_expiry_date matInput [matDatepicker]="picker"
+                  (dateChange)="selectionDateChanged('car_licence_expiry_date', car_licence_expiry_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">行車證到期日</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.car_licence_expiry_date" type="text">
+                </ion-input>
+                <ion-icon *ngIf="car_data.car_licence_url != null && car_data.car_licence_url != ''"
+                  (click)="commonService.downloadMedia(car_data.car_licence_url, true)" slot="end" name="eye">
+                </ion-icon>
+                <ion-icon *ngIf="!readonly" slot="end" name="cloud-upload"
+                  (click)="triggerImgUpload('car_licence_url')"></ion-icon>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker">
+                </mat-datepicker-toggle>
+              </ion-item>
+
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #insurance_expiry_date matInput [matDatepicker]="picker2"
+                  (dateChange)="selectionDateChanged('insurance_expiry_date', insurance_expiry_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker2></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">保險到期日</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.insurance_expiry_date" type="text">
+                </ion-input>
+                <ion-icon *ngIf="car_data.insurance_url != null && car_data.insurance_url != ''"
+                  (click)="commonService.downloadMedia(car_data.insurance_url, true)" slot="end" name="eye">
+                </ion-icon>
+                <ion-icon *ngIf="!readonly" slot="end" name="cloud-upload" (click)="triggerImgUpload('insurance_url')">
+                </ion-icon>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker2">
+                </mat-datepicker-toggle>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #car_check_date matInput [matDatepicker]="picker3"
+                  (dateChange)="selectionDateChanged('car_check_date', car_check_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker3></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">驗車到期日</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.car_check_date" type="text"></ion-input>
+                <ion-icon *ngIf="car_data.car_check_url != null && car_data.car_check_url != ''"
+                  (click)="commonService.downloadMedia(car_data.car_check_url, true)" slot="end" name="eye">
+                </ion-icon>
+                <ion-icon *ngIf="!readonly" slot="end" name="cloud-upload" (click)="triggerImgUpload('car_check_url')">
+                </ion-icon>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker3">
+                </mat-datepicker-toggle>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #purchase_date matInput [matDatepicker]="picker4"
+                  (dateChange)="selectionDateChanged('purchase_date', purchase_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker4></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">車輛購買日期</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.purchase_date" type="text"></ion-input>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker4">
+                </mat-datepicker-toggle>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">車輛購入價</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.purchase_price" type="number"
+                  min="1"></ion-input>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #received_date matInput [matDatepicker]="picker5"
+                  (dateChange)="selectionDateChanged('received_date', received_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker5"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker5></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">車輪接收日期</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.received_date" type="text"></ion-input>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker5">
+                </mat-datepicker-toggle>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <mat-form-field appearance="outline" style="display: none">
+                <input #launched_date matInput [matDatepicker]="picker6"
+                  (dateChange)="selectionDateChanged('launched_date', launched_date)" />
+                <mat-datepicker-toggle matSuffix [for]="picker6"></mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker6></mat-datepicker>
+              </mat-form-field>
+
+              <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                button="false">
+                <ion-label position="stacked">車輪上架日期</ion-label>
+                <ion-input readonly [(ngModel)]="car_data.launched_date" type="text"></ion-input>
+                <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker6">
+                </mat-datepicker-toggle>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+            </ion-col>
+          </ion-row>
+          <br />
+
+
+          <ion-row class="default-container">
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+              <div class="title-with-icon">
+                <ion-icon slot="start" src="assets/icon/document_dark.svg"></ion-icon>
+                <ion-label>保險數據</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                <ion-label class="ion-text-wrap" position="stacked">保險類型</ion-label>
+                <ion-select [disabled]="readonly" [(ngModel)]="car_data.insurance_type" multiple="false" cancelText="取消"
+                  okText="確認">
+                  <ion-select-option [value]="insuranceType.third_party">三保</ion-select-option>
+                  <ion-select-option [value]="insuranceType.comprehensive">全保</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">自身車輛財物損毀自負額</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.own_damage" type="number">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">全車被盜自負額</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.theft_loss_excess" type="number">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">自身車輛財物損毀於停泊時自負額</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.parking_damage_excess" type="number">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">第三者財物損失自負額</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.third_party_property_excess" type="number">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">保費</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.premium" type="number">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+
+          </ion-row>
+          <br />
+
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                  <ion-label>其他圖片</ion-label>
+                </div>
+                <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('other_img_url_list')" class="clickable"
+                  slot="start" name="cloud-upload"></ion-icon>
+              </div>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'other_img_url_list')" disabled="false">
+                <ion-item class="img-item" lines="none" *ngFor="let item of car_data.other_img_url_list; let i = index">
+                  <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
+                  <img [src]="('media_url' | env)+item" />
+                  <ion-icon slot="end" *ngIf="!readonly" (click)="car_data.other_img_url_list.splice(i, 1)"
+                    color="danger" class="remove-icon" name="trash-outline"></ion-icon>
+                </ion-item>
+              </ion-reorder-group>
+            </ion-col>
+          </ion-row>
+
+          <br />
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                  <ion-label>有期可供預訂圖片</ion-label>
+                </div>
+                <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('ava_email_img_url')" class="clickable"
+                  slot="start" name="cloud-upload"></ion-icon>
+              </div>
+            </ion-col>
+
+            <!-- <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-item class="img-item" lines="none">
+                                <ion-img
+                                    *ngIf="car_data.ava_email_img_url!=undefined && car_data.ava_email_img_url!=null && car_data.ava_email_img_url!=''"
+                                    [src]="('media_url' | env)+car_data.ava_email_img_url">
+                                </ion-img>
+                                <ion-label
+                                    *ngIf="car_data.ava_email_img_url==undefined || car_data.ava_email_img_url == null || car_data.ava_email_img_url == ''">
+                                    沒有圖片</ion-label>
+                                <ion-icon slot="end" *ngIf="!readonly && car_data.ava_email_img_url != ''"
+                                    (click)="car_data.ava_email_img_url = '' " color="danger" class="remove-icon"
+                                    name="trash-outline"></ion-icon>
+                            </ion-item>
+                        </ion-col> -->
+          </ion-row>
+          <br />
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-label>如何操作</ion-label>
+              </div>
+
+              <div class="NgxEditor__Wrapper">
+                <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+                </ngx-editor-menu>
+                <ngx-editor [editor]="editor" [(ngModel)]="car_data.tutorial_html_content" [disabled]="readonly"
+                  [placeholder]="'編輯教學內容'">
+                </ngx-editor>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ng-container *ngIf="auth.adminData.value != null && auth.adminData.value.type == adminType.admin">
+            <ion-row class="default-container">
+              <ion-col size="12">
+                <div class="title-with-icon">
+                  <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon>
+                  <ion-label>收入支出</ion-label>
+                </div>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">租車收入</ion-label>
+                  <ion-input readonly [value]="car_data.accumulated_rental_income" type="number">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">保養支出</ion-label>
+                  <ion-input readonly [value]="car_data.accumulated_maintenance_cost" type="number">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item readonly" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">維修支出</ion-label>
+                  <ion-input readonly [value]="car_data.accumulated_repair_cost" type="number">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <br />
+            <ion-row class="default-container">
+              <ion-col size="12">
+                <div class="title-with-icon">
+                  <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon>
+                  <ion-label> 價錢 </ion-label>
+                </div>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">日租價錢</ion-label>
+                  <ion-input
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [readonly]="readonly" [(ngModel)]="car_data.price_per_day" type="number" min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">原價（可留空）</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.original_price_per_day"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    type="number" min="1">
+                  </ion-input>
+                </ion-item>
+                <ion-text *ngIf="!readonly" class="hint">此價錢用於顯示作用，不會用於任何訂單計算</ion-text>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">日租保險費百分比(1st Tier)</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.insurance_price_tier_one_percentage" type="number" min="1"
+                    max="100"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">日租保險費百分比(2nd Tier)</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.insurance_price_tier_two_percentage" type="number" min="1"
+                    max="100"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">按金</ion-label>
+                  <ion-input
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [readonly]="readonly" [(ngModel)]="car_data.deposit" type="number" min="1">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">先租後買價</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.rent_to_buy_price" type="number" min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">里程收費(per odometer)</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.price_per_odometer" type="number" min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">每月包里程</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.included_odometer_per_month" type="number"
+                    min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-row>
+                  <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12"></ion-col>
+                </ion-row>
+                <ng-container *ngFor="let item of car_data.offer_plan_list; let i = index;">
+                  <div class="plan-div">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label class="ion-text-wrap" position="stacked">日數(或以上)</ion-label>
+                      <ion-input
+                        [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                        [readonly]="readonly" [(ngModel)]="item.minimum_rental_days" type="number" min="1">
+                      </ion-input>
+                    </ion-item>
+                    &nbsp;&nbsp;
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label class="ion-text-wrap" position="stacked">價錢(每日)</ion-label>
+                      <ion-input
+                        [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                        [readonly]="readonly" [(ngModel)]="item.price_per_day" type="number" min="1"></ion-input>
+                    </ion-item>
+                    &nbsp;&nbsp;
+                    <ion-item class="input-item readonly" mode="md" lines="none" button="false">
+                      <ion-label class="ion-text-wrap" position="stacked">總價(每月)</ion-label>
+                      <ion-input readonly="true"
+                        [value]="(item.price_per_day * (item.minimum_rental_days >= 30 ? 30 : item.minimum_rental_days)) | currency:'HKD':'symbol-narrow':'1.0-1'">
+                      </ion-input>
+                    </ion-item>
+                  </div>
+                  <div class="plan-div" *ngIf="item.minimum_rental_days != null">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label class="ion-text-wrap" position="stacked">{{item.minimum_rental_days}}日保險費百分比(1st
+                        Tier)</ion-label>
+                      <ion-input [readonly]="readonly"
+                        [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                        [(ngModel)]="item.insurance_price_tier_one_percentage" type="number" min="1"
+                        max="100"></ion-input>
+                    </ion-item>
+                    &nbsp;&nbsp;
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label class="ion-text-wrap" position="stacked">{{item.minimum_rental_days}}日保險費百分比(2st
+                        Tier)</ion-label>
+                      <ion-input [readonly]="readonly"
+                        [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                        [(ngModel)]="item.insurance_price_tier_two_percentage" type="number" min="1"
+                        max="100"></ion-input>
+                    </ion-item>
+                    <ion-button *ngIf="!readonly" fill="clear" (click)="car_data.offer_plan_list.splice(i, 1)">
+                      <ion-icon color="danger" slot="icon-only" name="trash"></ion-icon>
+                    </ion-button>
+                    <!-- &nbsp;&nbsp;
+                                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md"
+                                            lines='none' button='false'>
+                                            <ion-label position="stacked">原價</ion-label>
+                                            <ion-input [readonly]="readonly" [(ngModel)]="item.original_price"
+                                                type="number" min="1"></ion-input>
+                                        </ion-item>
+                                        &nbsp;&nbsp;
+                                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md"
+                                            lines='none' button='false'>
+                                            <ion-label position="stacked">額外資料</ion-label>
+                                            <ion-input [readonly]="readonly" [(ngModel)]="item.info" type="text">
+                                            </ion-input>
+                                        </ion-item>
+                                        <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md"
+                                            lines='none' button='false'>
+                                            <ion-label>隱藏總價</ion-label>
+                                            <ion-toggle [disabled]="readonly" slot="end"
+                                                (ionChange)="item.hide_total = $event.detail.checked"
+                                                [checked]="item.hide_total"></ion-toggle>
+                                        </ion-item> -->
+                  </div>
+                </ng-container>
+                <ion-button *ngIf="!readonly" (click)="addOfferPlan()" color="secondary" expand="block" fill="clear"
+                  shape="round">
+                  新增租期計劃
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <br />
+            <ion-row class="default-container">
+              <ion-col size="12">
+                <div class="title-with-icon">
+                  <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                  <ion-label> 取還車地點／時間／租用日數 </ion-label>
+                </div>
+              </ion-col>
+              <!-- <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                    button='false'>
+                                    <ion-label position="stacked">默認取車點</ion-label>
+                                    <ion-select [disabled]="readonly" [(ngModel)]="car_data.last_return_parking_id"
+                                        multiple="false" cancelText="取消" okText="確認">
+                                        <ion-select-option value="null">沒有</ion-select-option>
+                                        <ion-select-option *ngFor="let item of (parking_data_list_of_car_rental_point$ | async)"
+                                            [value]="item.id">
+                                            {{item.zh_name}}
+                                        </ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                                <ion-text class="hint">此選項會成為客人租車時的預設交車地點</ion-text>
+                            </ion-col> -->
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap">keyless</ion-label>
+                  <ion-checkbox [disabled]="true" [checked]="car_data.keyless_type != ''" slot="end">
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">VIN</ion-label>
+                  <ion-input [readonly]="true" [(ngModel)]="car_data.vin" type="text"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">OBD number</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.obd_number" type="text"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">只限取車點</ion-label>
+                  <ion-select [disabled]="readonly"
+                    [value]="car_data.applicable_pickup_parking_id_list.length > 0 ? car_data.applicable_pickup_parking_id_list[0] : null"
+                    (ionChange)="handleDefaultPickupChange($event)" multiple="false" cancelText="取消" okText="確認">
+                    <ion-select-option value="">沒有</ion-select-option>
+                    <ion-select-option *ngFor="let item of (parking_data_list_of_car_rental_point$ | async)"
+                      [value]="item.id">
+                      {{item.zh_name}}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-text class="hint">*如不選將自動以上一張最近訂單還車點計算</ion-text>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">只限還車點</ion-label>
+                  <ion-select [disabled]="readonly" [(ngModel)]="car_data.applicable_return_parking_id_list"
+                    multiple="true" cancelText="取消" okText="確認">
+                    <ion-select-option *ngFor="let item of (parking_data_list_of_car_rental_point$ | async)"
+                      [value]="item.id">
+                      {{item.zh_name}}
+                    </ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-text class="hint">*如不選將全部租車點停車場(包括{{(parking_data_list_of_car_rental_point_name$
+                  | async).join(', ')}})</ion-text>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap">24小時取車還車</ion-label>
+                  <ion-checkbox [disabled]="readonly"
+                    [checked]="car_data.maximum_pick_time_to_allow_another_return != '' && car_data.maximum_return_time_to_allow_another_pickup != '' && car_data.starting_hour_to_allow_pickup != null && car_data.ending_hour_to_allow_return != null && car_data.minimun_hour_interval_between_pickup_return != null"
+                    (ionChange)="keylessPickupDropOffCheckboxChange($event)" slot="end">
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">最少租用日數</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.minimum_booking_days" type="number"
+                    min="1"></ion-input>
+                </ion-item>
+                <ion-text class="hint">*如只限長租，輸入30</ion-text>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">最多租用日數</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.maximum_booking_days" type="number"
+                    max="99999"></ion-input>
+                </ion-item>
+                <ion-text class="hint">*如只限短租，輸入29</ion-text>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">手機解鎖教學link(影片)</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.keyless_tutorial_video_url"
+                    type="text"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">手機解鎖教學link(網站文字)</ion-label>
+                  <ion-input [readonly]="readonly" [(ngModel)]="car_data.keyless_tutorial_website_url"
+                    type="text"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <br />
+          </ng-container>
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-icon slot="start" src="assets/icon/pan_dark.svg"></ion-icon>
+                <ion-label>車輛資料</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item readonly" mode="md" lines="none" button="false">
+                <ion-label position="stacked">ID</ion-label>
+                <ion-input readonly [value]="car_data.id" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label>可租用</ion-label>
+                <ion-toggle [disabled]="readonly" slot="end" (ionChange)="disabledChange($event)"
+                  [checked]="car_data.disabled == false"></ion-toggle>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label>已出售</ion-label>
+                <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="car_data.sold"></ion-toggle>
+              </ion-item>
+            </ion-col>
+            <!-- <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label>預租車輛</ion-label>
+                                <ion-toggle [disabled]="readonly" slot="end"
+                                    [(ngModel)]="car_data.prerent"></ion-toggle>
+                            </ion-item>
+                        </ion-col> -->
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label>待出售</ion-label>
+                <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="car_data.for_sale"></ion-toggle>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <mat-form-field class="full-width input-mat-form" [ngClass]="{'readonly': readonly}" appearance="outline"
+                floatLabel="auto">
+                <mat-label>目前位置(只用作員工參考)
+                  <span style="color: var(--ion-color-secondary)" *ngIf="car_data?.dashcam_imei != ''">(GPS定期更新)</span>
+                </mat-label>
+                <input type="text" [readonly]="true" matInput [(ngModel)]="car_data.current_location"
+                  [matAutocomplete]="auto" />
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let option of (all_parking_data_list$ | async)" [value]="option.zh_address">
+                    {{option.zh_address}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label>已登記Asgard Autocharge</ion-label>
+                <ion-toggle [disabled]="true" slot="end" [checked]="car_data.ev_mac_address != ''"></ion-toggle>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">App顯示排行(1-100)</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.index" type="number"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">型號</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.model" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">品牌</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.brand" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">引擎</ion-label>
+                <!-- <ion-input [readonly]="readonly" [(ngModel)]="car_data.engine" type="text"></ion-input> -->
+                <ion-select [disabled]="readonly" [(ngModel)]="car_data.engine" multiple="false" cancelText="取消"
+                  okText="確認">
+                  <ion-select-option value="diesel">柴油</ion-select-option>
+                  <ion-select-option value="hybrid">混合動力</ion-select-option>
+                  <ion-select-option value="electric">電動</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">車牌</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.plate" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">年份</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.year" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">顏色中文名</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.color_zh_name" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">顏色英文名</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.color_en_name" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item with-icon" style="z-index: 99" [ngClass]="{'readonly': readonly}" mode="md"
+                lines="none" button="false">
+                <ion-label position="stacked">顏色</ion-label>
+                <ion-input readonly="true" [(ngModel)]="car_data.color_code" type="text"></ion-input>
+                <ion-icon slot="end" [style.color]="car_data.color_code" cpPositionRelativeToArrow="true"
+                  cpOutputFormat="HEX" [(colorPicker)]="car_data.color_code" name="ellipse"></ion-icon>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">績航力</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.endurance" type="text">
+                </ion-input>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">801 KM</ion-text>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">坐位</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.seat" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">耗油量</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.fuel_consumption" type="text">
+                </ion-input>
+              </ion-item>
+              <ion-text *ngIf="!readonly" class="hint">0.6/km</ion-text>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">裝備</ion-label>
+                <!-- <ion-input [readonly]="readonly" [(ngModel)]="car_data.engine" type="text"></ion-input> -->
+                <ion-select [disabled]="readonly" [(ngModel)]="car_data.equipment_list" multiple="true" cancelText="取消"
+                  okText="確認">
+                  <ion-select-option value="手機充電">手機充電</ion-select-option>
+                  <ion-select-option value="泊車鏡頭">泊車鏡頭</ion-select-option>
+                  <ion-select-option value="行車紀錄儀">行車紀錄儀</ion-select-option>
+                  <ion-select-option value="安全汽袋">安全汽袋</ion-select-option>
+
+                  <ion-select-option value="Keyless Go">Keyless Go</ion-select-option>
+                  <ion-select-option value="巡航定速功能">巡航定速功能</ion-select-option>
+                  <ion-select-option value="藍芽語音功能">藍芽語音功能</ion-select-option>
+                  <ion-select-option value="LED日行燈">LED日行燈</ion-select-option>
+                  <ion-select-option value="電子恆溫冷氣">電子恆溫冷氣</ion-select-option>
+                  <ion-select-option value="雙電門">雙電門</ion-select-option>
+                  <ion-select-option value="電暖座">電暖座</ion-select-option>
+                  <ion-select-option value="電動記憶椅">電動記憶椅</ion-select-option>
+                  <ion-select-option value="電動天窗">電動天窗</ion-select-option>
+                  <ion-select-option value="自動泊車(輔助)">自動泊車(輔助)</ion-select-option>
+                  <ion-select-option value="泊車雷達感應">泊車雷達感應</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">車輛種類</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.category" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">引擎號碼</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.engine_number" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">氣缸容量</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.cc" type="number"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">底盤編號</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.chassis_number" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">登記號碼</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.register_number" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">輪胎尺寸</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.tire_size" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">輪胎牌子</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.tire_brand" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">輪胎型號</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.tire_model" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">租賃期開始時里程表讀數</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.odometer_value" type="text">
+                </ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">Hash Tag</ion-label>
+                <ion-select [disabled]="readonly" [(ngModel)]="car_data.hash_tag" multiple="true" cancelText="取消"
+                  okText="確認">
+                  <ion-select-option value="lantau_island">大嶼山租車自駕遊</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">首數</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.head" type="number"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                <ion-label position="stacked">Remark</ion-label>
+                <ion-input [readonly]="readonly" [(ngModel)]="car_data.remark" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+
+          </ion-row>
+          <br />
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                <ion-label>其他文件</ion-label>
+              </div>
+
+              <div class="other-doc-upload-div">
+                <ion-item class="input-item" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">文件名（可不輸入）</ion-label>
+                  <ion-input [(ngModel)]="other_doc_file_name" type="text"></ion-input>
+                </ion-item>
+                <ion-button *ngIf="!readonly" (click)="triggerImgUpload('other_doc_url_list')" slot="end"
+                  class="default-ion-btn" fill="clear">
+                  <ion-icon slot="start" name="cloud-download"></ion-icon>
+                  上載文件
+                </ion-button>
+                <input style="display: none" type="file" #upload_img accept="image/x-png,image/png,image/jpeg"
+                  (change)="uploadImg()" />
+              </div>
+              <br /><br />
+              <ion-item class="other-doc-item input-item" [ngClass]="{'readonly': readonly}" lines="none"
+                *ngFor="let item of car_data.other_doc_url_list; let i = index;">
+                <!-- <ion-label>{{item.name}}</ion-label> -->
+                <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name"></ion-input>
+                <ion-icon *ngIf="!readonly" class="delete-icon" (click)="car_data.other_doc_url_list.splice(i, 1)"
+                  name="trash" slot="end">
+                </ion-icon>
+                <ion-icon class="download-icon"
+                  (click)="commonService.downloadMedia(car_data.other_doc_url_list[i].url, true)" name="cloud-download"
+                  slot="end"></ion-icon>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+
+          <!-- <br>
+
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon>
+                <ion-label>先租後買</ion-label>
+              </div>
+            </ion-col>
+          </ion-row> -->
+        </ion-col>
+
+        <ion-col size="12">
+          <br />
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                  <ion-label>車輛狀態相片(取車／還車用)</ion-label>
+                </div>
+                <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('status_img_url_list')" class="clickable"
+                  slot="start" name="cloud-upload"></ion-icon>
+              </div>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'status_img_url_list')" disabled="false">
+                <ion-item class="img-item" lines="none"
+                  *ngFor="let item of car_data.status_img_url_list; let i = index">
+                  <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
+                  <img [src]="('media_url' | env)+item" />
+                  <ion-icon slot="end" *ngIf="!readonly" (click)="car_data.status_img_url_list.splice(i, 1)"
+                    color="danger" class="remove-icon" name="trash-outline"></ion-icon>
+                </ion-item>
+              </ion-reorder-group>
+            </ion-col>
+          </ion-row>
+          <br />
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                  <ion-label>原有破損位置(取車／還車用)</ion-label>
+                </div>
+                <ion-button *ngIf="!readonly" (click)="newCarDamage()" expand="block" fill="outline" shape="round">
+                  新增破損
+                </ion-button>
+              </div>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'car_damage_list')" disabled="false">
+                <ion-item class="img-item" lines="none" *ngFor="let item of car_data.car_damage_list; let i = index">
+                  <ng-container *ngIf="item?.category != null && item?.subcategory != null">
+                    <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
+                    <ion-label slot="start"
+                      class="ion-text-wrap">{{item?.category_name}}-{{item?.subcategory_name}}</ion-label>
+                    <!-- <img  *ngFor="let img of item.img_url_list" [src]="('media_url' | env)+img"> -->
+                    <app-gallery-slides *ngIf="item.img_url_list.length > 0" slot="start" [height]="300" [width]="300"
+                      [img_url_list]="item.img_url_list"></app-gallery-slides>
+                    <ion-icon *ngIf="!readonly" slot="end" (click)="triggerImgUpload('car_damage_list', i)"
+                      class="clickable" slot="start" name="cloud-upload"></ion-icon>
+                    <ion-icon *ngIf="!readonly" slot="end" (click)="car_data.car_damage_list.splice(i, 1)"
+                      color="danger" class="remove-icon" name="trash-outline"></ion-icon>
+                  </ng-container>
+                  <ng-container *ngIf="item?.category == null || item?.subcategory == null">
+                    <ion-select (ionChange)="damageCategoryChange(i)" [(ngModel)]="item.category" placeholder="選擇分類"
+                      multiple="false" cancelText="取消" okText="確認">
+                      <ion-select-option *ngFor="let a of carDamageCategory" [value]="a">
+                        {{'car_damage.'+a | translate}}
+                      </ion-select-option>
+                    </ion-select>
+                    <ion-select (ionChange)="damageSubcategoryChange(i)" [(ngModel)]="item.subcategory"
+                      placeholder="選擇子分類" multiple="false" cancelText="取消" okText="確認">
+                      <ion-select-option *ngFor="let b of subcategory_list" [value]="b">
+                        {{'car_damage.'+b | translate}}
+                      </ion-select-option>
+                    </ion-select>
+                  </ng-container>
+                </ion-item>
+              </ion-reorder-group>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+
+<!-- <ion-modal [isOpen]="isLiveStreamingModalOpen" (didDismiss)="onDidDismiss($event)" class="liveStreamingModal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button (click)="isLiveStreamingModalOpen = false">
+            <ion-icon slot="start" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <iframe *ngIf="streaming_url != ''" [src]="streaming_url" width="900px" height="715px" frameborder="0"></iframe>
+    </ion-content>
+  </ng-template>
+</ion-modal> -->
+
+<ion-modal [isOpen]="isHistoricalStreamingModalOpen" (didDismiss)="onDidDismiss($event)"
+  class="historicalStreamingModal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button (click)="isHistoricalStreamingModalOpen = false">
+            <ion-icon slot="start" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <iframe *ngIf="streaming_url != ''" [src]="streaming_url" width="1300px" height="715px" frameborder="0"></iframe>
+    </ion-content>
+  </ng-template>
+</ion-modal>

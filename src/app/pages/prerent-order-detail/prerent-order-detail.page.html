@@ -1,0 +1,233 @@
+<input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">全新車預約</ion-title>
+
+    <ng-container *ngIf="prerent_order_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(prerent_order_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true ; prerent_order_data = checking_prerent_order_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="prerent_order_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="23" size-lg="3" *ngIf="prerent_order_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="prerent_order_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="prerent_order_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+            <ion-input readonly [value]="prerent_order_data.create_date | date : 'yyyy-MM-dd HH:mm'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="prerent_order_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="prerent_order_data.disabled" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3"
+          *ngIf="prerent_order_data.user_id != null && user_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">用戶 (電話)</ion-label>
+            <ion-input readonly [value]="user_data.zh_full_name+ ' ('+user_data.phone+')'" type="text"></ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/user-detail?user_id='+user_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+        <ng-container *ngIf="prerent_order_data.user_id == null">
+          <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+            <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">姓名</ion-label>
+              <ion-input readonly [value]="prerent_order_data.full_name+' (' + prerent_order_data.call + ')'"
+                type="text"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+            <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+              <ion-input readonly [value]="prerent_order_data.phone" type="text"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+            <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+              <ion-input readonly [value]="prerent_order_data.email" type="text"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ng-container>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="prerent_order_data.prerent_car_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">車輛</ion-label>
+            <ion-input readonly
+              [value]="prerent_order_data.prerent_car_data.brand+' '+prerent_order_data.prerent_car_data.model+' ('+prerent_order_data.prerent_color_option.color_zh_name+')'"
+              type="text">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="prerent_order_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="prerent_order_data.status" multiple="false" cancelText="取消"
+              okText="確認">
+              <ion-select-option [value]="prerentOrderStatus.awaiting_payment">待付款</ion-select-option>
+              <ion-select-option [value]="prerentOrderStatus.awaiting_verification">審核中</ion-select-option>
+              <ion-select-option [value]="prerentOrderStatus.paid">已繳付</ion-select-option>
+              <ion-select-option [value]="prerentOrderStatus.cancelled">已取消</ion-select-option>
+              <ion-select-option [value]="prerentOrderStatus.completed">已完成</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">金額</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="prerent_order_data.amount" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">租約期</ion-label>
+            <ion-input readonly
+              [value]="(prerent_order_data.start_date | date : 'yyyy-MM-dd') + ' 至 ' + (prerent_order_data.end_date | date : 'yyyy-MM-dd')"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">計劃</ion-label>
+            <ion-input readonly
+              [value]="(prerent_order_data.prerent_plan_option.rental_days/30)+'個月 - ' + (prerent_order_data.prerent_plan_option.price_per_month | currency : 'HKD' :'symbol':'1.0-1') + '/月' "
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="prerent_order_data.remark" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="prerent_order_data.payment_method" multiple="false"
+              cancelText="取消" okText="確認">
+              <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="credit_card">信用卡</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="fps">FPS(AirWallex)</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="alipayhk">AlipayHK</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+          *ngIf="prerent_order_data.payment_method != null && prerent_order_data.payment_method != '' && prerent_order_data.payment_method == 'bank_transfer'">
+          <ion-button
+            *ngIf="prerent_order_data.payment_order_data != null && prerent_order_data.payment_order_data != ''"
+            download (click)="commonService?.openPage(prerent_order_data.payment_order_data, true, true)" expand="block"
+            fill="outline" shape="round" color="secondary">
+            下載轉帳證明
+          </ion-button>
+          <ion-img *ngIf="prerent_order_data.payment_order_data != null && prerent_order_data.payment_order_data != ''"
+            [src]="commonService.media_url()+prerent_order_data.payment_order_data"></ion-img>
+          <ion-button *ngIf="!readonly" expand="block" fill="outline" shape="round" color="secondary"
+            (click)="triggerImgUpload()">
+            上載轉帳證明
+          </ion-button>
+          <ion-button
+            *ngIf="!readonly && prerent_order_data.payment_order_data != null && prerent_order_data.payment_order_data != ''"
+            expand="block" fill="outline" shape="round" color="danger" (click)="removeImg()">
+            移除轉帳證明
+          </ion-button>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+          *ngIf="prerent_order_data.payment_method != null && prerent_order_data.payment_method != '' && (prerent_order_data.payment_method == 'credit_card' || prerent_order_data.payment_method == 'alipayhk') && prerent_order_data.payment_order_data != null && prerent_order_data.payment_order_data != ''">
+          <ion-item *ngIf="prerent_order_data?.payment_order_data?.receipt_url" class="input-item readonly" mode="md"
+            lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">stripe參考編號</ion-label>
+            <ion-input readonly [value]="prerent_order_data?.payment_order_data?.id" type="text"></ion-input>
+          </ion-item>
+          <ion-button *ngIf="prerent_order_data?.payment_order_data?.receipt_url"
+            (click)="commonService?.openPage(prerent_order_data.payment_order_data.receipt_url, true, false)"
+            expand="block" fill="outline" shape="round" color="secondary">
+            查看stripe收據
+          </ion-button>
+          <ion-button *ngIf="prerent_order_data?.payment_order_data?.charges?.data[0].receipt_url"
+            (click)="commonService?.openPage(prerent_order_data.payment_order_data.charges?.data[0].receipt_url, true, false)"
+            expand="block" fill="outline" shape="round" color="secondary">
+            查看stripe收據
+          </ion-button>
+          <ion-item *ngIf="prerent_order_data?.payment_order_data?.pspReference" class="input-item readonly"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+            <ion-input readonly [value]="prerent_order_data?.payment_order_data?.pspReference"
+              type="text"></ion-input>
+          </ion-item>
+          <ion-item *ngIf="prerent_order_data?.payment_order_data?.additionalData?.cardSummary"
+            class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+            <ion-input readonly
+              [value]="prerent_order_data?.payment_order_data?.additionalData?.cardSummary+' ('+prerent_order_data?.payment_order_data?.additionalData?.paymentMethod+')'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+          *ngIf="prerent_order_data.payment_method != null && prerent_order_data.payment_method != '' && (prerent_order_data.payment_method == 'fps' || prerent_order_data.payment_method == 'alipayhk') && !prerent_order_data.payment_order_data.hasOwnProperty('pspReference')">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+            <ion-input readonly [value]="prerent_order_data?.payment_order_data?.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

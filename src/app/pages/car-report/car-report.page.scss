@@ -1,0 +1,108 @@
+ion-content{
+    --background: var(--ion-color-medium-shade);
+}
+
+@media print {
+    body{
+        width: 21cm;
+        height: 29.7cm;
+   } 
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.pageA4 {
+    background-color: white;
+    width: 210mm;
+    height: 297mm;
+    margin: auto;
+    padding: 18mm 6mm;
+}
+.report-title-div{
+    padding-top: 4mm;
+    .report-title{
+        font-weight: 500;
+        font-size: 6mm;
+        span{
+            font-size: 5.5mm;
+            font-weight: 350;
+        }
+    }
+    .report-title-car{
+        font-weight: bolder;
+        font-size: 10mm;
+        margin-bottom: 4mm !important;
+
+    }
+    .divider{
+        height: 1mm;
+        background-color: black;
+        width: 100%;
+        margin-top: 6mm;
+    }
+}
+
+.top-part{
+    margin: 16mm 2mm;
+    .cost-of-good{
+        background-color: rgb(151 193 92);
+        border-radius: 3mm;
+        padding: 3mm;
+    }
+    .title{
+        color: white;
+        font-size: 10mm;
+        font-weight: 500;
+        // margin-bottom: 5mm !important;
+    }
+    .value{
+        font-size: 9mm;
+        font-weight: 500;
+    }
+}
+
+.launched-date{
+    font-size: 4mm;
+    font-weight: 500;
+}
+
+.bottom-part{
+ ion-col{
+    padding: 16mm 10mm;
+ }
+ .left{
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+ }
+ .right{
+    border-top: 1px solid black;
+    // border-left: 1px solid black;
+ }
+}
+
+table tr td {
+    height: auto;
+}
+th, td{
+    padding: 1mm 3mm;
+}
+table{
+    width: 100%;
+    border: 1px solid black;
+    th{
+        background-color: black;
+        color: rgb(151 193 92);
+        h1{
+            font-weight: 500;
+        }
+    }
+    td{
+        border: 1px solid black;
+        p{
+            font-size: 4.5mm;
+            font-weight: 400;
+        }
+    }
+}

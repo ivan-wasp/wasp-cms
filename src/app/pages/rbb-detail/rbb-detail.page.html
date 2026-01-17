@@ -1,0 +1,658 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">{{car_data?.plate}}</ion-title>
+
+        <ng-container *ngIf="rbb_id != null">
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(rbb_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; rbb_data = checking_rbb_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="rbb_id == null">
+            <ion-button fill="clear" (click)="createNewRbb()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                新增先租後買
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <input style="display: none;" type="file" #upload_img
+        accept="image/x-png,image/jpeg,application,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="rbb_data != null">
+        <ion-grid>
+            <ion-row>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-two-icon">
+                                <div class="">
+                                    <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
+                                    <ion-label>先租後買計劃</ion-label>
+                                </div>
+                            </div>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                            *ngIf="rbb_id == null || rbb_id == ''">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">選擇訂單</ion-label>
+                                <ionic-selectable (onSearch)="searchOrder($event)" [disabled]="readonly"
+                                    [(ngModel)]="rbb_data.order_id" itemValueField="id" shouldStoreItemValue="id"
+                                    itemTextField="plate" [items]="all_rendering_order_data_list" [canClear]="true"
+                                    [canSearch]="true" [isMultiple]="false" confirmButtonText="確認"
+                                    clearButtonText="全部反選" closeButtonText="取消" (onChange)="orderChange($event)"
+                                    [hasVirtualScroll]="true">
+                                    <ng-template ionicSelectableItemTemplate let-port="item"
+                                        let-isPortSelected="isItemSelected">
+                                        {{port.user_zh_full_name}} {{port.user_phone}} ； {{port.brand}} {{port.model}}
+                                        ({{port.plate}}) ； {{port.start_date}}至{{port.end_date}}
+                                    </ng-template>
+                                    <ng-template ionicSelectableValueTemplate let-ports="item">
+                                        {{getOrderDataById(rbb_data.order_id)?.plate}}
+                                    </ng-template>
+                                </ionic-selectable>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                            *ngIf="rbb_id == null || rbb_id == ''">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">選擇車輛（必選）</ion-label>
+                                <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+                                    [(ngModel)]="rbb_data.car_id" itemValueField="id" shouldStoreItemValue="id"
+                                    itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true"
+                                    [canSearch]="true" [isMultiple]="false" confirmButtonText="確認"
+                                    clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true" (onChange)="carChange($event)"> 
+                                    <ng-template ionicSelectableItemTemplate let-port="item"
+                                        let-isPortSelected="isItemSelected">
+                                        {{port.model}} - {{port.plate}}
+                                    </ng-template>
+                                    <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                        let-isPortSelected="isItemSelected">
+                                        <img class="select-end-img"
+                                            [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                                    </ng-template>
+                                    <ng-template ionicSelectableValueTemplate let-ports="item">
+                                        {{getCarDataById(rbb_data.car_id)?.plate}}
+                                        ({{getCarDataById(rbb_data.car_id)?.model}})
+                                    </ng-template>
+
+                                </ionic-selectable>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="rbb_id != null">
+                            <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">編號</ion-label>
+                                <ion-input readonly [value]="rbb_data.id" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">Active</ion-label>
+                                <ion-toggle [disabled]="readonly" slot="end" (ionChange)="disabledChange($event)"
+                                    [checked]="rbb_data.disabled == false"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="rbb_id != null">
+                            <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+                                <ion-input readonly value="{{rbb_data.create_date | date: 'yyyy-MM-dd'}}"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車價</ion-label>
+                                <ion-input [readonly]="readonly" min="0" [(ngModel)]="rbb_data.car_price"
+                                    type="number"></ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">計劃(由客人選擇)</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.plan" multiple="false"
+                                    cancelText="取消" okText="確認">
+                                    <ion-select-option value="cash">現金</ion-select-option>
+                                    <ion-select-option value="loan">免審批貸款</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">期數</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.mortgage_period"
+                                    (ionChange)="periodChange()" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option value="36">36</ion-select-option>
+                                    <ion-select-option value="48">48</ion-select-option>
+                                    <ion-select-option value="60">60</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                        <!-- <ng-container > -->
+                        <ion-col *ngFor="let ir of rbb_data.mortgage_period; let i = index" size-xs="12" size-sm="6"
+                            size-md="4" size-lg="4">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">
+                                    {{rbb_data.mortgage_period[i]}}期利率
+                                    <ng-container
+                                        *ngIf="rbb_data.interest_rate[i] != null && rbb_data.interest_rate[i] != ''">
+                                        {{rbb_data.interest_rate[i]}}%
+                                    </ng-container>
+                                </ion-label>
+                                <ion-input [readonly]="readonly" min="0" max="100"
+                                    [(ngModel)]="rbb_data.interest_rate[i]" type="number"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <!-- </ng-container> -->
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="rbb_id != null">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">客人已選期數</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.selected_mortgage_period"
+                                    multiple="false" cancelText="取消" okText="確認">
+                                    <ion-select-option value="36">36</ion-select-option>
+                                    <ion-select-option value="48">48</ion-select-option>
+                                    <ion-select-option value="60">60</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">首數折扣</ion-label>
+                                <ion-toggle [disabled]="readonly" slot="end"
+                                    [(ngModel)]="rbb_data.first_payment_discount"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                            *ngIf="rbb_data.first_payment_discount == true">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">折扣</ion-label>
+                                <ion-select [disabled]="readonly"
+                                    [(ngModel)]="rbb_data.first_payment_discount_percentage" multiple="false"
+                                    cancelText="取消" okText="確認">
+                                    <ion-select-option value="5">5%</ion-select-option>
+                                    <ion-select-option value="10">10%</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">Hybrid Care</ion-label>
+                                <ion-toggle [disabled]="readonly" slot="end"
+                                    [(ngModel)]="rbb_data.hybrid_care"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="rbb_data.hybrid_care == true">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">Hybrid Care 價錢</ion-label>
+                                <ion-input [readonly]="readonly" min="0" [(ngModel)]="rbb_data.hybrid_care_amount"
+                                    type="number"></ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="rbb_id != null">
+                            <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap">客人加購Hybrid Care</ion-label>
+                                <ion-toggle [disabled]="readonly" slot="end"
+                                    [(ngModel)]="rbb_data.purchase_hybrid_care"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+
+
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.status" multiple="false"
+                                    cancelText="取消" okText="確認">
+                                    <ion-select-option value="awaiting_application">未申請</ion-select-option>
+                                    <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+                                    <ion-select-option value="approved">已批核</ion-select-option>
+                                    <ion-select-option value="rejected">拒絕審批</ion-select-option>
+                                    <ion-select-option value="missing_documentation">待補交文件</ion-select-option>
+                                    <ion-select-option value="pending">待取文件</ion-select-option>
+                                    <ion-select-option value="completed">完成交易</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">設備</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.equipment_id_list"
+                                    multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option [value]="item.id"
+                                        *ngFor="let item of all_rbb_equipment_data_list">{{item?.zh_name}}
+                                        (${{item?.price}})</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngIf="rbb_id != null">
+                            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                                button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">客人加購的設備</ion-label>
+                                <ion-select [disabled]="readonly" [(ngModel)]="rbb_data.selected_equipment_id_list"
+                                    multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option [value]="item.id"
+                                        *ngFor="let item of all_rbb_equipment_data_list">{{item?.zh_name}}
+                                        (${{item?.price}})</ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container" *ngIf="car_data != null">
+                        <ion-col size="12">
+                            <div class="title-with-two-icon">
+                                <div class="">
+                                    <ion-icon slot="start" src="assets/icon/pan_dark.svg"></ion-icon>
+                                    <ion-label>計劃車輛</ion-label>
+                                </div>
+                            </div>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="4" size-md="4" size-lg="4">
+                            <ion-img class="fit-content cover-img" *ngIf="car_data.cover_img_url_list.length > 0"
+                                [src]="('media_url' | env)+car_data?.cover_img_url_list[0]"></ion-img>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="8" size-md="8" size-lg="8">
+                            <ion-row>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">車輛編號</ion-label>
+                                        <ion-input readonly [value]="car_data?.id" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">型號</ion-label>
+                                        <ion-input readonly [value]="car_data?.model" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">品牌</ion-label>
+                                        <ion-input readonly [value]="car_data?.brand" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">引撆</ion-label>
+                                        <ion-input *ngIf="car_data.engine == 'hybrid'" readonly value="混合動力"
+                                            type="text">
+                                        </ion-input>
+                                        <ion-input *ngIf="car_data.engine == 'diesel'" readonly value="柴油" type="text">
+                                        </ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">車牌</ion-label>
+                                        <ion-input readonly [value]="car_data?.plate" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">年份</ion-label>
+                                        <ion-input readonly [value]="car_data?.year" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">顏色</ion-label>
+                                        <ion-input readonly [value]="car_data.color_code" type="text"></ion-input>
+                                        <ion-icon slot="end" [style.color]="car_data.color_code"
+                                            name="ellipse"></ion-icon>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">顏色名稱</ion-label>
+                                        <ion-input readonly [value]="car_data?.color_zh_name" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                            </ion-row>
+                        </ion-col>
+                    </ion-row>
+
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="user_data != null">
+                    <mat-accordion>
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    <div class="title-with-two-icon" style="margin-bottom: 0;">
+                                        <div class="">
+                                            <ion-icon slot="start" src="assets/icon/menu_user.svg"></ion-icon>
+                                            <ion-label>租用人資料</ion-label>
+                                        </div>
+                                    </div>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <ion-row>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">用戶編號</ion-label>
+                                        <ion-input readonly [value]="user_data?.id" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">用戶名稱</ion-label>
+                                        <ion-input readonly [value]="user_data?.username" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">中文全名</ion-label>
+                                        <ion-input readonly [value]="user_data?.zh_full_name" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">英文全名</ion-label>
+                                        <ion-input readonly [value]="user_data?.en_full_name" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                                        <ion-input readonly [value]="user_data?.email" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                                        <ion-input readonly [value]="user_data?.phone" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">身份證號碼</ion-label>
+                                        <ion-input readonly [value]="user_data?.identity_number"
+                                            type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                            </ion-row>
+
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                    *ngIf="rbb_data.status != 'awaiting_application'">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-icon slot="start" src="assets/icon/folder_dark.svg"></ion-icon>
+                                <ion-label>訂購單</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size="6">
+                            <ion-button class="default-ion-btn" fill="clear" expand="block"
+                                [disabled]="rbb_data.rbb_confirm_url == undefined || rbb_data.rbb_confirm_url == null || rbb_data.rbb_confirm_url == ''"
+                                (click)="commonService?.openPage(rbb_data.rbb_confirm_url, true, true)">
+                                查看
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size="6">
+                            <ion-button class="default-ion-btn" fill="clear" expand="block" (click)="generateConfirm()">
+                                產生
+                            </ion-button>
+                        </ion-col>
+
+                    </ion-row>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                    *ngIf="rbb_data.status == 'awaiting_verification' || rbb_data.status == 'approved' || rbb_data.status == 'pending' || rbb_data.status == 'completed'">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-icon slot="start" src="assets/icon/folder_dark.svg"></ion-icon>
+                                <ion-label>買賣協議</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size="6">
+                            <ion-button class="default-ion-btn" fill="clear" expand="block"
+                                [disabled]="rbb_data.rbb_agreement_url == undefined || rbb_data.rbb_agreement_url == null || rbb_data.rbb_agreement_url == ''"
+                                (click)="commonService?.openPage(rbb_data.rbb_agreement_url, true, true)">
+                                查看
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size="6">
+                            <ion-button class="default-ion-btn" fill="clear" expand="block"
+                                (click)="generateAgreement()">
+                                產生
+                            </ion-button>
+                        </ion-col>
+
+                    </ion-row>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="user_data != null">
+                    <mat-accordion>
+                        <mat-expansion-panel [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    <div class="title-with-two-icon" style="margin-bottom: 0;">
+                                        <div class="">
+                                            <ion-icon slot="start" src="assets/icon/insurance_dark.svg"></ion-icon>
+                                            <ion-label>上載文件</ion-label>
+                                        </div>
+                                    </div>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <ion-row>
+
+                                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                                    *ngIf="user_data.call == 'Company'">
+                                    <ion-button *ngIf="user_data.br_url != null && user_data.br_url != ''"
+                                        (click)="commonService.downloadMedia(user_data.br_url, true)" expand="block"
+                                        fill="outline" shape="round" color="secondary">
+                                        查看BR副本
+                                    </ion-button>
+                                    <ion-button *ngIf="!readonly && user_data.br_url != null && user_data.br_url != ''"
+                                        (click)="user_data.br_url = ''" expand="block" fill="outline" shape="round"
+                                        color="danger">
+                                        移除BR副本
+                                    </ion-button>
+                                    <ion-img *ngIf="user_data.br_url != null && user_data.br_url != ''"
+                                        [src]="commonService.media_url()+user_data.br_url"></ion-img>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                    <ion-button
+                                        *ngIf="user_data.identity_card_url != null && user_data.identity_card_url != ''"
+                                        (click)="commonService.downloadMedia(user_data.identity_card_url, true)"
+                                        expand="block" fill="outline" shape="round" color="secondary">
+                                        查看身份證副本
+                                    </ion-button>
+                                    <ion-button
+                                        *ngIf="!readonly && user_data.identity_card_url != null && user_data.identity_card_url != ''"
+                                        (click)="user_data.identity_card_url = ''" expand="block" fill="outline"
+                                        shape="round" color="danger">
+                                        移除身份證副本
+                                    </ion-button>
+                                    <ion-img
+                                        *ngIf="user_data.identity_card_url != null && user_data.identity_card_url != ''"
+                                        [src]="commonService.media_url()+user_data.identity_card_url"></ion-img>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                    <ion-button
+                                        *ngIf="user_data.driving_license_url != null && user_data.driving_license_url != ''"
+                                        (click)="commonService.downloadMedia(user_data.driving_license_url, true)"
+                                        expand="block" fill="outline" shape="round" color="secondary">
+                                        查看駕駛執照
+                                    </ion-button>
+                                    <ion-button
+                                        *ngIf="!readonly && user_data.driving_license_url != null && user_data.driving_license_url != ''"
+                                        (click)="user_data.driving_license_url = ''" expand="block" fill="outline"
+                                        shape="round" color="danger">
+                                        移除駕駛執照
+                                    </ion-button>
+                                    <ion-img
+                                        *ngIf="user_data.driving_license_url != null && user_data.driving_license_url != ''"
+                                        [src]="commonService.media_url()+user_data.driving_license_url"></ion-img>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                    <ion-button
+                                        *ngIf="user_data.address_proof_url != null && user_data.address_proof_url != ''"
+                                        (click)="commonService.downloadMedia(user_data.address_proof_url, true)"
+                                        expand="block" fill="outline" shape="round" color="secondary">
+                                        查看住址證明
+                                    </ion-button>
+                                    <ion-button
+                                        *ngIf="!readonly && user_data.address_proof_url != null && user_data.address_proof_url != ''"
+                                        (click)="user_data.address_proof_url = ''" expand="block" fill="outline"
+                                        shape="round" color="danger">
+                                        移除住址證明
+                                    </ion-button>
+                                    <ion-img
+                                        *ngIf="user_data.address_proof_url != null && user_data.address_proof_url != ''"
+                                        [src]="commonService.media_url()+user_data.address_proof_url"></ion-img>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                    <ion-button
+                                        *ngIf="user_data.income_certificate_url != null && user_data.income_certificate_url != ''"
+                                        (click)="commonService.downloadMedia(user_data.income_certificate_url, true)"
+                                        expand="block" fill="outline" shape="round" color="secondary">
+                                        查看入息證明
+                                    </ion-button>
+                                    <ion-button
+                                        *ngIf="!readonly && user_data.income_certificate_url != null && user_data.income_certificate_url != ''"
+                                        (click)="user_data.income_certificate_url = ''" expand="block" fill="outline"
+                                        shape="round" color="danger">
+                                        移除入息證明
+                                    </ion-button>
+                                    <ion-img
+                                        *ngIf="user_data.income_certificate_url != null && user_data.income_certificate_url != ''"
+                                        [src]="commonService.media_url()+user_data.income_certificate_url"></ion-img>
+                                </ion-col>
+                            </ion-row>
+
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-icon slot="start" src="assets/icon/folder_dark.svg"></ion-icon>
+                                <ion-label>其他文件</ion-label>
+                            </div>
+
+                            <div class="other-doc-upload-div">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">文件名（可不輸入）</ion-label>
+                                    <ion-input [(ngModel)]="other_doc_file_name" type="text"></ion-input>
+                                </ion-item>
+                                <ion-button *ngIf="!readonly" (click)="triggerImgUpload('other_doc_url_list')"
+                                    slot="end" class="default-ion-btn" fill="clear">
+                                    <ion-icon slot="start" name="cloud-download"></ion-icon>
+                                    上載文件
+                                </ion-button>
+                                <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                                    (change)="uploadImg()">
+                            </div>
+                            <br><br>
+                            <ion-item class="other-doc-item  input-item" [ngClass]="{'readonly': readonly}" lines="none"
+                                *ngFor="let item of rbb_data.other_doc_url_list; let i = index;">
+                                <!-- <ion-label>{{item.name}}</ion-label> -->
+                                <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name"></ion-input>
+                                <ion-icon *ngIf="!readonly" class="delete-icon"
+                                    (click)="rbb_data.other_doc_url_list.splice(i, 1)" name="trash" slot="end">
+                                </ion-icon>
+                                <ion-icon class="download-icon"
+                                    (click)="commonService.downloadMedia(rbb_data.other_doc_url_list[i].url, true)"
+                                    name="cloud-download" slot="end"></ion-icon>
+                            </ion-item>
+
+                        </ion-col>
+
+                    </ion-row>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngIf="rbb_payment_data != null">
+                    <app-rbb-payment class="full-width" [rbb_payment_id]="rbb_payment_data?.id"></app-rbb-payment>
+                </ion-col>
+
+            </ion-row>
+
+            <!-- <ion-row *ngIf="rbb_data.payment_data_list != null">
+        <ion-col size="12">
+          <ion-slides mode="ios" pager="ios" scrollbar="ios">
+            <ion-slide *ngFor="let item of rbb_data.payment_id_list">
+              <app-payment-slider class="full-width" [payment_id]="item"></app-payment-slider>
+            </ion-slide>
+          </ion-slides>
+        </ion-col>
+      </ion-row> -->
+
+        </ion-grid>
+    </div>
+</ion-content>

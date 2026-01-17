@@ -1,0 +1,13 @@
+{
+  "appId": "com.wasphk.cms",
+  "appName": "黃蜂租車 CMS",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}

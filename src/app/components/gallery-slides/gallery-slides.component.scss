@@ -1,0 +1,12 @@
+.container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.back-btn, .next-btn{
+    font-size: 40px;
+    cursor: pointer;
+}
+ion-slides{
+    width: 80%;
+}

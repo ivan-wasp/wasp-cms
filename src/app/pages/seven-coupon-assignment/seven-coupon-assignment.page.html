@@ -1,0 +1,114 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <!-- <ion-title class="hidden-xs-down" *ngIf="not_distributed_quantity != null">可派發coupon數量：{{not_distributed_quantity}}</ion-title> -->
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <div class="ion-margin">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">現金券類型</ion-label>
+            <ion-select (ionChange)="sevenCouponTypeChange()" multiple="false" cancelText="取消" okText="確認" [(ngModel)]="seven_coupon_type">
+              <ion-select-option [value]="sevenCouponType.seven_eleven">7-11 現金券</ion-select-option>
+              <ion-select-option [value]="sevenCouponType.islet_coffee_lab">Islet Coffee Lab 現金券</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <br>
+          <ion-item class="input-item" mode="md" lines='none' button='false' *ngIf="not_distributed_coupon_list != null && seven_coupon_type == sevenCouponType.seven_eleven">
+            <ion-label position="stacked">派發面值</ion-label>
+            <ion-select multiple="false" cancelText="取消" okText="確認" [(ngModel)]="amount">
+              <!-- <ion-select-option value="null" *ngIf="not_distributed_coupon_list?.length <= 0">沒有可派發的現金券</ion-select-option> -->
+              <ion-select-option *ngFor="let item of not_distributed_coupon_list" [value]="item.amount">${{item.amount}}
+                (可派發{{item?.quantity}}張)
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <br>
+          <ng-container *ngIf="(seven_coupon_type == sevenCouponType.seven_eleven && amount != null) || seven_coupon_type == sevenCouponType.islet_coffee_lab">
+            <ion-button color="dark" (click)="selected_user_id_list = having_deposit_user_id_list" fill="solid"
+              expand="block">
+              選擇按金客戶
+            </ion-button>
+            <br>
+            <ion-item class="input-item" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap">選擇派發的用戶（必選）</ion-label>
+              <ionic-selectable #portComponent (onSearch)="commonService?.searchUser($event)"
+                [(ngModel)]="selected_user_id_list" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate"
+                [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="true"
+                confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                  {{port?.zh_full_name || port?.username}} - {{port?.phone}}
+                </ng-template>
+                <ng-template ionicSelectableValueTemplate let-ports="item">
+
+                  <ng-container *ngIf="selected_user_id_list.length <= 10">
+                    <div class="ionic-selectable-value-item" *ngFor="let port of selected_user_id_list;  let i=index;">
+                      {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username}} -
+                      {{getUserDataById(port)?.phone}}
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="selected_user_id_list.length > 10">
+                    已選取{{selected_user_id_list.length}}個用戶
+                  </ng-container>
+                </ng-template>
+                <ng-template ionicSelectableFooterTemplate>
+                  <ion-toolbar>
+                    <ion-row>
+                      <ion-col *ngIf="portComponent.canClear">
+                        <ion-button color="secondary" [disabled]="!portComponent.itemsToConfirm.length"
+                          (click)="clear()" expand="block" fill="outline" shape="round">
+                          全部反選
+                        </ion-button>
+                      </ion-col>
+                      <ion-col>
+                        <ion-button color="secondary" (click)="selectAll()" expand="block" fill="outline" shape="round">
+                          全選
+                        </ion-button>
+                      </ion-col>
+                      <ion-col>
+                        <ion-button color="secondary" (click)="confirm()" expand="block" fill="outline" shape="round">
+                          確認
+                        </ion-button>
+                      </ion-col>
+                    </ion-row>
+                  </ion-toolbar>
+                </ng-template>
+              </ionic-selectable>
+            </ion-item>
+            <br>
+            <ion-item class="input-item" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">派發數量</ion-label>
+              <ion-input [(ngModel)]="quantity" max="" type="text"></ion-input>
+            </ion-item>
+            <br>
+            <ion-button *ngIf="not_distributed_coupon_list" color="tertiary"
+              [disabled]="selected_user_id_list.length <= 0 || quantity <= 0 || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+              expand="block" (click)="distributeCouponByUserIdsAndQantity()" fill="solid">
+              派發
+            </ion-button>
+          </ng-container>
+
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+          <div *ngIf="selected_user_id_list.length > 10">
+            <ion-item *ngFor="let item of selected_user_id_list">
+              <ion-label>{{getUserDataById(item)?.zh_full_name || getUserDataById(item)?.username}} -
+                {{getUserDataById(item)?.phone}}</ion-label>
+            </ion-item>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+</ion-content>

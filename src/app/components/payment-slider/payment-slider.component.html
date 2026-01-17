@@ -1,0 +1,571 @@
+<input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+<div style="margin: 4px;" *ngIf="payment_data != null">
+    <ion-row class="full-width">
+        <ion-col class="ion-no-padding" *ngIf="payment_id != null" size-xs="12" size-sm="12" size-md="6" size-lg="6">
+            <ion-row class="default-container">
+                <ion-col class="ion-no-padding" size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
+                            <ion-label>帳單詳情</ion-label>
+                        </div>
+                        <div
+                            *ngIf="((admin_data | async) != null && (admin_data | async)?.type == adminType.admin)">
+                            <ion-button fill="clear" (click)="readonly = false" *ngIf="readonly">
+                                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                                <ion-text color="secondary">修改</ion-text>
+                            </ion-button>
+                            <ion-button fill="clear" (click)="resetEdit()" *ngIf="!readonly">
+                                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                                <ion-text color="secondary">取消修改</ion-text>
+                            </ion-button>
+                            <ion-button fill="clear" (click)="updatePaymentData()" *ngIf="!readonly">
+                                <ion-icon slot="start" name="save"></ion-icon>
+                                <ion-text color="secondary">儲存</ion-text>
+                            </ion-button>
+                        </div>
+
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+                    <ion-button class="default-ion-btn" fill="clear" expand="block"
+                        [disabled]="payment_data.invoice_url == null || payment_data.invoice_url == ''"
+                        (click)="commonService?.openPage(payment_data.invoice_url, true, true)">
+                        查看Invoice
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+                    <ion-button (click)="generateInvoice()" class="default-ion-btn" fill="clear" expand="block">
+                        產生Invoice
+                    </ion-button>
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">帳單編號</ion-label>
+                        <ion-input readonly [value]="payment_data?.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+                        <ion-input readonly [value]="payment_data.create_date | date : 'yyyy-MM-dd HH:mm'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">參考編號</ion-label>
+                        <ion-input readonly [value]="payment_data?.reference_number" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <!-- <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">帳單租金期</ion-label>
+            <ion-input readonly [value]="payment_data?.booking_date_list.length" type="text"></ion-input>
+          </ion-item>
+        </ion-col> -->
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">繳費到期日</ion-label>
+                        <ion-input readonly [value]="payment_data?.expiry_date" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">可使用折扣優惠</ion-label>
+                        <ion-checkbox
+                            [disabled]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                            [(ngModel)]="payment_data.allow_discount" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <!-- <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+          *ngIf="payment_data.payment_method != null && payment_data.payment_method != ''">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+            <ion-input *ngIf="payment_data.payment_method == 'bank_transfer'" readonly value="銀行轉帳" type="text">
+            </ion-input>
+            <ion-input *ngIf="payment_data.payment_method == 'credit_card'" readonly value="信用卡" type="text">
+            </ion-input>
+          </ion-item>
+        </ion-col> -->
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+                        <ion-select [(ngModel)]="payment_data.payment_method" multiple="false"
+                            [disabled]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+                            <ion-select-option [disabled]="true" value="credit_card">信用卡</ion-select-option>
+                            <ion-select-option [disabled]="true" value="fps">FPS(AirWallex)</ion-select-option>
+                            <ion-select-option [disabled]="true" value="alipayhk">AlipayHK</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && payment_data.payment_method == 'bank_transfer'">
+                    <ion-button *ngIf="payment_data.payment_order_data != null && payment_data.payment_order_data != ''"
+                        download (click)="commonService?.openPage(payment_data.payment_order_data, true, true)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        下載轉帳證明
+                    </ion-button>
+                    <ion-img *ngIf="payment_data.payment_order_data != null && payment_data.payment_order_data != ''"
+                        [src]="commonService.media_url()+payment_data.payment_order_data"></ion-img>
+                    <ion-button *ngIf="!readonly" expand="block" fill="outline" shape="round" color="secondary"
+                        (click)="triggerImgUpload()">
+                        上載轉帳證明
+                    </ion-button>
+                    <ion-button
+                        *ngIf="!readonly && payment_data.payment_order_data != null && payment_data.payment_order_data != ''"
+                        expand="block" fill="outline" shape="round" color="danger" (click)="removeImg(payment_data)">
+                        移除轉帳證明
+                    </ion-button>
+                </ion-col>
+                <!-- receipt_url -->
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && (payment_data.payment_method == 'credit_card' || payment_data.payment_method == 'alipayhk') && payment_data.payment_order_data != null && payment_data.payment_order_data != ''">
+                    <ion-item *ngIf="payment_data?.payment_order_data?.receipt_url" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">stripe參考編號</ion-label>
+                        <ion-input readonly [value]="payment_data?.payment_order_data?.id" type="text"></ion-input>
+                    </ion-item>
+                    <!-- old stripe api -->
+                    <ion-button *ngIf="payment_data?.payment_order_data?.receipt_url"
+                        (click)="commonService?.openPage(payment_data.payment_order_data.receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <!-- new stripe api -->
+                    <ion-button *ngIf="payment_data?.payment_order_data?.charges?.data[0].receipt_url"
+                        (click)="commonService?.openPage(payment_data.payment_order_data.charges.data[0].receipt_url, true, false)"
+                        expand="block" fill="outline" shape="round" color="secondary">
+                        查看stripe收據
+                    </ion-button>
+                    <!-- adyen api -->
+                    <ion-item *ngIf="payment_data?.payment_order_data?.pspReference" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+                        <ion-input readonly [value]="payment_data?.payment_order_data?.pspReference" type="text"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="payment_data?.payment_order_data?.additionalData?.cardSummary" class="input-item readonly"
+                        mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+                        <ion-input readonly [value]="payment_data?.payment_order_data?.additionalData?.cardSummary+' ('+payment_data?.payment_order_data?.additionalData?.paymentMethod+')'" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ng-container
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && (payment_data.payment_method == 'fps' || payment_data.payment_method == 'alipayhk') && !payment_data.payment_order_data.hasOwnProperty('pspReference')">
+                    <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                        <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+                            <ion-input readonly [value]="payment_data?.payment_order_data?.id" type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                            <ion-input readonly
+                                [value]="payment_data.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">帳單狀態</ion-label>
+                            <ion-select
+                                [disabled]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                                [(ngModel)]="payment_data.status" multiple="false" cancelText="取消" okText="確認">
+                                <ion-select-option value="cancelled">已取消</ion-select-option>
+                                <ion-select-option value="awaiting_payment">未付款</ion-select-option>
+                                <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+                                <ion-select-option value="paid">已繳付</ion-select-option>
+                            </ion-select>
+                        </ion-item>
+                        <ion-text color="secondary" class="hint"
+                            *ngIf="!readonly">1.續約單<br>2.狀態轉為〝已繳付〞<br>3.繳款日期前<br>將自動派發5張＄10 7-11 coupon</ion-text>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="payment_data.remark" type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">內部額外折扣備注</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="payment_data.internal_discount_amount_remark"
+                                type="text">
+                            </ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">內部額外收費備注</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="payment_data.internal_charge_amount_remark"
+                                type="text">
+                            </ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ion-col>
+                <!-- old stripe payment -->
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && payment_data.payment_method == 'credit_card' && payment_data.payment_order_data != null && payment_data.payment_order_data != '' && payment_data?.payment_order_data?.source != null">
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                            <ion-input readonly
+                                [value]="payment_data.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">Card Name</ion-label>
+                            <ng-container *ngIf="payment_data?.payment_order_data?.source?.name == null">
+                                <ion-input readonly type="text"></ion-input>
+                            </ng-container>
+                            <ng-container *ngIf="payment_data?.payment_order_data?.source?.name != null">
+                                <ion-input readonly [(ngModel)]="payment_data.payment_order_data.source.name"
+                                    type="text"></ion-input>
+                            </ng-container>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">Card Number(Last 4 digit)</ion-label>
+                            <ion-input readonly [(ngModel)]="payment_data.payment_order_data.source.last4"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">Card Type</ion-label>
+                            <ion-input readonly [value]="payment_data.payment_order_data.source.brand"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ion-col>
+                <!-- new stripe payment -->
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && payment_data.payment_method == 'credit_card' && payment_data.payment_order_data != null && payment_data.payment_order_data != '' && payment_data?.payment_order_data?.charges && payment_data.payment_order_data.charges.data[0].payment_method_details.type == 'card'">
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                            <ion-input readonly
+                                [value]="payment_data.payment_completed_datetime | date : 'yyyy-MM-dd HH:mm'"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">Card Number(Last 4 digit)</ion-label>
+                            <ion-input readonly
+                                [(ngModel)]="payment_data.payment_order_data.charges.data[0].payment_method_details.card.last4"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">Card Type</ion-label>
+                            <ion-input readonly
+                                [(ngModel)]="payment_data.payment_order_data.charges.data[0].payment_method_details.card.brand"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ion-col>
+
+            </ion-row>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" [attr.size-md]="payment_id != null ? '6' : '12'"
+            [attr.size-lg]="payment_id != null ? '6' : '12'">
+            <ion-row class="default-container" *ngIf="(admin_data | async)?.type != adminType.pickup_dropoff">
+                <ion-col size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
+                            <ion-label>帳單金額詳情</ion-label>
+                        </div>
+                        <div
+                            *ngIf="payment_id != null && (admin_data | async) != null && (admin_data | async)?.type == adminType.admin">
+                            <ion-button fill="clear" (click)="readonly = false" *ngIf="readonly">
+                                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                                <ion-text color="secondary">修改</ion-text>
+                            </ion-button>
+                            <ion-button fill="clear" (click)="readonly = true" *ngIf="!readonly">
+                                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                                <ion-text color="secondary">取消修改</ion-text>
+                            </ion-button>
+                            <ion-button fill="clear" (click)="updatePaymentData()" *ngIf="!readonly">
+                                <ion-icon slot="start" name="save"></ion-icon>
+                                <ion-text color="secondary">儲存</ion-text>
+                            </ion-button>
+
+                        </div>
+                    </div>
+                </ion-col>
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">
+                        <ng-container *ngIf="payment_data?.deposit_amount == 0">
+                            {{payment_data?.booking_date_list.length}}日租金
+                            <br>
+                            <span
+                                *ngIf="payment_data?.booking_date_list.length > 1">({{payment_data?.booking_date_list[0]}}
+                                - {{payment_data?.booking_date_list[payment_data?.booking_date_list.length-1]}})</span>
+                            <span
+                                *ngIf="payment_data?.booking_date_list.length == 1">({{payment_data?.booking_date_list[0]}})</span>
+                        </ng-container>
+                        <ng-container *ngIf="payment_data?.deposit_amount != 0">
+                            租金
+                        </ng-container>
+                        <ng-container
+                            *ngIf="payment_data?.campaign_type != undefined && payment_data?.campaign_type != null && payment_data?.campaign_type == 'free_booking_days' && payment_data?.free_booking_days != null && payment_data?.free_booking_days > 0">
+                            <br>活動優惠：免租{{payment_data?.free_booking_days}}日
+                        </ng-container>
+                        <ng-container
+                            *ngIf="payment_data?.campaign_type != undefined && payment_data?.campaign_type != null && payment_data?.campaign_type == 'percentage_off' && payment_data?.percentage_off != null && payment_data?.percentage_off > 0">
+                            <br>活動優惠：免租{{payment_data?.percentage_off}}%
+                        </ng-container>
+                    </ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label>HK${{payment_data?.rental_amount | number}}</ion-label>
+                </ion-col>
+
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <!-- (click)="commonService?.openCMSPage('/coupon-detail?coupon_id='+payment_data.coupon_id, 'root')" -->
+                    <ng-container *ngIf="payment_data.status != 'paid' && !readonly">
+                        <ion-label class="amount-title">
+                            優惠券折扣
+                        </ion-label>
+                        <div class="coupon-div ion-margin-bottom" *ngIf="!readonly">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label position="stacked">優惠碼</ion-label>
+                                <ion-input [(ngModel)]="coupon_code" type="text">
+                                </ion-input>
+                            </ion-item>
+                            <ion-button [disabled]="coupon_code == null || coupon_code == ''" class="major_btn"
+                                (click)="applyDiscount('coupon', coupon_code)" expand="block">
+                                使用優惠碼
+                            </ion-button>
+                        </div>
+
+                        <ion-button *ngIf="payment_data.coupon_id != null && payment_data.coupon_id != ''"
+                            color="secondary" class="major_btn"
+                            (click)="commonService?.openCMSPage('/coupon-detail?coupon_id='+payment_data.coupon_id, 'blank')"
+                            expand="block">
+                            查看優惠券
+                        </ion-button>
+
+                        <ion-button *ngIf="!readonly && payment_data.coupon_id != null && payment_data.coupon_id != ''"
+                            class="major_btn" (click)="applyDiscount('reset')" expand="block">
+                            取消優惠碼
+                        </ion-button>
+                        <ng-container
+                            *ngIf="!readonly && (dataService.awaiting_application_deposit_amount$ | async) != null && (dataService.awaiting_application_deposit_amount$ | async) > 0 && (dataService.awaiting_application_deposit_create_date$ | async) < payment_data.create_date ">
+                            <ion-button class="major_btn" (click)="applyDiscount('deposit_discount')" expand="block">
+                                按金客戶：9折優惠
+                            </ion-button>
+                            <ion-button *ngIf="!readonly && payment_data.discount_type == 'deposit_discount'"
+                                class="major_btn" (click)="applyDiscount('reset')" expand="block">
+                                取消按金優惠
+                            </ion-button>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container
+                        *ngIf="payment_data.discount_type != undefined && payment_data.discount_type != null && readonly">
+                        <ng-container *ngIf="payment_data.discount_type == 'coupon'">
+                            <ion-label class="amount-title">
+                                優惠券折扣
+                            </ion-label>
+                            <br>
+                            <ion-button *ngIf="payment_data.coupon_id != null && payment_data.coupon_id != ''"
+                                color="secondary" class="major_btn"
+                                (click)="commonService?.openCMSPage('/coupon-detail?coupon_id='+payment_data.coupon_id, 'blank')"
+                                expand="block">
+                                查看優惠券
+                            </ion-button>
+                        </ng-container>
+                        <ng-container *ngIf="payment_data.discount_type == 'use_referral'">
+                            <ion-label class="amount-title">
+                                推薦碼優惠
+                            </ion-label>
+                        </ng-container>
+                        <ng-container *ngIf="payment_data.discount_type == 'use_bonus'">
+                            <ion-label class="amount-title">
+                                推薦回贈優惠
+                            </ion-label>
+                        </ng-container>
+                        <ng-container *ngIf="payment_data.discount_type == 'deposit_discount'">
+                            <ion-label class="amount-title">
+                                按金優惠
+                            </ion-label>
+                        </ng-container>
+                    </ng-container>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right ion-align-self-center">
+                    <ng-container
+                        *ngIf="payment_data.discount_type == undefined || payment_data.discount_type == null || payment_data.discount_type == null">
+                        <ion-label *ngIf="payment_data?.coupon_amount != 0">-HK${{payment_data?.coupon_amount |
+                            number}}</ion-label>
+                        <ion-label *ngIf="payment_data?.discount_amount != 0">-HK${{payment_data?.discount_amount |
+                            number}}</ion-label>
+                    </ng-container>
+                    <ng-container
+                        *ngIf="payment_data.discount_type != undefined && payment_data.discount_type != null && payment_data.discount_type != ''">
+                        <ion-label *ngIf="payment_data?.coupon_amount != 0">-HK${{payment_data?.coupon_amount |
+                            number}}</ion-label>
+                        <ion-label *ngIf="payment_data?.discount_amount != 0">-HK${{payment_data?.discount_amount |
+                            number}}</ion-label>
+                    </ng-container>
+                </ion-col>
+
+                <div class="divider"></div>
+
+                <ng-container>
+                    <ion-col size="7.5" class="ion-text-left">
+                        <ion-label class="amount-title">按金</ion-label>
+                    </ion-col>
+                    <ion-col size="4.5" class="ion-text-right">
+                        <ion-label>HK${{payment_data.deposit_amount | number}}</ion-label>
+                    </ion-col>
+                </ng-container>
+
+                <ng-container>
+                    <ion-col size="7.5" class="ion-text-left">
+                        <ion-label class="amount-title">保障方案</ion-label>
+                    </ion-col>
+                    <ion-col size="4.5" class="ion-text-right">
+                        <ion-label>HK${{payment_data.insurance_amount | number}}</ion-label>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">停車場租金</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label>HK${{payment_data?.parking_amount | number}}</ion-label>
+                </ion-col>
+
+                <div class="divider"></div>
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">設備租金</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label>HK${{payment_data?.equipment_amount | number}}</ion-label>
+                </ion-col>
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">加購品</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label>HK${{payment_data?.product_amount | number}}</ion-label>
+                </ion-col>
+
+                <div class="divider"></div>
+
+
+                <ion-col size="7.5" class="ion-text-left ion-align-self-center">
+                    <ion-label class="amount-title">罰款</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label *ngIf="readonly">HK${{payment_data.penality_amount | number}}</ion-label>
+                    <ion-item
+                        *ngIf="!readonly && (!('production' | env) || ((admin_data | async) && (admin_data | async)?.authority_list.includes(authority.offer_discount)))"
+                        class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-input min="0" class="ion-text-right" [readonly]="readonly"
+                            [(ngModel)]="payment_data.penality_amount" type="number"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container
+                    *ngIf="!('production' | env) || ((admin_data | async) && (admin_data | async)?.authority_list.includes(authority.offer_discount))">
+                    <div class="divider"></div>
+                    <ion-col size="7.5" class="ion-text-left">
+                        <ion-label class="amount-title">內部額外折扣</ion-label>
+                    </ion-col>
+                    <ion-col size="4.5" class="ion-text-right">
+                        <ion-label *ngIf="readonly">-HK${{payment_data.internal_discount_amount | number}}</ion-label>
+                        <ion-item *ngIf="!readonly" [disabled]="true" class="input-item"
+                            [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                            <ion-input min="0" class="ion-text-right" [readonly]="readonly"
+                                [(ngModel)]="payment_data.internal_discount_amount" type="number"></ion-input>
+                        </ion-item>
+                    </ion-col>
+
+
+                    <ion-col size="7.5" class="ion-text-left">
+                        <ion-label class="amount-title">內部額外收費</ion-label>
+                    </ion-col>
+                    <ion-col size="4.5" class="ion-text-right">
+                        <ion-label *ngIf="readonly">HK${{payment_data.internal_charge_amount | number}}</ion-label>
+                        <ion-item *ngIf="!readonly" [disabled]="true" class="input-item"
+                            [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                            <ion-input min="0" class="ion-text-right" [readonly]="readonly"
+                                [(ngModel)]="payment_data.internal_charge_amount" type="number"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <div class="divider"></div>
+
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">信用卡額外收費</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label>HK${{payment_data.credit_card_extra_charge_amount | number}}</ion-label>
+                </ion-col>
+
+                <div class="divider"></div>
+
+
+                <ion-col size="7.5" class="ion-text-left">
+                    <ion-label class="amount-title">總額</ion-label>
+                </ion-col>
+                <ion-col size="4.5" class="ion-text-right">
+                    <ion-label class="total-amount">HK${{payment_data.total_amount | number}}</ion-label>
+                </ion-col>
+
+                <ng-container *ngIf="payment_id != null">
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                        <ion-button *ngIf="!readonly" (click)="recalculatePayment()" color="secondary" expand="block"
+                            fill="outline" shape="round">
+                            重新計算帳單
+                        </ion-button>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                        <ion-button *ngIf="recalculated_payment_data != null" (click)="updatePaymentAmount()"
+                            color="secondary" expand="block" fill="outline" shape="round">
+                            更新帳單
+                        </ion-button>
+                    </ion-col>
+                </ng-container>
+            </ion-row>
+        </ion-col>
+    </ion-row>
+    <br>
+</div>

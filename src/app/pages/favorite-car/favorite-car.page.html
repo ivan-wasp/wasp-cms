@@ -1,0 +1,153 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+
+        <ion-title class="hidden-xs-down">
+            有車通知
+            <ng-container *ngIf="car_data != null">
+                ：{{car_data?.plate}}({{car_data?.model}})
+            </ng-container>
+        </ion-title>
+
+        <ion-buttons slot="end" *ngIf="favorited_user_data_list != null && favorited_user_data_list.length > 0"
+            (click)="sendFavoriteReminder()">
+            <ion-button fill="clear" [disabled]="start_date == null || end_date == null">
+                <ion-icon slot="start" name="save"></ion-icon>
+                {{start_date == null || end_date == null ? '請先選擇時段' : '發送有車通知給所有已預留用戶'}}
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="ion-margin">
+        <ion-grid>
+
+            <ion-row>
+                <ion-col size="12" class="ion-text-right">
+                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">選擇車輛</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchCar($event)" [(ngModel)]="car_data"
+                            itemValueField="id" itemTextField="plate" [items]="(rentable_car_data_list$ | async)"
+                            [canClear]="false" [canSearch]="true" (onChange)="carChange($event)" [isMultiple]="false"
+                            confirmButtonText="確認" clearButtonText="取消選擇" closeButtonText="取消"
+                            [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                {{port.model}} - {{port.plate}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                <div class="ionic-selectable-value-item">
+                                    {{car_data?.plate}} ({{car_data?.model}})
+                                </div>
+                            </ng-template>
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+            <br>
+            <ion-row class="default-container">
+
+                <ion-col size="12">
+                    <ion-row>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                            <div class="title-with-two-icon">
+                                <div class="">
+                                    <ion-icon slot="start" src="assets/icon/calendar_dark.svg"></ion-icon>
+                                    <ion-label>請選擇一個時段</ion-label>
+                                </div>
+                            </div>
+                            <ion-calendar #calendar [(ngModel)]="dateRange" (change)="onDateChange($event)"
+                                style="padding: 0;" [type]="type" [format]="'YYYY-MM-DD'"
+                                [options]="optionsRange"></ion-calendar>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                            <div class="title-with-two-icon">
+                                <div class="display: flex; justity-content: space-between;">
+                                    <!-- <ion-icon slot="start" src="assets/icon/user_selected.svg"></ion-icon> -->
+                                    <ion-label>已預留用戶</ion-label>
+
+                                </div>
+
+                            </div>
+                            <ion-row>
+                                <ion-col size="12">
+                                    <ion-item class="input-item with-icon" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap" position="stacked">選擇此日期後加入的用戶</ion-label>
+                                        <ion-input *ngIf="create_date != null && create_date != ''" readonly
+                                            value="{{create_date | date : 'yyyy-MM-dd HH:mm'}}" type="text">
+                                        </ion-input>
+                                        <ion-input *ngIf="!(create_date != null && create_date != '')" readonly value=""
+                                            type="text"></ion-input>
+                                        <ion-icon *ngIf="(create_date != null && create_date != '')"
+                                            (click)="create_date = ''; getAllFavoritedUser();" slot="end"
+                                            name="close-outline"></ion-icon>
+                                        <mat-datepicker-toggle slot="end" matSuffix
+                                            [for]="picker"></mat-datepicker-toggle>
+                                    </ion-item>
+
+                                    <mat-form-field appearance="outline" style="display: none;">
+                                        <mat-label>開始日期</mat-label>
+                                        <input matInput [ngxMatDatetimePicker]="picker" [value]="create_date"
+                                            (dateChange)="createDateChange($event)">
+                                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <ngx-mat-datetime-picker #picker showSpinners="true" [showSeconds]='showSeconds'
+                                            [stepHour]="stepHour" [stepMinute]="stepMinute" touchUi="true"
+                                            color="primary" [enableMeridian]="enableMeridian" disableMinute="false"
+                                            hideTime="false">
+                                        </ngx-mat-datetime-picker>
+                                    </mat-form-field>
+                                </ion-col>
+                                <ion-col size="12">
+                                    <ion-item lines="none">
+                                        <ion-label *ngIf="!is_only_this_car"
+                                            class="ion-text-wrap">所有喜愛型號{{car_data?.model}}的用戶</ion-label>
+                                        <ion-label *ngIf="is_only_this_car"
+                                            class="ion-text-wrap">喜愛{{car_data?.plate}}的用戶</ion-label>
+                                        <ion-toggle (ionChange)="toggleChange($event)" slot="end"
+                                            [(ngModel)]="is_only_this_car"></ion-toggle>
+                                    </ion-item>
+                                </ion-col>
+                            </ion-row>
+                            <ion-item class="input-item readonly" mode="md" lines='none' button='false'
+                                *ngFor="let item of favorited_user_data_list">
+                                <ion-label position="stacked">
+                                    <ng-container *ngIf="item?.zh_full_name != null && item?.zh_full_name != ''">
+                                        {{item?.zh_full_name}}
+                                    </ng-container>
+                                    <ng-container *ngIf="item?.zh_full_name == null || item?.zh_full_name == ''">
+                                        {{item?.username}}
+                                    </ng-container>
+                                    {{item?.phone}}
+                                </ion-label>
+                            </ion-item>
+                            <!-- <div class="ion-text-right">
+                                <ion-button
+                                    *ngIf="favorited_user_data_list != null && favorited_user_data_list.length > 0" [disabled]="start_date == null || end_date == null" (click)="sendFavoriteReminder()" fill="outline"
+                                    shape="round" color="secondary">
+                                    {{start_date == null || end_date == null ? '請先選擇一個日期' : '發送有車通知給所有已預留用戶'}}
+                                </ion-button>
+                            </div> -->
+                        </ion-col>
+
+                    </ion-row>
+                </ion-col>
+
+            </ion-row>
+
+        </ion-grid>
+    </div>
+
+</ion-content>

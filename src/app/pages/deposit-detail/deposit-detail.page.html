@@ -1,0 +1,354 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">按金</ion-title>
+
+        <ng-container *ngIf="deposit_id != null">
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(deposit_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; deposit_data = checking_deposit_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <!-- <ion-buttons slot="end" *ngIf="deposit_id == null">
+      <ion-button fill="clear" (click)="createNewCoupon()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立優惠券
+      </ion-button>
+    </ion-buttons> -->
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <div class="ion-margin" *ngIf=" deposit_data != null">
+        <ion-grid>
+            <ion-row *ngIf="deposit_id != null">
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+                        (click)="commonService?.openCMSPage('/daf?deposit_id='+deposit_id, 'root')">
+                        代領按金授權書
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+
+                    <!-- http://localhost:8101/order?page=1&limit=10&sorting=null&direction=null&key_word=&status=&create_date_start=&create_date_end=&booking_date_start=&booking_date_end=&user_id=100&car_id= -->
+                    <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+                        (click)="commonService?.openCMSPage('order?page=1&limit=10&sorting=null&direction=null&key_word=&status=&create_date_start=&create_date_end=&booking_date_start=&booking_date_end=&user_id='+deposit_data.user_id+'&car_id=', 'root')">
+                        租務記錄
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+                        (click)="commonService?.openCMSPage('/violation?page=1&limit=10&sorting=null&direction=null&key_word=&status=&user_id='+deposit_data.user_id, 'root')">
+                        違例紀錄
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <ion-button class="top-btn" color="primary" expand="block" fill="clear"
+                        (click)="commonService?.openCMSPage('/rdr?deposit_id='+deposit_id, 'root')">
+                        退回按金報告
+                    </ion-button>
+                </ion-col>
+
+            </ion-row>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="deposit_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="deposit_data.disabled"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+                        <ion-input readonly [value]="deposit_data.create_date | date : 'yyyy-MM-dd'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">金額</ion-label>
+                        <ion-input readonly [value]="'HK$'+(deposit_data.amount | number)" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">訂單編號</ion-label>
+                        <ion-input readonly [value]="deposit_data.order_id" type="text"></ion-input>
+                        <ion-icon
+                            (click)="commonService.openCMSPage('/order-detail?order_id='+deposit_data.order_id, 'root')"
+                            slot="end" name="eye"></ion-icon>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款編號</ion-label>
+                        <ion-input readonly [value]="deposit_data.payment_id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">申請日期</ion-label>
+                        <ion-input readonly
+                            [value]="deposit_data.application_date == null || deposit_data.application_date == '' ? '' : (deposit_data.application_date | date : 'yyyy-MM-dd HH:mm')"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">執行日期(Airwallex)</ion-label>
+                        <ion-input readonly
+                            [value]="deposit_data.execution_date == null || deposit_data.execution_date == '' ? '' : (deposit_data.execution_date | date : 'yyyy-MM-dd')"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <!-- <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">批核日期</ion-label>
+                        <ion-input readonly [value]="deposit_data.approval_date == null || deposit_data.approval_date == '' ? '' : (deposit_data.approval_date | date : 'yyyy-MM-dd HH:mm')" type="text"></ion-input>
+                    </ion-item>
+                </ion-col> -->
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #estimated_refund_date matInput [matDatepicker]="picker"
+                            (dateChange)="selectionDateChanged('estimated_refund_date', estimated_refund_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">估計退款日期</ion-label>
+                        <ion-input readonly [(ngModel)]="deposit_data.estimated_refund_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker"></mat-datepicker-toggle>
+                        <ion-icon *ngIf="!readonly" (click)="deposit_data.estimated_refund_date = ''"
+                            style="margin: auto; cursor: pointer;" slot="end" name="close"></ion-icon>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #actual_refund_date matInput [matDatepicker]="picker2"
+                            (dateChange)="selectionDateChanged('actual_refund_date', actual_refund_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">退款日期</ion-label>
+                        <ion-input readonly [(ngModel)]="deposit_data.actual_refund_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker2"></mat-datepicker-toggle>
+                        <ion-icon *ngIf="!readonly" (click)="deposit_data.actual_refund_date = ''"
+                            style="margin: auto; cursor: pointer;" slot="end" name="close"></ion-icon>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">狀態</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="deposit_data.status" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option [disabled]="true" value="awaiting_application">未申請</ion-select-option>
+                            <ion-select-option value="awaiting_execution">待執行</ion-select-option>
+                            <ion-select-option value="executed">已執行</ion-select-option>
+                            <ion-select-option value="refunded">已退還</ion-select-option>
+                            <ion-select-option value="confiscated">已扣起</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">將狀態轉為已批核或已退還，所有此用戶未使用的7-11 coupon會被收回。</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">用戶名</ion-label>
+                        <ion-input readonly [value]="user_data?.username" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">用戶中文名</ion-label>
+                        <ion-input readonly [value]="user_data?.zh_full_name" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">用戶英文名</ion-label>
+                        <ion-input readonly [value]="user_data?.en_full_name" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">用戶電話</ion-label>
+                        <ion-input readonly [value]="user_data?.phone" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="deposit_data.remark" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">AirWallex payment id</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="deposit_data.airwallex_payment_id"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+            </ion-row>
+            <br>
+            <ion-row class="default-container"
+                *ngIf="!('production' | env) || (deposit_data.status=='awaiting_application' && user_data != null && (admin_data | async)?.id == 17 && (admin_data | async)?.couchbase_username == 'Ivan')">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-label>申請退還按金</ion-label>
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-radio-group name="auto" mode="md" [(ngModel)]="entity_type">
+                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                            <ion-label>個人</ion-label>
+                            <ion-radio value="PERSONAL"></ion-radio>
+                        </ion-item>
+                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                            <ion-label>公司</ion-label>
+                            <ion-radio [disabled]="user_data.en_company_name == ''" value="COMPANY"></ion-radio>
+                        </ion-item>
+                    </ion-radio-group>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">選擇銀行</ion-label>
+                        <ionic-selectable [isEnabled]="!readonly" [(ngModel)]="bank" [items]="bank_list"
+                            placeholder="(選擇收款銀行)" itemValueField="bank_code" itemTextField="bank_name"
+                            [canSearch]="true" closeButtonText="取消" searchPlaceholder="搜尋銀行名稱或銀行代碼"
+                            (onChange)="bankChange($event)" (onSearch)="searchBankList($event)">
+
+                            <ng-template ionicSelectableItemTemplate let-bank="item"
+                                let-isBankSelected="isItemSelected">
+                                {{bank.bank_code}} - {{bank.bank_name}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemIconTemplate let-bank="item"
+                                let-isBankSelected="isItemSelected">
+                                <ion-icon slot="start" [name]="isBankSelected ? 'checkmark-circle' : 'radio-button-off'"
+                                    [color]="isBankSelected ? 'wasp2' : null">
+                                </ion-icon>
+                            </ng-template>
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item">
+                        <ion-input [formControl]="account_number" type="tel" maxlength="15" minlength="9"
+                            onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                            label="" placeholder="銀行賬號"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item">
+                        <ion-input readonly [formControl]="account_name" type="text" label=""
+                            placeholder="賬戶名"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item">
+                        <ion-input [(ngModel)]="refund_amount" type="number" label="" placeholder="退還金額"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size="12" class="ion-text-right">
+                    <ion-button (click)="applyReturnDeposit()" fill="clear" class="default-ion-btn">
+                        申請退還按金（建立Airwallex轉賬指示）
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                        <ion-label>其他文件</ion-label>
+                    </div>
+
+                    <div class="other-doc-upload-div">
+                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                            <ion-label position="stacked">文件名（可不輸入）</ion-label>
+                            <ion-input [(ngModel)]="other_doc_file_name" type="text"></ion-input>
+                        </ion-item>
+                        <ion-button (click)="triggerImgUpload('doc_url_list')" slot="end" class="default-ion-btn"
+                            fill="clear">
+                            <ion-icon slot="start" name="cloud-download"></ion-icon>
+                            上載文件
+                        </ion-button>
+                        <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                            (change)="uploadImg()">
+                    </div>
+                    <br><br>
+                    <ion-item class="other-doc-item input-item" [ngClass]="{'readonly': readonly}" lines="none"
+                        *ngFor="let item of deposit_data.doc_url_list; let i = index;">
+                        <!-- <ion-label>{{item.name}}</ion-label> -->
+                        <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name"></ion-input>
+                        <ion-icon *ngIf="!readonly" class="delete-icon" (click)="deposit_data.doc_url_list.splice(i, 1)"
+                            name="trash" slot="end">
+                        </ion-icon>
+                        <ion-icon class="download-icon"
+                            (click)="commonService.downloadMedia(deposit_data.doc_url_list[i].url, true)"
+                            name="cloud-download" slot="end"></ion-icon>
+
+                    </ion-item>
+
+                </ion-col>
+
+            </ion-row>
+
+
+        </ion-grid>
+    </div>
+
+
+</ion-content>

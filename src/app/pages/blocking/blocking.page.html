@@ -1,0 +1,251 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">
+      禁止預約
+      <ng-container *ngIf="car_data != null">
+        ：{{car_data?.plate}}({{car_data?.model}})
+      </ng-container>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
+        <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
+        管理員通知
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="end" *ngIf="car_data != null">
+      <ion-button fill="clear" (click)="save()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        儲存
+      </ion-button>
+    </ion-buttons> -->
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-margin" *ngIf="blocking_data">
+    <ion-grid>
+
+      <ion-row>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇車輛</ion-label>
+            <ionic-selectable [disabled]="blocking_data != null && blocking_data.id != null"
+              (onSearch)="commonService?.searchCar($event)" [(ngModel)]="car_data" itemValueField="id"
+              itemTextField="plate" [items]="(rentable_car_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              (onChange)="carChange($event)" [isMultiple]="false" confirmButtonText="確認" clearButtonText="取消選擇"
+              closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img"
+                  *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0"
+                  [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                <div class="ionic-selectable-value-item">
+                  {{car_data?.plate}} ({{car_data?.model}})
+                </div>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇可預約用戶（可不選）</ion-label>
+            <ionic-selectable [disabled]="blocking_data != null && blocking_data.id != null" #ionSelectable
+              (onOpen)="onOpen($event)" (onSearch)="commonService?.searchUser($event)"
+              [(ngModel)]="blocking_data.excluded_user_id_list" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_full_name || port.username}} - {{port.phone}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+
+                <ng-container *ngIf="blocking_data.excluded_user_id_list.length <= 10">
+                  <div class="ionic-selectable-value-item"
+                    *ngFor="let port of blocking_data.excluded_user_id_list;  let i=index;">
+                    {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username}} -
+                    {{getUserDataById(port)?.phone}}
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="blocking_data.excluded_user_id_list.length > 10">
+                  已選取{{blocking_data.excluded_user_id_list.length}}個用戶
+                </ng-container>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+
+        <ion-col size="12">
+          <ion-row>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+              <div class="title-with-two-icon">
+                <div class="">
+                  <ion-icon slot="start" src="assets/icon/calendar_dark.svg"></ion-icon>
+                  <ion-label>禁止預約月歷</ion-label>
+                </div>
+                <ion-item mode="md" lines='none' button='false'>
+                  <ion-label>Range Selection</ion-label>
+                  <ion-toggle [checked]="calendar_mode == 'range'" (ionChange)="onChange($event)" slot="end">
+                  </ion-toggle>
+                </ion-item>
+              </div>
+              <ion-calendar *ngIf="calendar_mode == 'single'" [(ngModel)]="blocking_data.booking_date_list"
+                style="padding: 0;" type="string" [format]="'YYYY-MM-DD'" [options]="optionsSingle"></ion-calendar>
+              <ion-calendar *ngIf="calendar_mode == 'range'" (change)="onDateRangeChange($event)" style="padding: 0;"
+                type="string" [format]="'YYYY-MM-DD'" [options]="optionsRange"></ion-calendar>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" class="ion-align-self-center">
+              <div>
+                <ion-chip *ngFor="let item of blocking_data.booking_date_list; let i = index;">
+                  <ion-label>{{item}}</ion-label>
+                  <!-- <ion-icon *ngIf="!(blocking_data != null && blocking_data.id != null)" name="close-circle"
+                    (click)="blocking_data.booking_date_list.splice(i, 1)"></ion-icon> -->
+                  <ion-icon name="close-circle" (click)="blocking_data.booking_date_list.splice(i, 1)"></ion-icon>
+                </ion-chip>
+              </div>
+              <br><br>
+              <ion-item class="input-item" mode="md" lines='none' button='false'>
+                <ion-label position="stacked">備注</ion-label>
+                <ion-input [(ngModel)]="blocking_data.remark" type="text"></ion-input>
+              </ion-item>
+              <br>
+              <ion-item  class="input-item" mode="md" lines='none' button='false'>
+                <ion-label class="ion-text-wrap">因維修而禁止預約</ion-label>
+                <ion-checkbox
+                  [(ngModel)]="blocking_data.is_maintaining" slot="end"></ion-checkbox>
+              </ion-item>
+              <br>
+              <ion-item class="input-item" mode="md" lines='none' button='false'>
+                <ion-label class="ion-text-wrap">停用</ion-label>
+                <ion-checkbox [(ngModel)]="blocking_data.disabled" slot="end"></ion-checkbox>
+              </ion-item>
+              <br>
+              <div class="ion-text-right">
+
+                <ion-button *ngIf="!(blocking_data.id != null)" (click)="createNewBlocking()" fill="outline"
+                  shape="round" color="secondary">
+                  新增禁止預約
+                </ion-button>
+                <ion-button *ngIf="blocking_data.id != null" (click)="save()" fill="outline" shape="round"
+                  color="secondary">
+                  儲存
+                </ion-button>
+              </div>
+            </ion-col>
+
+          </ion-row>
+        </ion-col>
+
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+        <ion-col size="12" class="ion-text-right">
+          <ion-button (click)="showAll()" fill="outline">
+            {{disabled == false ? '顯示全部' : '取消顯示全部'}}
+          </ion-button>
+        </ion-col>
+        <ion-col size="12">
+          <ion-row>
+            <ion-col size="1">
+              ID
+            </ion-col>
+            <ion-col size="2">
+              車輛 - 備注
+            </ion-col>
+            <ion-col size="1">
+              停用
+            </ion-col>
+            <ion-col size="1">
+              維修
+            </ion-col>
+            <ion-col size="4">
+              日期
+            </ion-col>
+            <ion-col size="2">
+              可預約用戶
+            </ion-col>
+            <ion-col size="1">
+
+            </ion-col>
+          </ion-row>
+          <ion-row *ngFor="let item of display_blocking_data_list" class="item-row"
+            [style.background]="item.disabled == true ? 'var(--ion-color-medium)' : ''">
+            <ion-col size="1">
+              {{item?.id}}
+            </ion-col>
+            <ion-col size="2">
+              {{getCarDataById(item.car_id)?.plate}} ({{getCarDataById(item.car_id)?.model}})
+              <br><br>
+              {{item?.remark}}
+            </ion-col>
+            <ion-col size="1" class="ion-align-self-center">
+              <ion-chip *ngIf="item?.disabled" color="danger" mode="ios" outline="true">
+                <ion-label>停用</ion-label>
+              </ion-chip>
+            </ion-col>
+            <ion-col size="1" class="ion-align-self-center">
+              <ion-chip *ngIf="item?.is_maintaining" color="danger" mode="ios" outline="true">
+                <ion-label>維修</ion-label>
+              </ion-chip>
+            </ion-col>
+            <ion-col size="4">
+              <div
+                *ngIf="item.booking_date_list.length > 1 && getDayDiff(item.booking_date_list[0], item.booking_date_list[item.booking_date_list.length-1]) == item.booking_date_list.length-1; else sepereated">
+                <ion-chip color="secondary" mode="ios" outline="true">
+                  <ion-label>{{item.booking_date_list[0]}} 至
+                    {{item.booking_date_list[item.booking_date_list.length-1]}}</ion-label>
+                </ion-chip>
+              </div>
+              <ng-template #sepereated>
+                <div>
+                  <ion-chip *ngFor="let date of item.booking_date_list" color="secondary" mode="ios" outline="true">
+                    <ion-label>{{date}}</ion-label>
+                  </ion-chip>
+                </div>
+              </ng-template>
+
+            </ion-col>
+            <ion-col size="2" class="ion-align-self-center">
+              <ion-chip *ngFor="let user_id of item.excluded_user_id_list"
+                (click)="commonService.openCMSPage('/user-detail?user_id='+user_id, 'blank')" color="tertiary"
+                mode="ios" outline="true">
+                <ion-label>{{getUserDataById(user_id)?.zh_full_name || getUserDataById(user_id)?.username}} -
+                  {{getUserDataById(user_id)?.phone}}</ion-label>
+              </ion-chip>
+            </ion-col>
+            <ion-col size="1" class="ion-align-self-center">
+              <ion-button (click)="editBlocking(item)" class="default-ion-btn" fill="clear" expand="block">
+                修改
+              </ion-button>
+              <!-- <ion-button (click)="commonService?.deleteDataAlert(item)" class="default-ion-btn" color="danger"
+                fill="clear">
+                刪除
+              </ion-button> -->
+
+            </ion-col>
+          </ion-row>
+        </ion-col>
+
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+</ion-content>

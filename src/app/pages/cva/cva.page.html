@@ -1,0 +1,468 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+        <ion-title class="hidden-xs-down">更換車輛同意書</ion-title>
+
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="save()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                產生PDF
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div class="ion-margin" *ngIf="order_data != null">
+        <ion-grid>
+            <ion-row>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>租用人資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">中文全名</ion-label>
+                                <ion-input [(ngModel)]="vrb.user_zh_full_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">英文全名</ion-label>
+                                <ion-input [(ngModel)]="vrb.user_en_full_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">身份證號碼</ion-label>
+                                <ion-input [(ngModel)]="vrb.user_identity_number" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡電話</ion-label>
+                                <ion-input [(ngModel)]="vrb.user_phone" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡地址</ion-label>
+                                <ion-input [(ngModel)]="vrb.user_address" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>車輛資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車輛種類</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_category" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">引擎號碼</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_engine_number" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">廠名</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_brand" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">顏色</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_color_zh_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">底盤編號</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_chassis_number" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">型號</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_model" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">輪軩牌子</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_tire_brand" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">輪軩型號</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_tire_model" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">輪軩尺寸</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_tire_size" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">年份</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_year" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">租賃期開始時里程表讀數</ion-label>
+                                <ion-input [(ngModel)]="vrb.odometer_value" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">登記號碼</ion-label>
+                                <ion-input [(ngModel)]="vrb.car_register_number" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>車輛狀況紀錄</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">左前車門</ion-label>
+                                <ion-select [(ngModel)]="vrb.left_top_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.left_top_img_url_list != null && vrb.left_top_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.left_top_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.left_top_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.left_top_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('left_top_img_url_list')" expand="block">
+                                上載左前車門圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">左後車門</ion-label>
+                                <ion-select [(ngModel)]="vrb.left_bottom_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.left_bottom_img_url_list != null && vrb.left_bottom_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.left_bottom_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.left_bottom_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.left_bottom_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('left_bottom_img_url_list')" expand="block">
+                                上載左後車門圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車頭</ion-label>
+                                <ion-select [(ngModel)]="vrb.middle_top_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.middle_top_img_url_list != null && vrb.middle_top_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.middle_top_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.middle_top_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.middle_top_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('middle_top_img_url_list')" expand="block">
+                                上載車頭圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車頂</ion-label>
+                                <ion-select [(ngModel)]="vrb.middle_middle_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.middle_middle_img_url_list != null && vrb.middle_middle_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.middle_middle_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.middle_middle_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.middle_middle_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('middle_middle_img_url_list')" expand="block">
+                                上載車頂圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車尾</ion-label>
+                                <ion-select [(ngModel)]="vrb.middle_bottom_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.middle_bottom_img_url_list != null && vrb.middle_bottom_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.middle_bottom_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.middle_bottom_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.middle_bottom_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('middle_bottom_img_url_list')" expand="block">
+                                上載車尾圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">右前車門</ion-label>
+                                <ion-select [(ngModel)]="vrb.right_top_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.right_top_img_url_list != null && vrb.right_top_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.right_top_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.right_top_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.right_top_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('right_top_img_url_list')" expand="block">
+                                上載右前車門圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">右後車門</ion-label>
+                                <ion-select [(ngModel)]="vrb.right_bottom_list" multiple="true" cancelText="取消" okText="確認">
+                                    <ion-select-option *ngFor="let item of inspection_option_list" [value]="item.value">{{item?.name}}
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item>
+                            <ion-slides mode="ios" pager="false" scrollbar="ios" *ngIf="vrb.right_bottom_img_url_list != null && vrb.right_bottom_img_url_list.length > 0" [options]="slideOpts">
+                                <ion-slide *ngFor="let item of vrb.right_bottom_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img [src]="('media_url' | env)+item" alt="">
+                                        <ion-icon (click)="vrb.right_bottom_img_url_list.splice(i, 1)" color="danger" name="close-circle-outline"></ion-icon>
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                            <ion-button *ngIf="vrb.right_bottom_list.length > 0" color="secondary" fill="outline" (click)="selectImageSource('right_bottom_img_url_list')" expand="block">
+                                上載右後車門圖片（如有）
+                            </ion-button>
+                        </ion-col>
+                        <ion-col>
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">備註</ion-label>
+                                <ion-input [(ngModel)]="vrb.check_report_remark" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br/>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>更換車輛</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">同意日期</ion-label>
+                                <ion-input [(ngModel)]="vrb.agreement_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">同意時間</ion-label>
+                                <ion-input [(ngModel)]="vrb.agreement_time" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <!-- <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">更換車輛型號</ion-label>
+                                <ion-select [(ngModel)]="vrb.new_car_model" type="text">
+                                    <ion-select-option *ngFor="let item of car_data_list">
+                                       {{item.model}}
+                                       <br/>
+                                       ({{item.plate}})
+                                    </ion-select-option>
+                                </ion-select>
+                            </ion-item> -->
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">更換車輛型號</ion-label>
+                                <ionic-selectable (onSearch)="commonService?.searchCar($event)" [(ngModel)]="car_data" itemValueField="id" itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="false" [canSearch]="true" (onChange)="selectCar($event)" [isMultiple]="false" confirmButtonText="確認"
+                                    clearButtonText="取消選擇" closeButtonText="取消" [hasVirtualScroll]="true">
+                                    <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                        {{port.model}} - {{port.plate}}
+                                    </ng-template>
+                                    <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                        <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                                    </ng-template>
+                                    <ng-template ionicSelectableValueTemplate let-ports="item">
+                                        <div class="ionic-selectable-value-item">
+                                            {{car_data?.plate}} ({{car_data?.model}})
+                                        </div>
+                                    </ng-template>
+                                </ionic-selectable>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">更換車輛車牌</ion-label>
+                                <ion-input [(ngModel)]="vrb.new_car_number_plate" type="text">
+
+                                </ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">更換開始日期</ion-label>
+                                <ion-input [(ngModel)]="vrb.exchange_start_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">更換結束日期</ion-label>
+                                <ion-input [(ngModel)]="vrb.exchange_end_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br/>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>訂單資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">開始日期</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_start_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">取車時間</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_pick_up_time" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">結束日期</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_end_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">還車時間</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_return_time" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">總租金</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_rental_amount" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">按金</ion-label>
+                                <ion-input [(ngModel)]="vrb.order_deposit_amount" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <!-- <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false' *ngIf="vrb != undefined">
+                                <ion-label class="ion-text-wrap" position="stacked">檢查員</ion-label>
+                                <ion-input readonly [(ngModel)]="vrb.staff_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col> -->
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+                            <div>
+                                <h2>公司蓋章及簽名</h2>
+                                <canvas class="signature-pad-canvas" #canvas width="250" height="200" style="touch-action: none;"></canvas>
+                                <div>
+                                    <ion-button color="secondary" (click)="signaturePad.clear();" fill="outline">
+                                        清除簽名
+                                    </ion-button>
+                                </div>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+                            <div>
+                                <h2>客人簽名</h2>
+                                <canvas class="signature-pad-canvas" #canvas2 width="250" height="200" style="touch-action: none;"></canvas>
+                                <div>
+                                    <ion-button color="secondary" (click)="signaturePad2.clear();" fill="outline">
+                                        清除簽名
+                                    </ion-button>
+                                </div>
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-button color="secondary" fill="outline" (click)="selectImageSource('other_img_url_list')" expand="block">
+                                上載其他圖片
+                            </ion-button>
+                            <ion-reorder-group (ionItemReorder)="doReorder($event)" disabled="false">
+                                <ion-item class="img-item" lines="none" *ngFor="let item of vrb.other_img_url_list; let i = index">
+                                    <ion-reorder slot="start"></ion-reorder>
+                                    <ion-img [src]="('media_url' | env)+item"></ion-img>
+                                    <ion-icon slot="end" (click)="vrb.other_img_url_list.splice(i, 1)" color="danger" class="remove-icon" name="trash-outline"></ion-icon>
+                                </ion-item>
+                            </ion-reorder-group>
+                        </ion-col>
+                    </ion-row>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </div>
+</ion-content>
+<ion-footer class="hidden-sm-up ion-no-border">
+    <ion-toolbar>
+        <ion-button color="secondary" fill="outline" (click)="save()" expand="block">
+            <ion-icon slot="start" name="save"></ion-icon>
+            產生PDF
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,275 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">停車場</ion-title>
+
+    <ng-container *ngIf="parking_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(parking_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; parking_data = checking_parking_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="parking_id == null">
+      <ion-button fill="clear" (click)="createNewParking()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立停車場
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="parking_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="parking_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">可租用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.rentable" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">預設停車場</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.default" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">租車點（取還車）</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.is_car_rental_point"
+              slot="end"></ion-checkbox>
+          </ion-item>
+          <ion-text class="hint">*如租車點只供部分車輛使用，同時需要設定所有車輛各自的還車點</ion-text>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">顯示於app篩選</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.show_in_app_filter" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">網絡受限</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.poor_internet" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文分類(ie.觀塘, 大角咀)</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.zh_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文分類(ie.觀塘, 大角咀)</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.en_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文名稱</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.zh_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文名稱</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.en_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文地址</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.zh_address" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文地址</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.en_address" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文說明</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.zh_description" placeholder="B1 ~ B4 停下停車場"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文說明</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.en_description" placeholder=""
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">區域</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="parking_data.district" multiple="false" cancelText="取消"
+              okText="確認">
+              <ion-select-option *ngFor="let item of areaList" [value]="item">{{'onboarding_form.'+item |
+                translate}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">緯度</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.latitude" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">經度</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.longitude" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">額配</ion-label>
+            <ion-input [readonly]="readonly" type="number" min="0" [(ngModel)]="parking_data.quota"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">每少租用日數</ion-label>
+            <ion-input [readonly]="readonly" type="number" min="1"
+              [(ngModel)]="parking_data.minimum_booking_days"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">車位數</ion-label>
+            <ion-input [readonly]="readonly" type="number" min="1"
+              [(ngModel)]="parking_data.no_of_parking_space"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇限定使用的車輛（如不選將全部可用）</ion-label>
+            <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+              [(ngModel)]="parking_data.car_id_list" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate"
+              [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="true"
+              confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                <div class="ionic-selectable-value-item" *ngFor="let port of parking_data.car_id_list">
+                  {{getCarDataById(port)?.plate}} ({{getCarDataById(port)?.model}})
+                </div>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">每月租金</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.price_per_month" type="number"
+              min="1"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">取/還車提示</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="parking_data.pickup_dropoff_remark" placeholder=""
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item">
+            <ion-label slot="start" >取/還車提示圖片</ion-label>
+            <ion-img style="max-width: 50%;" slot="start"
+              *ngIf="parking_data.pickup_dropoff_img_url && parking_data.pickup_dropoff_img_url != ''"
+              [src]="('media_url' | env)+parking_data.pickup_dropoff_img_url"></ion-img>
+            <ion-icon *ngIf="!readonly" class="clickable" (click)="triggerImgUpload('pickup_dropoff_img_url')"
+              slot="end" name="cloud-upload-outline"></ion-icon>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+
+          <ion-item class="input-item">
+            <ion-label slot="start">封面相片</ion-label>
+            <ion-img style="max-width: 50%;" slot="start"
+              *ngIf="parking_data.cover_img_url && parking_data.cover_img_url != ''"
+              [src]="('media_url' | env)+parking_data.cover_img_url"></ion-img>
+            <ion-icon *ngIf="!readonly" class="clickable" (click)="triggerImgUpload('cover_img_url')" slot="end"
+              name="cloud-upload-outline"></ion-icon>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item">
+            <ion-label> 上載其他相片(顯示於app停車場詳情) </ion-label>
+            <ion-icon *ngIf="!readonly" class="clickable" (click)="triggerImgUpload('img_url_list')" slot="end"
+              name="cloud-upload-outline"></ion-icon>
+          </ion-item>
+          <ion-reorder-group [disabled]="readonly" (ionItemReorder)="handleReorder($any($event))">
+            <ion-item class="input-item" *ngFor="let item of parking_data.img_url_list; let i = index">
+              <ion-img style="max-width: 50%;" slot="start" [src]="('media_url' | env)+item"></ion-img>
+              <ion-icon *ngIf="!readonly" class="clickable" (click)="parking_data.img_url_list.splice(i, 1)" slot="end"
+                name="trash-outline"></ion-icon>
+              <ion-reorder slot="end"></ion-reorder>
+            </ion-item>
+          </ion-reorder-group>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+  </div>
+
+
+</ion-content>

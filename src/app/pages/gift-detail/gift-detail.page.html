@@ -1,0 +1,168 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">禮品</ion-title>
+
+        <ng-container *ngIf="gift_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(gift_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; gift_data = checking_gift_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="gift_id == null">
+            <ion-button fill="clear" (click)="createNewGift()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立禮品
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <input style="display: none;" multiple type="file" #upload_img accept="image/x-png,image/jpeg,application,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="gift_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="gift_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="gift_data.disabled" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">已使用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="gift_data.used" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">中文標題</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="gift_data.zh_title" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">英文標題</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="gift_data.en_title" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">中文描述</ion-label>
+                        <ion-textarea [readonly]="readonly" [(ngModel)]="gift_data.zh_description" type="text"></ion-textarea>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">英文描述</ion-label>
+                        <ion-textarea [readonly]="readonly" [(ngModel)]="gift_data.en_description" type="text"></ion-textarea>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">禮品碼</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="gift_data.code" type="text"></ion-input>
+                    </ion-item>
+                    <ion-text class="hint">系統將自行產生 (也可手動輸入)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <ng-container *ngIf="gift_data.id == null">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                            <ion-label class="ion-text-wrap">選擇用戶（必選）</ion-label>
+                            <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly" [(ngModel)]="gift_data.user_list" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="true"
+                                confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                                <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                    {{port.zh_full_name || port.username}} - {{port.phone}}
+                                </ng-template>
+                                <ng-template ionicSelectableValueTemplate let-ports="item">
+                                    <ng-container *ngIf="gift_data.user_list.length <= 10">
+                                        <div class="ionic-selectable-value-item" *ngFor="let port of gift_data.user_list;  let i=index;">
+                                            {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username}} - {{getUserDataById(port)?.phone}}
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="gift_data.user_list.length > 10">
+                                        已選取{{gift_data.user_list.length}}個用戶
+                                    </ng-container>
+                                </ng-template>
+                            </ionic-selectable>
+                        </ion-item>
+                    </ng-container>
+                    <ng-container *ngIf="gift_data.id != null">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                            <ion-label class="ion-text-wrap">選擇用戶（必選）</ion-label>
+                            <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly" [(ngModel)]="gift_data.user_id" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="false"
+                                confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                                <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                    {{port.zh_full_name || port.username}} - {{port.phone}}
+                                </ng-template>
+                                <ng-template ionicSelectableValueTemplate let-ports="item">
+                                    {{getUserDataById(gift_data?.user_id)?.zh_full_name}} ({{getUserDataById(gift_data?.user_id)?.phone}})
+                                </ng-template>
+                            </ionic-selectable>
+                        </ion-item>
+                    </ng-container>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+                    <!-- <ion-row class="default-container">
+                        <ion-col size="12"> -->
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                            <ion-label>圖片</ion-label>
+                        </div>
+                        <ion-icon *ngIf="!readonly" (click)="triggerImgUpload('img_url')" class="clickable" slot="start" name="cloud-upload"></ion-icon>
+                    </div>
+                    <div class="ion-text-center">
+                        <ion-img class="fit-content cover-img" *ngIf="gift_data.img_url!=undefined && gift_data.img_url!=null && gift_data.img_url!=''" [src]="('media_url' | env)+gift_data?.img_url">
+                        </ion-img>
+                    </div>
+                    <!-- </ion-col>
+                    </ion-row> -->
+                </ion-col>
+
+            </ion-row>
+        </ion-grid>
+    </div>
+
+
+</ion-content>

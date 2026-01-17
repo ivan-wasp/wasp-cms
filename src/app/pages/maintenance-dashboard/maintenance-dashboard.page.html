@@ -1,0 +1,224 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+      <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <ion-grid class="ion-padding">
+    <ion-row>
+      <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-start">
+
+        <ion-row class="header-row">
+          <ion-col size="8.5">
+            <ion-text color="secondary">
+              <h1>保養</h1>
+            </ion-text>
+          </ion-col>
+          <ion-col size="3.5">
+            <ion-text color="secondary">
+              <h2>累計日數</h2>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+
+
+        <ng-container *ngFor="let item of ongoing_appointment_data_list;">
+          <ion-row class="item-row" *ngIf="item?.maintenance_data?.zh_service_name =='保養'">
+              <ion-col class="left-col" size="8.5">
+                <div>
+                  <h2 class="ion-no-margin">{{item?.car_plate}}</h2>
+                  <h4>{{item?.car_brand}} {{item?.car_model}}</h4>
+                  <h4 *ngIf="item.user_id != null && item?.contact_name == ''">
+                    {{item?.user_zh_full_name?.charAt(0)}}{{item?.user_call == 'Miss' ? '小姐' : '先生'}}
+                    ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+                  <h4 *ngIf="item.user_id != null && item?.contact_name != ''"> {{item?.contact_name?.charAt(0)}}
+                    ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+                  <h4 *ngIf="item.user_id == null && item.admin_id != null">WASP admin</h4>
+                  <h3 style="visibility: hidden;">123</h3>
+                  <p class="remark" [style.visibility]="item.remark != '' ? 'visible' : 'hidden'">{{item?.remark == '' ?
+                    '123' : item?.remark}}</p>
+                </div>
+              </ion-col>
+              <ion-col size="3.5" class="ion-align-self-center">
+                <ion-text color="dark">
+                  <h1 class="ion-text-center"><strong>{{item?.accmulated_days}}</strong></h1>
+                </ion-text>
+              </ion-col>
+              
+              <ion-col size="12" class="show-on-hover action-btn-col">
+                <ion-button (click)="commonService?.openCMSPage('/appointment-detail?appointment_id='+item.id, 'blank')" color="secondary" expand="block" fill="outline">
+                  查看詳情
+                </ion-button>
+                <ion-button (click)="completeAppointment(item)" color="tertiary" expand="block" fill="outline">
+                  完成預約服務
+                </ion-button>
+              </ion-col>
+          </ion-row>
+        </ng-container>
+
+      </ion-col>
+      <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-start">
+        <ion-row class="header-row">
+          <ion-col size="8.5">
+            <ion-text color="secondary">
+              <h1>維修</h1>
+            </ion-text>
+          </ion-col>
+          <ion-col size="3.5">
+            <ion-text color="secondary">
+              <h2>累計日數</h2>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+
+        <ng-container *ngFor="let item of ongoing_appointment_data_list;">
+          <ion-row class="item-row" *ngIf="item?.maintenance_data?.zh_service_name =='維修檢查'">
+            <ion-col class="left-col" size="8.5">
+              <div>
+                <h2 class="ion-no-margin">{{item?.car_plate}}</h2>
+                <h4>{{item?.car_brand}} {{item?.car_model}}</h4>
+                <h4 *ngIf="item.user_id != null && item?.contact_name == ''">
+                  {{item?.user_zh_full_name?.charAt(0)}}{{item?.user_call == 'Miss' ? '小姐' : '先生'}}
+                  ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+                <h4 *ngIf="item.user_id != null && item?.contact_name != ''"> {{item?.contact_name?.charAt(0)}}
+                  ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+                <h4 *ngIf="item.user_id == null && item.admin_id != null">WASP admin</h4>
+                <h3>{{item?.maintenance_category_data?.zh_name}} {{item?.sub_maintenance_category_data ? '＋'
+                  +item?.sub_maintenance_category_data?.zh_name : ''}}</h3>
+                <p class="remark" [style.visibility]="item.remark != '' ? 'visible' : 'hidden'">{{item?.remark == '' ?
+                  '123' : item?.remark}}</p>
+              </div>
+            </ion-col>
+            <ion-col size="3.5" class="ion-align-self-center">
+              <ion-text color="dark">
+                <h1 class="ion-text-center"><strong>{{item?.accmulated_days}}</strong></h1>
+              </ion-text>
+            </ion-col>
+
+            <ion-col size="12" class="show-on-hover action-btn-col">
+              <ion-button (click)="commonService?.openCMSPage('/appointment-detail?appointment_id='+item.id, 'blank')" color="secondary" expand="block" fill="outline">
+                查看詳情
+              </ion-button>
+              <ion-button (click)="completeAppointment(item)" color="tertiary" expand="block" fill="outline">
+                完成預約服務
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ng-container>
+
+
+
+      </ion-col>
+      <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-start">
+        
+        <ion-row class="header-row upcoming">
+          <ion-col size="12">
+            <ion-text color="secondary">
+              <h2 style="border-bottom: 1px solid var(--ion-color-dark-tint);">處理中賠償</h2>
+            </ion-text>
+          </ion-col>
+          <ion-col size="12" *ngIf="compensation_payment_data_list == null || compensation_payment_data_list.length <= 0">
+            未有處理中賠償
+          </ion-col>
+          <ion-col size="12">
+            <div class="compensation-div" *ngFor="let item of compensation_payment_data_list;">
+              <h2>{{item?.create_date | date:'yyyy-MM-dd HH:mm'}}</h2>
+              <h2 class="ion-no-margin">{{item?.car_plate}}</h2>
+              <h4>{{item?.car_brand}} {{item?.car_model}}</h4>
+              <h4 *ngIf="item.user_id != null">
+                {{item?.user_zh_full_name?.charAt(0)}}{{item?.user_call == 'Miss' ? '小姐' : '先生'}}
+                ({{item?.user_phone}})</h4>
+              <h3 *ngIf="item?.compensation_price != null">
+                HK${{item?.compensation_price | number}}
+                <span *ngIf="item.expiry_date != ''">({{item?.expiry_date | date:'yyyy-MM-dd'}}前繳交)</span>
+              </h3>
+              <p>{{item?.remark}}</p>
+              <ion-chip color="tertiary" mode="ios" outline="true" *ngIf="item.status == 'awaiting_quotation'">
+                <ion-label>{{'待報價'}}</ion-label>
+              </ion-chip>
+              <ion-chip color="dark" mode="ios" outline="true" *ngIf="item.status == 'awaiting_payment'">
+                <ion-label>{{'待付款'}}</ion-label>
+              </ion-chip>
+              <ion-chip color="medium" mode="ios" outline="true" *ngIf="item.status == 'awaiting_verification'">
+                <ion-label>{{'待審核'}}</ion-label>
+              </ion-chip>
+              <div class="show-on-hover action-btn-div">
+                <ion-button (click)="commonService?.openCMSPage('/compensation-payment-detail?compensation_payment_id='+item.id, 'blank')" color="secondary" expand="block" fill="outline">
+                  查看詳情
+                </ion-button>
+                <ion-button *ngIf="item?.return_vehicle_report_pdf_url != ''"
+                (click)="commonService.downloadMedia(item?.return_vehicle_report_pdf_url, true)" color="tertiary" expand="block" fill="outline">
+                  下載還車報告
+                </ion-button>
+                <ion-button *ngIf="item?.status == 'awaiting_quotation'" (click)="selected_compensation_payment_data = item; isModalOpen = true;" color="secondary" expand="block" fill="outline">
+                  立即報價
+                </ion-button>
+              </div>
+            </div>
+          </ion-col>
+        </ion-row>
+        <br>
+        <ion-row class="header-row upcoming">
+          <ion-col size="12">
+            <ion-text color="secondary">
+              <h2 style="border-bottom: 1px solid var(--ion-color-dark-tint);">即將到場</h2>
+            </ion-text>
+          </ion-col>
+          <ion-col size="12" *ngIf="ongoing_appointment_data_list == null || ongoing_appointment_data_list.length <= 0">
+            未有預約
+          </ion-col>
+          <ion-col size="12">
+            <div class="upcoming-div" *ngFor="let item of upcoming_appointment_data_list;">
+              <h2>{{item?.appointment_datetime | date:'yyyy-MM-dd HH:mm'}}</h2>
+              <h2 class="ion-no-margin">{{item?.car_plate}}</h2>
+              <h4>{{item?.car_brand}} {{item?.car_model}}</h4>
+              <h4 *ngIf="item.user_id != null && item?.contact_name == ''">
+                {{item?.user_zh_full_name?.charAt(0)}}{{item?.user_call == 'Miss' ? '小姐' : '先生'}}
+                ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+              <h4 *ngIf="item.user_id != null && item?.contact_name != ''"> {{item?.contact_name?.charAt(0)}}
+                ({{item?.contact_phone == '' ? item?.user_phone : item?.contact_phone}})</h4>
+              <h4 *ngIf="item.user_id == null && item.admin_id != null">WASP admin</h4>
+              <h3>{{item?.maintenance_category_data?.zh_name}} {{item?.sub_maintenance_category_data ? '＋'
+                +item?.sub_maintenance_category_data?.zh_name : ''}}</h3>
+              <p>{{item?.remark}}</p>
+              <ion-chip color="dark" mode="ios" outline="true">
+                <ion-label>{{item?.maintenance_data?.zh_service_name =='維修檢查' ? '維' : '保'}}</ion-label>
+              </ion-chip>
+
+              <div class="show-on-hover action-btn-div">
+                <ion-button (click)="commonService?.openCMSPage('/appointment-detail?appointment_id='+item.id, 'blank')" color="secondary" expand="block" fill="outline">
+                  查看詳情
+                </ion-button>
+                <ion-button (click)="completeAppointment(item)" color="tertiary" expand="block" fill="outline">
+                  完成預約服務
+                </ion-button>
+              </div>
+            </div>
+          </ion-col>
+        </ion-row>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-modal id="compensation-quotation-modal"  #modal trigger="open-modal" [isOpen]="isModalOpen" (didDismiss)="onDidDismiss($event)">
+  <ng-template>
+    <div class="wrapper">
+      <h1 class="ion-text-center">賠償報價</h1>
+      <p>請注意報價送出後狀態將自動轉為《待付款》</p>
+      <br>
+      <ion-item class="input-item" mode="md" lines='none' button='false'>
+        <ion-label class="ion-text-wrap" position="stacked">報價</ion-label>
+        <ion-input [(ngModel)]="selected_compensation_payment_data.compensation_price" type="number"></ion-input>
+      </ion-item>
+      <br>
+      <ion-button (click)="updateCompensationPayment()" color="secondary" expand="block" fill="outline">
+        送出報價
+      </ion-button>
+    </div>
+  </ng-template>
+</ion-modal>

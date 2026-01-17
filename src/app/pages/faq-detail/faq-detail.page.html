@@ -1,0 +1,142 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    
+
+    <ion-title class="hidden-xs-down">常見問題</ion-title>
+
+    <ng-container *ngIf="faq_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(faq_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; faq_data = checking_faq_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="faq_id == null">
+      <ion-button fill="clear" (click)="createNewFaq()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立常見問題
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/*" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="faq_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="faq_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="faq_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文分類</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="faq_data.zh_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文分類</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="faq_data.en_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">排序</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="faq_data.index" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12">
+          <ion-item lines="none" style="--background: transparent;">
+            <ion-icon *ngIf="faq_data.icon_img_url && faq_data.icon_img_url != ''" [src]="('media_url' | env)+faq_data.icon_img_url" slot="start"></ion-icon>
+            <ion-button [disabled]="readonly" (click)="triggerImgUpload()" expand="block">
+              上載icon
+            </ion-button>
+          </ion-item>
+        </ion-col>
+        <ng-container *ngFor="let item of faq_data.detail_list; let i = index;">
+          <ion-col size-xs="5.5" size-sm="5.5" size-md="5.5" size-lg="5.5">
+            <ion-item class=" input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+              button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">中文題目</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="item.zh_title" type="text"></ion-input>
+            </ion-item>
+            <ion-item class=" input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+              button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">中文答案</ion-label>
+              <ion-textarea [readonly]="readonly" [(ngModel)]="item.zh_content" type="text" rows="5"></ion-textarea>
+            </ion-item>
+          </ion-col>
+          <ion-col size-xs="5.5" size-sm="5.5" size-md="5.5" size-lg="5.5">
+            <ion-item class=" input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+              button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">英文題目</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="item.en_title" type="text"></ion-input>
+            </ion-item>
+            <ion-item class=" input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+              button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">英文答案</ion-label>
+              <ion-textarea [readonly]="readonly" [(ngModel)]="item.en_content" type="text" rows="5"></ion-textarea>
+            </ion-item>
+          </ion-col>
+  
+          <ion-col size-xs="1" size-sm="1" size-md="1" size-lg="1" class="ion-align-self-center ion-text-center">
+            <ion-icon *ngIf="!readonly" (click)="faq_data.detail_list.splice(i, 1)" class="remove-icon"
+              name="trash-bin-outline"></ion-icon>
+          </ion-col>
+        </ng-container>
+
+        <ion-col size="12" *ngIf="!readonly">
+          <div>
+            <ion-button color="secondary" (click)="addQuestionAndAnswer()" fill="outline" shape="round">
+              新增問題及答案
+            </ion-button>
+          </div>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

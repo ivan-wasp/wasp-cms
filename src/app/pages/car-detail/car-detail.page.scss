@@ -1,0 +1,73 @@
+.cover-img {
+    margin: auto;
+}
+
+.plan-div {
+    align-items: center;
+    margin-bottom: 6px;
+    display: inline-flex;
+    width: 100%;
+    ion-item {
+        width: 50%;
+    }
+}
+
+.sold-alert-div {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    background: var(--ion-color-secondary);
+    border-radius: 5px;
+    h2 {
+        color: var(--ion-color-primary);
+    }
+    ion-icon {
+        margin-right: 12px;
+        font-size: 1.4rem;
+        color: var(--ion-color-primary);
+    }
+}
+
+.top-btn {
+    background: var(--ion-color-secondary);
+    --background: var(--ion-color-secondary);
+    border-radius: 8px;
+    --border-radius: 8px;
+    min-height: 100px;
+    font-size: 1.1rem;
+    ion-icon {
+        font-size: 1.6rem;
+    }
+}
+
+.top-btn2 {
+    background: var(--ion-color-primary);
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-secondary);
+    border-radius: 8px;
+    --border-radius: 8px;
+    min-height: 100px;
+    font-size: 1.1rem;
+    ion-icon {
+        color: var(--ion-color-secondary);
+        font-size: 1.6rem;
+    }
+}
+
+.img-item {
+    // position: relative;
+    // .remove-icon{
+    //     position: absolute;
+    //     right: 12px;
+    //     top: 12px;
+    //     font-size: 1.6rem;
+    //     cursor: pointer;
+    // }
+    img{
+        max-height: 150px;
+    }
+    .remove-icon {
+        font-size: 1.6rem;
+        cursor: pointer;
+    }
+}

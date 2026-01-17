@@ -1,0 +1,254 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+        <ion-title class="hidden-xs-down">租務數據</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
+                <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
+                管理員通知
+            </ion-button>
+        </ion-buttons>
+        <!-- <ion-buttons slot="end">
+      <ion-button (click)="commonService?.openCMSPage('/car-detail', 'root')" fill="clear">
+        <ion-icon slot="start" name="car-outline"></ion-icon>
+        新增汽車
+      </ion-button>
+    </ion-buttons> -->
+        <!-- <ion-buttons slot="end">
+      <ion-button fill="clear" class="export-excel-btn">
+        <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
+        輸出至Excel
+      </ion-button>
+    </ion-buttons> -->
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+
+    <div class="ion-margin table_container">
+        <ion-row class="table_header full-width hidden-sm-down">
+            <ion-col size="1">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('id')">
+                    <ion-icon *ngIf="sorting == 'id' && direction == 'ASC'" slot="start" name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'id' && direction == 'DESC'" slot="start" name="arrow-down-outline">
+                    </ion-icon>
+                    ID
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    封面圖
+                </ion-button>
+            </ion-col>
+            <ion-col size="1">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('today_status')">
+                    <ion-icon *ngIf="sorting == 'today_status' && direction == 'ASC'" slot="start" name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'today_status' && direction == 'DESC'" slot="start" name="arrow-down-outline">
+                    </ion-icon>
+                    空置中
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    車牌 型號
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    過往租務收入
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    保養支出總額
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+
+            </ion-col>
+            <ion-col size="2">
+
+            </ion-col>
+        </ion-row>
+
+        <ng-container *ngIf="dataService?.table_data_list == null">
+            <ion-row class="table_content full-width ske_table_content" *ngFor="let item of [].constructor(10)">
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="2">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="2">
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null && dataService?.table_data_list.length == 0">
+            <ion-row class="table_content full-width ske_table_content">
+                <ion-col size="12">
+                    <h3>找不到車輛</h3>
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null">
+            <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <span class="hidden-md-up">ID：</span>
+                    <span>{{item.id}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">封面圖：</span>
+                    <span>
+            <ion-img style="width: fit-content;"
+              *ngIf="item.cover_img_url_list != null && item.cover_img_url_list != ''"
+              [src]="('media_url' | env)+item?.cover_img_url_list">
+            </ion-img>
+            <!-- <ion-thumbnail *ngIf="item.cover_img_url_list != null && item.cover_img_url_list != ''">
+              <img [src]="('media_url' | env)+item?.cover_img_url_list" />
+            </ion-thumbnail> -->
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <span class="hidden-md-up">空置中：</span>
+                    <span>
+            <ion-chip *ngIf="item?.today_status == 'available'" color="danger" mode="ios" outline="true">
+              <ion-label>空置中</ion-label>
+            </ion-chip>
+            <ion-chip *ngIf="item?.today_status == 'booked'" color="success" mode="ios" outline="true">
+              <ion-label>租用中</ion-label>
+            </ion-chip>
+            <ion-chip *ngIf="item?.today_status == 'blocked'" color="medium" mode="ios" outline="true">
+              <ion-label>已預留中</ion-label>
+            </ion-chip>
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">車牌 型號：</span>
+                    <span>
+            <!-- {{item?.plate}} -->
+            <span class="car-plate">{{item?.plate}}</span>
+                    <br><span style="line-height: 2rem;">{{item?.model}}</span>
+                    </span>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">過往租務收入：</span>
+                    <span>
+            {{(item?.paid_payment_amount | currency : 'HKD' :'symbol':'1.0-1')
+            || ( 0 | currency : 'HKD' :'symbol':'1.0-1')}}
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">保養支出：</span>
+                    <span>
+            {{(item?.maintenance_cost_amount | currency : 'HKD' :'symbol':'1.0-1')
+            || ( 0 | currency : 'HKD' :'symbol':'1.0-1')}}
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up"></span>
+                    <span>
+            <ion-button color="secondary"
+              (click)="commonService?.openCMSPage('/campaign-detail?car_id='+item?.id, 'root')" expand="block"
+              fill="solid">
+              設定限時活動
+            </ion-button>
+            <ion-button color="secondary"
+              (click)="commonService?.openCMSPage('/coupon-detail?car_id='+item?.id, 'root')" expand="block"
+              fill="solid">
+              設定限時優惠券
+            </ion-button>
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up"></span>
+                    <span>
+                      <ion-button *ngIf="item.has_campaign" color="primary" (click)="commonService?.openCMSPage('/campaign?&car_id='+item.id, 'root')"
+                      expand="block" fill="solid">
+                      查看限時活動
+                    </ion-button>
+            <ion-button color="primary" (click)="commonService?.openCMSPage('/appointment?car_id='+item.id, 'root')"
+            expand="block" fill="solid">
+            查看保養維修紀錄
+          </ion-button>
+          </span>
+                </ion-col>
+            </ion-row>
+
+            <ion-row class="table_footer full-width" *ngIf="dataService?.table_data_list.length > 0">
+                <ion-col size-xs="12" size-sm="12" size-md="8" size-lg="8">
+                    <div class="nav_container space_between full-width">
+                        <div class="left_part">
+                            <ion-button [disabled]="page == 1" (click)="goPreviousPage()" class="default-ion-btn fit-content nav_page_btn">
+                                <ion-icon name="chevron-back-outline"></ion-icon>
+                                <span class="ion-margin-start" class="hidden-sm-down">上一頁</span>
+                            </ion-button>
+                        </div>
+                        <div class="middle_part">
+                            <ion-button *ngIf="page != 1" (click)="selectPage(1)" class="default-ion-btn fit-content page_num_btn">
+                                <ion-icon name="caret-back-outline"></ion-icon>
+                            </ion-button>
+                            <ion-button *ngIf="page-2 >= 1" (click)="selectPage(page-2)" class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                                {{page-2}}
+                            </ion-button>
+                            <ion-button *ngIf="page-1 >= 1" (click)="selectPage(page-1)" class="default-ion-btn fit-content page_num_btn">
+                                {{page-1}}
+                            </ion-button>
+                            <ion-button (click)="selectPage(page)" class="default-ion-btn fit-content current_page_num_btn">
+                                {{page}}
+                            </ion-button>
+                            <ion-button *ngIf="page+1 <= dataService?.table_data_number_of_page" (click)="selectPage(page+1)" class="default-ion-btn fit-content page_num_btn">
+                                {{page+1}}
+                            </ion-button>
+                            <ion-button *ngIf="page+2 <= dataService?.table_data_number_of_page" (click)="selectPage(page+2)" class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                                {{page+2}}
+                            </ion-button>
+                            <ion-button *ngIf="page != dataService?.table_data_number_of_page" (click)="selectPage(dataService.table_data_number_of_page)" class="default-ion-btn fit-content page_num_btn">
+                                <ion-icon name="caret-forward-outline"></ion-icon>
+                            </ion-button>
+                        </div>
+                        <div class="right_part">
+                            <ion-button [disabled]="page == dataService?.table_data_number_of_page" (click)="goNextPage()" class="default-ion-btn fit-content nav_page_btn">
+                                <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+
+                                <span class="ion-margin-end" class="hidden-sm-down">下一頁</span>
+                            </ion-button>
+                        </div>
+                    </div>
+
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <div class="table_pagination_option">
+                        <p class="display_info">
+                            顯示 {{(page-1)*limit+dataService?.table_data_list.length}}／{{dataService?.table_data_total_number}}（共{{dataService.table_data_number_of_page}}頁）
+                        </p>
+                        <mat-select (selectionChange)="limitChange($event)" class="table_limit" [value]="limit.toString()">
+                            <mat-option value="10">10</mat-option>
+                            <mat-option value="25">25</mat-option>
+                            <mat-option value="50">50</mat-option>
+                            <mat-option value="100">100</mat-option>
+                            <mat-option value="500">500</mat-option>
+                        </mat-select>
+                    </div>
+
+                </ion-col>
+            </ion-row>
+        </ng-container>
+    </div>
+
+</ion-content>

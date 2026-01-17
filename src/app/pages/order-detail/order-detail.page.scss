@@ -1,0 +1,29 @@
+.top-btn {
+    background: var(--ion-color-secondary);
+    --background: var(--ion-color-secondary);
+    border-radius: 8px;
+    --border-radius: 8px;
+    min-height: 50px;
+    font-size: 1.1rem;
+    ion-icon {
+        font-size: 1.6rem;
+    }
+}
+
+.payment-previous-icon,
+.payment-next-icon {
+    font-size: 36px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 99;
+}
+
+.payment-previous-icon {
+    left: 0;
+}
+
+.payment-next-icon {
+    right: 0;
+}

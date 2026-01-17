@@ -1,0 +1,407 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+        <ion-title class="hidden-xs-down">租務訂單</ion-title>
+
+        <ng-container *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+            <ion-buttons slot="end">
+                <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
+                    <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
+                    管理員通知
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end">
+                <ion-button (click)="commonService?.openCMSPage('/new-order', 'root')" fill="clear">
+                    <ion-icon slot="start" src="assets/icon/menu_notification.svg"></ion-icon>
+                    新增訂單
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" (click)="getOrderDataList(true)">
+                <ion-button fill="clear" class="export-excel-btn">
+                    <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
+                    輸出至Excel
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <div class="ion-margin">
+        <ion-row>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+                <ion-select (ionChange)="resetAndGetData($event)" class="filter-ion-select" interface="popover"
+                    mode="ios" [(ngModel)]="status" multiple="false" cancelText="取消" okText="確認" placeholder="訂單狀態">
+                    <ion-select-option value="">全部訂單狀態</ion-select-option>
+                    <ion-select-option value="awaiting_payment">未付款</ion-select-option>
+                    <ion-select-option value="awaiting_verification">待審核</ion-select-option>
+                    <ion-select-option value="awaiting_pick_up">待取車</ion-select-option>
+                    <ion-select-option value="rendering">租用中</ion-select-option>
+                    <ion-select-option value="completed">已完結</ion-select-option>
+                    <ion-select-option value="cancelled">已取消</ion-select-option>
+                </ion-select>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+                <mat-form-field appearance="fill" style="display: none;">
+                    <mat-label>建立日期</mat-label>
+                    <mat-date-range-input [rangePicker]="picker">
+                        <input #start_date
+                            [value]="create_date_start != null && create_date_start != '' ? create_date_start.split('T')[0] : ''"
+                            matStartDate placeholder="開始日期">
+                        <input #end_date
+                            [value]="create_date_end != null && create_date_end != '' ? create_date_end.split('T')[0] : ''"
+                            matEndDate placeholder="結束日期"
+                            (dateChange)="selectionCreateDateChanged(start_date, end_date)">
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker touchUi #picker></mat-date-range-picker>
+                </mat-form-field>
+                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                    <ion-input placeholder="建立日期"
+                        *ngIf="create_date_start != null && create_date_start != '' && create_date_end != null && create_date_end != ''"
+                        readonly
+                        value="{{create_date_start | date : 'yyyy-MM-dd'}} - {{create_date_end | date : 'yyyy-MM-dd'}}"
+                        type="text"></ion-input>
+                    <ion-input placeholder="建立日期"
+                        *ngIf="!(create_date_start != null && create_date_start != '' && create_date_end != null && create_date_end != '')"
+                        readonly value="" type="text"></ion-input>
+                    <ion-icon
+                        *ngIf="(create_date_start != null && create_date_start != '') || (create_date_end != null && create_date_end != '')"
+                        (click)="resetCreateDate()" slot="end" name="close-outline"></ion-icon>
+                    <mat-datepicker-toggle slot="end" matSuffix [for]="picker"></mat-datepicker-toggle>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+                <mat-form-field appearance="fill" style="display: none;">
+                    <mat-label>租賃期</mat-label>
+                    <mat-date-range-input [rangePicker]="picker2">
+                        <input #start_date2
+                            [value]="booking_date_start != null && booking_date_start != '' ? booking_date_start.split('T')[0] : ''"
+                            matStartDate placeholder="開始日期">
+                        <input #end_date2
+                            [value]="booking_date_end != null && booking_date_end != '' ? booking_date_end.split('T')[0] : ''"
+                            matEndDate placeholder="結束日期"
+                            (dateChange)="selectionBookingDateChanged(start_date2, end_date2)">
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-date-range-picker touchUi #picker2></mat-date-range-picker>
+                </mat-form-field>
+                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                    <ion-input placeholder="租賃期"
+                        *ngIf="booking_date_start != null && booking_date_start != '' && booking_date_end != null && booking_date_end != ''"
+                        readonly
+                        value="{{booking_date_start | date : 'yyyy-MM-dd'}} - {{booking_date_end | date : 'yyyy-MM-dd'}}"
+                        type="text"></ion-input>
+                    <ion-input placeholder="租賃期"
+                        *ngIf="!(booking_date_start != null && booking_date_start != '' && booking_date_end != null && booking_date_end != '')"
+                        readonly value="" type="text"></ion-input>
+                    <ion-icon
+                        *ngIf="(booking_date_start != null && booking_date_start != '') || (booking_date_end != null && booking_date_end != '')"
+                        (click)="resetBookingDate()" slot="end" name="close-outline"></ion-icon>
+                    <mat-datepicker-toggle slot="end" matSuffix [for]="picker2"></mat-datepicker-toggle>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center" *ngIf="(admin_data | async)?.type != adminType.owner">
+                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap">
+                        <ng-container *ngIf="!(user_id != null && user_id != '')">
+                            用戶
+                        </ng-container>
+                        <ng-container *ngIf="user_id != null && user_id != ''">
+                            {{getUserDataById(user_id)?.username}} - {{getUserDataById(user_id)?.zh_full_name}} -
+                            {{getUserDataById(user_id)?.phone}}
+                        </ng-container>
+                    </ion-label>
+                    <ionic-selectable #ionSelectable (onOpen)="onOpen($event)" (onChange)="onUserChange($event)"
+                        (onSearch)="commonService?.searchUser($event)" [(ngModel)]="user_id" itemValueField="id"
+                        shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)"
+                        [canClear]="true" [canSearch]="true" [isMultiple]="false" confirmButtonText="確認"
+                        clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                        <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                            {{port.zh_full_name || port.username}} - {{port.phone}}
+                        </ng-template>
+                        <!-- <ng-template  ionicSelectableValueTemplate let-ports="item">
+                {{getUserDataById(user_id)?.zh_full_name}} ({{getUserDataById(user_id)?.phone}})
+            </ng-template> -->
+                    </ionic-selectable>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center"
+                *ngIf="(all_car_data_list$ | async) != null">
+                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                    <ion-label class="ion-text-wrap">
+                        <ng-container *ngIf="!(car_id != null && car_id != '')">
+                            車輛
+                        </ng-container>
+                        <ng-container *ngIf="car_id != null && car_id != ''">
+                            {{getCarDataById(car_id)?.plate}} ({{getCarDataById(car_id)?.model}})
+                        </ng-container>
+                    </ion-label>
+                    <ionic-selectable (onChange)="onCarChange($event)" (onSearch)="commonService?.searchCar($event)"
+                        [(ngModel)]="car_id" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate"
+                        [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="false"
+                        confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                        <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                            {{port.model}} - {{port.plate}}
+                        </ng-template>
+                        <!-- <ng-template  ionicSelectableValueTemplate let-ports="item">
+              {{getCarDataById(car_id)?.plate}} ({{getCarDataById(car_id)?.model}})
+            </ng-template> -->
+                    </ionic-selectable>
+                </ion-item>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+                <ion-select (ionChange)="resetAndGetData($event)" class="filter-ion-select" interface="popover"
+                    mode="ios" [(ngModel)]="parking_id" multiple="false" cancelText="取消" okText="確認"
+                    placeholder="租車連車位">
+                    <ion-select-option value="">停車場</ion-select-option>
+                    <ion-select-option [value]="item.id"
+                        *ngFor="let item of (all_parking_data_list$ | async)">{{item?.zh_name}}</ion-select-option>
+                </ion-select>
+            </ion-col>
+        </ion-row>
+    </div>
+    <div class="ion-margin table_container">
+        <ion-row class="table_header full-width hidden-sm-down">
+            <ion-col size="1">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('id')">
+                    <ion-icon *ngIf="sorting == 'id' && direction == 'ASC'" slot="start" name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'id' && direction == 'DESC'" slot="start" name="arrow-down-outline">
+                    </ion-icon>
+                    ID
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('create_date')">
+                    <ion-icon *ngIf="sorting == 'create_date' && direction == 'ASC'" slot="start"
+                        name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'create_date' && direction == 'DESC'" slot="start"
+                        name="arrow-down-outline">
+                    </ion-icon>
+                    建立日期
+                </ion-button>
+            </ion-col>
+            <ion-col size="1">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    用戶名
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    車輛
+                </ion-button>
+            </ion-col>
+            <ion-col size="1.5">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('start_date')">
+                    <ion-icon *ngIf="sorting == 'start_date' && direction == 'ASC'" slot="start"
+                        name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'start_date' && direction == 'DESC'" slot="start"
+                        name="arrow-down-outline">
+                    </ion-icon>
+                    租賃期
+                </ion-button>
+            </ion-col>
+            <ion-col size="1">
+                <ion-button class="default-ion-btn fit-content sort_header_btn" (click)="switchSorting('status')">
+                    <ion-icon *ngIf="sorting == 'status' && direction == 'ASC'" slot="start" name="arrow-up-outline">
+                    </ion-icon>
+                    <ion-icon *ngIf="sorting == 'status' && direction == 'DESC'" slot="start" name="arrow-down-outline">
+                    </ion-icon>
+                    狀態
+                </ion-button>
+            </ion-col>
+            <ion-col size="3">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    停車場
+                </ion-button>
+            </ion-col>
+            <ion-col size="1"></ion-col>
+            <ion-col size="0.5"></ion-col>
+        </ion-row>
+
+        <ng-container *ngIf="dataService?.table_data_list == null">
+            <ion-row class="table_content full-width ske_table_content" *ngFor="let item of [].constructor(10)">
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1.5">
+                </ion-col>
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="3">
+                </ion-col>
+                <ion-col size="1">
+                </ion-col>
+                <ion-col size="0.5">
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null && dataService?.table_data_list.length == 0">
+            <ion-row class="table_content full-width ske_table_content">
+                <ion-col size="12">
+                    <h3>找不到租務訂單</h3>
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null">
+            <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <span class="hidden-md-up">ID：</span>
+                    <span>{{item.id}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">建立日期：</span>
+                    <span>{{item?.create_date | date : 'yyyy-MM-dd HH:mm'}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <span class="hidden-md-up">用戶名：</span>
+                    <span class="clickable"
+                        (click)="commonService.openCMSPage('/user-detail?user_id='+item.user_id, 'blank')">
+                        {{(admin_data | async)?.type == adminType.owner ? '*' + item?.user_data?.zh_full_name?.slice(-2) : item?.user_data?.zh_full_name}}
+                        <br>
+                        {{(admin_data | async)?.type == adminType.owner ? '****' + item?.user_data?.phone?.slice(-4) : item?.user_data?.phone}}
+                        <br>
+                        <ion-chip color="dark" mode="ios" outline="true"
+                            *ngIf="!('production' | env) || ((admin_data | async) && (admin_data | async).authority_list.includes(authority.credit_rating))">
+                            <ion-label>信用評級：{{item?.user_data?.credit_rating}}</ion-label>
+                        </ion-chip>
+                    </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">車輛：</span>
+                    <span class="clickable"
+                        (click)="commonService.openCMSPage('/car-detail?car_id='+item.car_id, 'blank')"><img
+                            [src]="('media_url' | env)+item?.car_data?.cover_img_url_list[0]" alt=""><br>
+                        {{item?.car_data?.plate}} <br> {{item?.car_data?.model}}</span>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+                    <span class="hidden-md-up">租賃期：</span>
+                    <span>{{item?.booking_date_list.length}}日<br>{{item?.start_date | date : 'yyyy-MM-dd'}} <br> 至 <br>
+                        {{item?.end_date |
+                        date : 'yyyy-MM-dd'}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <span class="hidden-md-up">狀態：</span>
+                    <span>
+                        <app-status-chip [data_type]="'order_data'" [status]="item.status"></app-status-chip>
+                    </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <span class="hidden-md-up">停車場：</span>
+                    <span>
+                        取車: {{item?.pick_up_data?.address}}
+                        <br>
+                        還車: {{item?.return_data?.address}}
+                        <br>
+                        租用停車場: {{item?.parking_data?.zh_name}}
+                    </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+                    <!-- <ion-button color="secondary" (click)="commonService?.openCMSPage(('/new-order?user_id='+item.user_id+'&car_id='+item.car_id), 'root')" fill="outline">
+                        續約
+                    </ion-button> -->
+                    <ion-button color="secondary" *ngIf="(admin_data | async)?.type != adminType.owner"
+                        (click)="commonService?.openCMSPage('/appointment?user_id='+item.user_id+'&car_id='+item.car_id, 'root')"
+                        fill="outline">
+                        保養
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="0.5" size-lg="0.5">
+                    <ion-icon style="font-size: 20px;" class="hidden-md-down clickable" name="chevron-forward-outline"
+                        (click)="commonService?.openCMSPage('/order-detail?order_id='+item.id, 'root')"></ion-icon>
+
+                    <ion-button (click)="commonService?.openCMSPage('/order-detail?order_id='+item.id, 'root')"
+                        class="default-ion-btn hidden-md-up" fill="clear">
+                        查看或更改
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+
+            <ion-row class="table_footer full-width" *ngIf="dataService?.table_data_list.length > 0">
+                <ion-col size-xs="12" size-sm="12" size-md="8" size-lg="8">
+                    <div class="nav_container space_between full-width">
+                        <div class="left_part">
+                            <ion-button [disabled]="page == 1" (click)="goPreviousPage()"
+                                class="default-ion-btn fit-content nav_page_btn">
+                                <ion-icon name="chevron-back-outline"></ion-icon>
+                                <span class="ion-margin-start" class="hidden-sm-down">上一頁</span>
+                            </ion-button>
+                        </div>
+                        <div class="middle_part">
+                            <ion-button *ngIf="page != 1" (click)="selectPage(1)"
+                                class="default-ion-btn fit-content page_num_btn">
+                                <ion-icon name="caret-back-outline"></ion-icon>
+                            </ion-button>
+                            <ion-button *ngIf="page-2 >= 1" (click)="selectPage(page-2)"
+                                class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                                {{page-2}}
+                            </ion-button>
+                            <ion-button *ngIf="page-1 >= 1" (click)="selectPage(page-1)"
+                                class="default-ion-btn fit-content page_num_btn">
+                                {{page-1}}
+                            </ion-button>
+                            <ion-button (click)="selectPage(page)"
+                                class="default-ion-btn fit-content current_page_num_btn">
+                                {{page}}
+                            </ion-button>
+                            <ion-button *ngIf="page+1 <= dataService?.table_data_number_of_page"
+                                (click)="selectPage(page+1)" class="default-ion-btn fit-content page_num_btn">
+                                {{page+1}}
+                            </ion-button>
+                            <ion-button *ngIf="page+2 <= dataService?.table_data_number_of_page"
+                                (click)="selectPage(page+2)"
+                                class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                                {{page+2}}
+                            </ion-button>
+                            <ion-button *ngIf="page != dataService?.table_data_number_of_page"
+                                (click)="selectPage(dataService.table_data_number_of_page)"
+                                class="default-ion-btn fit-content page_num_btn">
+                                <ion-icon name="caret-forward-outline"></ion-icon>
+                            </ion-button>
+                        </div>
+                        <div class="right_part">
+                            <ion-button [disabled]="page == dataService?.table_data_number_of_page"
+                                (click)="goNextPage()" class="default-ion-btn fit-content nav_page_btn">
+                                <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+
+                                <span class="ion-margin-end" class="hidden-sm-down">下一頁</span>
+                            </ion-button>
+                        </div>
+                    </div>
+
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                    <div class="table_pagination_option">
+                        <p class="display_info">
+                            顯示
+                            {{(page-1)*limit+dataService?.table_data_list.length}}／{{dataService?.table_data_total_number}}（共{{dataService.table_data_number_of_page}}頁）
+                        </p>
+                        <mat-select (selectionChange)="limitChange($event)" class="table_limit"
+                            [value]="limit.toString()">
+                            <mat-option value="10">10</mat-option>
+                            <mat-option value="25">25</mat-option>
+                            <mat-option value="50">50</mat-option>
+                            <mat-option value="100">100</mat-option>
+                            <mat-option value="500">500</mat-option>
+                        </mat-select>
+                    </div>
+
+                </ion-col>
+            </ion-row>
+        </ng-container>
+    </div>
+</ion-content>

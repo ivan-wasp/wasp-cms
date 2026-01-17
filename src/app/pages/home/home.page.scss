@@ -1,0 +1,43 @@
+.this-month-btn, .revenue, .neutral, .outstanding, .deposit{
+    min-height: 100px;
+    height: 100%;
+    ion-icon{
+        font-size: 36px;
+        // margin-right: 12px;
+    }
+    .amount{
+        font-size: 24px;
+    }
+    .subtitle{
+        font-size: 14px;
+        line-height: normal;
+    }
+    h2{
+        color: #ffffff;
+    }
+}
+
+.deposit{
+    --background: #FE9D24; 
+}
+.neutral{
+    --background: #43A5D1; 
+}
+.revenue{
+    --background: #74D143; 
+}
+.outstanding{
+    --background: var(--ion-color-danger);
+}
+.est-next-month-btn{
+    --background: #F7688F; 
+}
+
+.event-item{
+    cursor: pointer;
+    --border-color: var(--ion-color-light-shade);
+    --border-radius: 15px;
+    --border-style: solid;
+    --border-width: 1px;
+    --background: #F5F5F5;
+}

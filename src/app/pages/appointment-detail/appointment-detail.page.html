@@ -1,0 +1,283 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">預約維修</ion-title>
+
+    <ng-container *ngIf="appointment_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(appointment_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true ; appointment_data = checking_appointment_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="appointment_id == null">
+      <ion-button fill="clear" (click)="createNewAppointment()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立預約維修
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="appointment_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="appointment_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="appointment_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="appointment_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="appointment_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">管理員</ion-label>
+            <ion-input readonly="readonly" [value]="admin_data?.username" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇車輛（必選）</ion-label>
+            <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly" [(ngModel)]="appointment_data.car_id"
+              itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_car_data_list$ | async)"
+              [canClear]="true" [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+              closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img"
+                  [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{getCarDataById(appointment_data.car_id)?.plate}} ({{getCarDataById(appointment_data.car_id)?.model}})
+              </ng-template>
+
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇用戶（可不選）</ion-label>
+            <ionic-selectable #ionSelectable (onOpen)="onOpen($event)" (onSearch)="commonService?.searchUser($event)"
+              (onChange)="changeUser($event)" [disabled]="readonly" [(ngModel)]="appointment_data.user_id"
+              itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)"
+              [canClear]="true" [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+              closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_full_name || port.username}} - {{port.phone}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{getUserDataById(appointment_data.user_id)?.zh_full_name}}
+                ({{getUserDataById(appointment_data.user_id)?.phone}})
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇維修服務（必選）</ion-label>
+            <ionic-selectable (onSearch)="searchMaintenance($event)" [disabled]="readonly"
+              [(ngModel)]="appointment_data.maintenance_id" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_factory_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true" (onChange)="maintenanceChange($event)">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_service_name}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{getMaintenanceDataById(appointment_data.maintenance_id)?.zh_service_name}}
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+          *ngIf="selected_maintenance_data != null && selected_maintenance_data.maintenance_category_list.length > 0">
+          <ion-item [ngClass]="{'readonly': readonly}" class="input-item" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">維修分類</ion-label>
+            <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+              [(ngModel)]="appointment_data.maintenance_category_id" (ionChange)="maintenanceCategoryChange($event)">
+              <ion-select-option *ngFor="let item of selected_maintenance_data.maintenance_category_list"
+                [value]="item.maintenance_category_id">{{item?.maintenance_category_data?.zh_name}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+          *ngIf="appointment_data && appointment_data.maintenance_category_id != null">
+          <ion-item [ngClass]="{'readonly': readonly}" class="input-item" mode="md" lines='none' button='false'>
+            <ion-label position="stacked">維修子分類</ion-label>
+            <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+              [(ngModel)]="appointment_data.sub_maintenance_category_id">
+              <ion-select-option *ngFor="let item of selected_children_maintenance_category_list" [value]="item.id">
+                {{item?.zh_name}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="appointment_data.maintenance_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇提供服務的車房（必選）</ion-label>
+            <ionic-selectable (onSearch)="searchFactory($event)" [disabled]="readonly" (onChange)="changeFactory($event)"
+              [(ngModel)]="appointment_data.factory_id" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_factory_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_name}}
+              </ng-template>
+              <!-- <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img *ngIf="port.cover_img_url_list.length > 0" class="select-end-img"
+                  [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template> -->
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{getFactoryDataById(appointment_data.factory_id)?.zh_name}}
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="appointment_data.factory_id != null">
+          <mat-form-field appearance="outline" style="display: none;">
+            <mat-label>開始日期</mat-label>
+            <input matInput [ngxMatDatetimePicker]="picker" [value]="appointment_data.appointment_datetime"
+              (dateChange)="appointmentDatetimeChange($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #picker showSpinners="true" [showSeconds]='showSeconds' [stepHour]="stepHour"
+              [stepMinute]="stepMinute" touchUi="true" color="primary" [enableMeridian]="enableMeridian"
+              disableMinute="false" hideTime="false">
+            </ngx-mat-datetime-picker>
+          </mat-form-field>
+
+          <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+            button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">預約日期時間</ion-label>
+            <ion-input
+              *ngIf="appointment_data.appointment_datetime != null && appointment_data.appointment_datetime != ''"
+              readonly value="{{appointment_data.appointment_datetime | date : 'yyyy-MM-dd HH:mm'}}" type="text">
+            </ion-input>
+            <ion-input
+              *ngIf="!(appointment_data.appointment_datetime != null && appointment_data.appointment_datetime != '')"
+              readonly value="" type="text"></ion-input>
+            <ion-icon
+              *ngIf="!readonly && (appointment_data.appointment_datetime != null && appointment_data.appointment_datetime != '')"
+              (click)="resetAppointmentDate()" slot="end" name="close-outline"></ion-icon>
+            <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker"></mat-datepicker-toggle>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="appointment_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="appointment_data.status" multiple="false" cancelText="取消"
+              okText="確認">
+              <ion-select-option value="awaiting_verification">審核中</ion-select-option>
+              <ion-select-option value="accepted">已接受預約</ion-select-option>
+              <ion-select-option value="completed">已完成</ion-select-option>
+              <ion-select-option value="cancelled">已取消</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">聯絡人名稱</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="appointment_data.contact_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">聯絡電話</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="appointment_data.contact_phone" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="appointment_data.remark" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">支出</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="appointment_data.cost" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+          <ion-slides mode="ios" pager="ios" scrollbar="ios">
+            <ion-slide *ngFor="let item of appointment_data.img_url_list; let i = index">
+              <ion-img [src]="('media_url' | env)+item">
+              </ion-img>
+              <!-- <ion-button *ngIf="!readonly" color="danger" (click)="appointment_data.img_url_list.splice(i, 1)" fill="solid" expand="block">
+                刪除
+              </ion-button> -->
+            </ion-slide>
+          </ion-slides>
+          <ion-button *ngIf="!readonly" color="dark" (click)="triggerImgUpload()" fill="solid" expand="block">
+            上載參考相片
+          </ion-button>
+        </ion-col>
+        <!-- <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="!readonly">
+          <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+            button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">加入項目</ion-label>
+            <ion-input #new_item (keydown.enter)="appointment_data.item_list.push(new_item.value); new_item.value = '';"
+              [readonly]="readonly" type="text"></ion-input>
+            <ion-icon (click)="appointment_data.item_list.push(new_item.value); new_item.value = '';" slot="end"
+              name="add-circle-outline"></ion-icon>
+          </ion-item>
+        </ion-col> -->
+
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

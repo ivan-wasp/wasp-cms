@@ -1,0 +1,7 @@
+{
+  "name": "ionic_cms_template",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,262 @@
+<ion-app>
+    <mat-progress-bar class="loading_mat_progress" *ngIf="commonService.isLoading" mode="query"></mat-progress-bar>
+    <div class="loading_blur" *ngIf="commonService.isLoading"></div>
+    <!-- <ion-split-pane contentId="menu-content" when="md"> -->
+    <ion-split-pane contentId="menu-content" when="lg">
+        <ion-menu #menu swipeGesture="false" [style.display]="current_url.includes('login') ? 'none' : ''"
+            contentId="menu-content" type="reveal" side="start">
+            <!-- <ion-menu swipeGesture="false" [ngStyle]="{display: commonService?.show_sidemenu ? '' : 'none'}"
+      [style.display]="current_url.includes('login') ? 'none' : ''" contentId="menu-content" type="overlay" side="start" > -->
+            <ion-header class="ion-no-border bg-major-color">
+                <ion-toolbar class="bg-major-color">
+
+                    <!-- <ion-buttons slot="start">
+            <ion-button >
+              <ion-toggle [checked]="commonService?.dark_mode" (click)="commonService?.toggleDarkTheme()"></ion-toggle>
+              Dark mode
+            </ion-button>
+          </ion-buttons> -->
+                    <ion-title>{{authService?.getAdminData()?.username}} (v{{('appVersion' | env)}}{{('production' |
+                        env) ? '' : ' 測試環境'}})</ion-title>
+                </ion-toolbar>
+
+            </ion-header>
+            <ion-content class="bg-color">
+                <div class="ion-text-center">
+                    <img style="width: 150px;" src="assets/icon/wasp_logo.png" alt="">
+
+                </div>
+
+                <ion-row class="row_div"
+                    *ngIf="authService.adminData.value != null && authService.adminData.value?.type != adminType.maintainer && authService.adminData.value?.type != adminType.owner && authService.adminData.value?.type != adminType.buyer && authService.adminData.value?.type != adminType.sales && authService.adminData.value?.type != adminType.pickup_dropoff">
+                    <ng-container *ngFor="let p of appPages; let i = index">
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 3">
+                            <div class="divider">
+                                租務訂單
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 16">
+                            <div class="divider">
+                                先租後買
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 19">
+                            <div class="divider">
+                                加購品及設備
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 23">
+                            <div class="divider">
+                                維修
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 26">
+                            <div class="divider">
+                                通知
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 27">
+                            <div class="divider">
+                                優惠
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 30">
+                            <div class="divider">
+                                其他設定
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 36">
+                            <div class="divider">
+                                企業合作
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == appPages.length-1">
+                            <div class="divider">
+                                &nbsp;
+                            </div>
+                        </ion-col>
+                        <ion-col size="6" class="ion-no-padding" *ngIf="i == appPages.length-1">
+                            <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                                <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                                <ion-label>登出</ion-label>
+                            </div>
+                        </ion-col>
+
+                    </ng-container>
+                </ion-row>
+
+                <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.maintainer">
+                    <ng-container *ngFor="let p of maintainer_appPages; let i = index">
+                        <ion-col size="12" *ngIf="i == 0">
+                            <div class="divider">
+                                車隊管理
+                            </div>
+                        </ion-col>
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                    </ng-container>
+                    <ion-col size="6" class="ion-no-padding">
+                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
+
+                </ion-row>
+
+                <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.buyer">
+                    <ng-container *ngFor="let p of buyer_appPages; let i = index">
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                    </ng-container>
+                    <ion-col size="6" class="ion-no-padding">
+                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
+
+                </ion-row>
+
+                <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.sales">
+                    <ng-container *ngFor="let p of sales_appPages; let i = index">
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 3">
+                            <div class="divider">
+                                租務訂單
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 11">
+                            <div class="divider">
+                                維修
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 13">
+                            <div class="divider">
+                                通知
+                            </div>
+                        </ion-col>
+                        <ion-col size="12" *ngIf="i == 15">
+                            <div class="divider">
+                                優惠
+                            </div>
+                        </ion-col>
+
+                    </ng-container>
+
+                    <ion-col size="6" class="ion-no-padding">
+                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
+
+                </ion-row>
+
+
+                <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.owner">
+                    <ng-container *ngFor="let p of owner_appPages; let i = index">
+                        <ion-col size="12" *ngIf="i == 0">
+                            <div class="divider">
+                                車輛管理
+                            </div>
+                        </ion-col>
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                    </ng-container>
+                    <ion-col size="6" class="ion-no-padding">
+                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
+
+                </ion-row>
+
+                <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.pickup_dropoff">
+                    <ng-container *ngFor="let p of pickup_dropoff_appPages; let i = index">
+                        <ion-col size="12" *ngIf="i == 0">
+                            <div class="divider">
+                                車輛管理
+                            </div>
+                        </ion-col>
+                        <ion-col size="6" class="ion-no-padding">
+                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
+                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                    [routerLink]="[p.url]"
+                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
+                                    <ion-icon
+                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
+                                    </ion-icon>
+                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                </div>
+                            </ion-menu-toggle>
+                        </ion-col>
+                    </ng-container>
+                    <ion-col size="6" class="ion-no-padding">
+                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
+
+                </ion-row>
+
+            </ion-content>
+        </ion-menu>
+        <ion-router-outlet id="menu-content"></ion-router-outlet>
+    </ion-split-pane>
+</ion-app>

@@ -1,0 +1,134 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">7-11Coupon</ion-title>
+
+        <ng-container *ngIf="seven_coupon_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(seven_coupon_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false" [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; seven_coupon_data = checking_seven_coupon_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="seven_coupon_id == null">
+            <ion-button fill="clear" (click)="createNewSevenCoupon()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立7-11Coupon
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <div class="ion-margin" *ngIf="seven_coupon_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="seven_coupon_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item *ngIf="seven_coupon_id != null" class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="seven_coupon_data.disabled" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item *ngIf="seven_coupon_id != null" class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">已使用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="seven_coupon_data.used" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <!-- <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label position="stacked">類型</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="seven_coupon_data.type" multiple="false" cancelText="取消" okText="確認">
+                            <ion-select-option value="">沒有</ion-select-option>
+                            <ion-select-option value="7-11">7-11</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col> -->
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item *ngIf="seven_coupon_id != null" class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">7-11優惠碼</ion-label>
+                        <ion-input readonly [value]="seven_coupon_data.code" type="text"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="seven_coupon_id == null" class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">7-11優惠碼</ion-label>
+                        <ion-input [(ngModel)]="seven_coupon_data.code" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">派發日期</ion-label>
+                        <ion-input readonly value="{{seven_coupon_data.assign_datetime | date: 'yyyy-MM-dd'}}"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">到期日</ion-label>
+                        <ion-input readonly value="{{seven_coupon_data.expiry_date | date: 'yyyy-MM-dd'}}"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">選擇用戶</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly" [(ngModel)]="seven_coupon_data.user_id" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="false"
+                            confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                {{port.zh_full_name || port.username}} - {{port.phone}}
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                {{getUserDataById(seven_coupon_data?.user_id)?.zh_full_name}} ({{getUserDataById(seven_coupon_data?.user_id)?.phone}})
+                            </ng-template>
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <qrcode [qrdata]="seven_coupon_data.code" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+                </ion-col>
+
+            </ion-row>
+        </ion-grid>
+    </div>
+
+
+</ion-content>

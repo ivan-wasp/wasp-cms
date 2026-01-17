@@ -1,0 +1,1135 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+            <ion-button *ngIf="temp_order_data != null && payment_data_list != null" (click)="makeOrder()"
+                expand="block" fill="clear" shape="round">
+                <ion-icon name="car-outline"></ion-icon>
+                建立此訂單
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content #content class="bg-color">
+    <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="(all_user_data_list$ | async) != null">
+        <ion-grid>
+
+            <ion-row>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-two-icon">
+                                <div class="">
+                                    <ion-icon slot="start" src="assets/icon/menu_user.svg"></ion-icon>
+                                    <ion-label>用戶</ion-label>
+                                </div>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap">選擇用戶（必選）</ion-label>
+                                <ionic-selectable (onSearch)="commonService?.searchUser($event)" itemValueField="id"
+                                    itemTextField="zh_full_name" [items]="(all_user_data_list$ | async)"
+                                    [canClear]="false" [canSearch]="true" [isMultiple]="false"
+                                    (onChange)="selectUser($event)" confirmButtonText="確認" clearButtonText="全部反選"
+                                    closeButtonText="取消" [hasVirtualScroll]="true">
+                                    <ng-template ionicSelectableItemTemplate let-port="item"
+                                        let-isPortSelected="isItemSelected">
+                                        {{port.zh_full_name || port.username}} - {{port.phone}}
+                                    </ng-template>
+                                    <ng-template ionicSelectableValueTemplate let-ports="item">
+                                        {{update_user_data?.zh_full_name || update_user_data?.username}}
+                                        {{update_user_data?.phone}}
+                                    </ng-template>
+                                </ionic-selectable>
+                            </ion-item>
+
+                        </ion-col>
+
+                        <ng-container *ngIf="update_user_data != null">
+                            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">ID</ion-label>
+                                    <ion-input readonly [value]="update_user_data.id" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">用戶名稱</ion-label>
+                                    <ion-input readonly [value]="update_user_data.username" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">電話</ion-label>
+                                    <ion-input readonly [value]="update_user_data.phone" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                                <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">電郵</ion-label>
+                                    <ion-input readonly [value]="update_user_data.email" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                        </ng-container>
+
+                    </ion-row>
+                </ion-col>
+
+                <ng-container *ngIf="update_user_data != null">
+                    <ion-col size-xs="12" size-sm="12" size-md="5" size-lg="5">
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-two-icon">
+                                    <div class="">
+                                        <ion-icon slot="start" src="assets/icon/menu_user.svg"></ion-icon>
+                                        <ion-label>租用人資料</ion-label>
+                                    </div>
+                                </div>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">稱呼</ion-label>
+                                    <ion-select [(ngModel)]="update_user_data.call" multiple="false" cancelText="取消"
+                                        okText="確認">
+                                        <ion-select-option value="Miss">小姐</ion-select-option>
+                                        <ion-select-option value="Mr.">先生</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">中文全名</ion-label>
+                                    <ion-input [(ngModel)]="update_user_data.zh_full_name" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">英文全名</ion-label>
+                                    <ion-input [(ngModel)]="update_user_data.en_full_name" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false' *ngIf="update_user_data.phone != '62337073'">
+                                    <ion-label position="stacked">香港身份證號碼</ion-label>
+                                    <ion-input [(ngModel)]="update_user_data.identity_number" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">出生日期</ion-label>
+                                    <ion-input [(ngModel)]="update_user_data.date_of_birth" type="text"></ion-input>
+                                </ion-item>
+                                <ion-text class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">地址</ion-label>
+                                    <ion-input [(ngModel)]="update_user_data.address" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+
+                        </ion-row>
+                        <br>
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>負責員工</ion-label>
+                                </div>
+                            </ion-col>
+                            <!-- admin id -->
+                            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">負責員工</ion-label>
+                                    <ionic-selectable (onSearch)="commonService.searchStaff($event)"
+                                        [(ngModel)]="admin_data" itemValueField="id" itemTextField="plate"
+                                        [items]="(all_admin_data_list$ | async)" [canClear]="false" [canSearch]="true"
+                                        (onChange)="selectStaff($event)" [isMultiple]="false" confirmButtonText="確認"
+                                        clearButtonText="取消選擇" closeButtonText="取消" [hasVirtualScroll]="true">
+                                        <ng-template ionicSelectableItemTemplate let-port="item"
+                                            let-isPortSelected="isItemSelected">
+                                            {{port.id}} {{port.username}}
+                                        </ng-template>
+                                        <!-- <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                            <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                                        </ng-template> -->
+                                        <ng-template ionicSelectableValueTemplate let-ports="item">
+                                            <div class="ionic-selectable-value-item">
+                                                {{admin_data?.id}} {{admin_data?.username}}
+                                            </div>
+                                        </ng-template>
+                                    </ionic-selectable>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="12" size-md="7" size-lg="7">
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-two-icon">
+                                    <div class="">
+                                        <ion-icon slot="start" src="assets/icon/insurance_dark.svg"></ion-icon>
+                                        <ion-label>保險申報</ion-label>
+                                    </div>
+                                </div>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">年滿25歲？</ion-label>
+                                    <ion-toggle slot="end"
+                                        value="true"></ion-toggle>
+                                </ion-item>
+                                <br>
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">危險駕駛記錄(三年內)？</ion-label>
+                                    <ion-toggle slot="end" [value]="update_user_data.dangerous_driving_record"></ion-toggle>
+                                </ion-item>
+                            </ion-col>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">酒精或毒品相關違例駕駛記錄(三年內)？</ion-label>
+                                    <ion-toggle slot="end" [value]="update_user_data.drug_driving_record"></ion-toggle>
+                                </ion-item>
+                                <br>
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">最少兩年「一年暫準執照（P牌）及最少 一年正式執照」</ion-label>
+                                    <ion-toggle slot="end"
+                                        [value]="update_user_data.two_year_driving_experience"></ion-toggle>
+                                </ion-item>
+                            </ion-col>
+                        </ion-row>
+                        <br>
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>上載文件</ion-label>
+                                </div>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                                *ngIf="update_user_data.call == 'Company'">
+                                <p>香港身份證</p>
+                                <ion-button
+                                    [style.--background]="update_user_data.br_url != null && update_user_data.br_url != '' ? ('url('+('media_url' | env)+update_user_data.br_url+') no-repeat center center / cover') : '#c7c7c7'"
+                                    class="big-upload-btn" (click)="triggerImgUpload('br_url')" fill="clear">
+                                    <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                                    {{update_user_data.br_url != null && update_user_data.br_url
+                                    != '' ? '重新上載'
+                                    : '上載'}}
+                                </ion-button>
+                                <ion-button
+                                    *ngIf="update_user_data.identity_card_url != null && update_user_data.identity_card_url != ''"
+                                    class="default-ion-btn" download expand="full"
+                                    [href]="('media_url' | env)+update_user_data.identity_card_url" fill="clear">
+                                    <ion-icon slot="start" name="cloud-download"></ion-icon>
+                                    下載
+                                </ion-button>
+                                <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                                    (change)="uploadImg()">
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                <p>香港身份證</p>
+                                <ion-button
+                                    [style.--background]="update_user_data.identity_card_url != null && update_user_data.identity_card_url != '' ? ('url('+('media_url' | env)+update_user_data.identity_card_url+') no-repeat center center / cover') : '#c7c7c7'"
+                                    class="big-upload-btn" (click)="triggerImgUpload('identity_card_url')" fill="clear">
+                                    <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                                    {{update_user_data.identity_card_url != null && update_user_data.identity_card_url
+                                    != '' ? '重新上載'
+                                    : '上載'}}
+                                </ion-button>
+                                <ion-button
+                                    *ngIf="update_user_data.identity_card_url != null && update_user_data.identity_card_url != ''"
+                                    class="default-ion-btn" download expand="full"
+                                    [href]="('media_url' | env)+update_user_data.identity_card_url" fill="clear">
+                                    <ion-icon slot="start" name="cloud-download"></ion-icon>
+                                    下載
+                                </ion-button>
+                                <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                                    (change)="uploadImg()">
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                <p>住址證明</p>
+                                <ion-button
+                                    [style.--background]="update_user_data.address_proof_url != null && update_user_data.address_proof_url != '' ? ('url('+('media_url' | env)+update_user_data.address_proof_url+') no-repeat center center / cover') : '#c7c7c7'"
+                                    class="big-upload-btn" (click)="triggerImgUpload('address_proof_url')" fill="clear">
+                                    <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                                    {{update_user_data.address_proof_url != null && update_user_data.address_proof_url
+                                    != '' ? '重新上載'
+                                    : '上載'}}
+                                </ion-button>
+                                <ion-button
+                                    *ngIf="update_user_data.address_proof_url != null && update_user_data.address_proof_url != ''"
+                                    class="default-ion-btn" download expand="full"
+                                    [href]="('media_url' | env)+update_user_data.identity_card_url" fill="clear">
+                                    <ion-icon slot="start" name="cloud-download"></ion-icon>
+                                    下載
+                                </ion-button>
+                                <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                                    (change)="uploadImg()">
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                <p>駕駛執照</p>
+                                <ion-button
+                                    [style.--background]="update_user_data.driving_license_url != null && update_user_data.driving_license_url != '' ? ('url('+('media_url' | env)+update_user_data.driving_license_url+') no-repeat center center / cover') : '#c7c7c7'"
+                                    class="big-upload-btn" (click)="triggerImgUpload('driving_license_url')"
+                                    fill="clear">
+                                    <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                                    {{update_user_data.driving_license_url != null &&
+                                    update_user_data.driving_license_url != '' ?
+                                    '重新上載' : '上載'}}
+                                </ion-button>
+                                <ion-button
+                                    *ngIf="update_user_data.driving_license_url != null && update_user_data.driving_license_url != ''"
+                                    class="default-ion-btn" download expand="full"
+                                    [href]="('media_url' | env)+update_user_data.identity_card_url" fill="clear">
+                                    <ion-icon slot="start" name="cloud-download"></ion-icon>
+                                    下載
+                                </ion-button>
+                                <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg"
+                                    (change)="uploadImg()">
+                            </ion-col>
+                        </ion-row>
+                    </ion-col>
+
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>租用車輛（如需查看車輛取車點，請先選擇日期）</ion-label>
+                                </div>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">可租用車輛</ion-label>
+                                    <ionic-selectable (onSearch)="commonService?.searchCar($event)" itemValueField="id"
+                                        itemTextField="plate" [items]="(rentable_car_data_list$ | async)"
+                                        [canClear]="false" [canSearch]="true" (onChange)="selectCar($event)"
+                                        [isMultiple]="false" confirmButtonText="確認" clearButtonText="取消選擇"
+                                        closeButtonText="取消" [hasVirtualScroll]="true">
+                                        <ng-template ionicSelectableItemTemplate let-port="item"
+                                            let-isPortSelected="isItemSelected">
+                                            {{port.model}} - {{port.plate}}
+                                            <!-- <ng-container
+                                                *ngIf="temp_order_data.booking_date_list != null && temp_order_data.booking_date_list.length > 0">
+                                                - {{getParkingDataById(port.last_return_parking_id)?.zh_name}}
+                                            </ng-container> -->
+                                        </ng-template>
+                                        <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                            let-isPortSelected="isItemSelected">
+                                            <img class="select-end-img" *ngIf="port?.cover_img_url_list?.length > 0"
+                                                [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                                        </ng-template>
+                                        <ng-template ionicSelectableValueTemplate let-ports="item">
+                                            <div class="ionic-selectable-value-item">
+                                                {{(car_data$ | async)?.plate}} ({{(car_data$ | async)?.model}})
+                                            </div>
+                                        </ng-template>
+                                    </ionic-selectable>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" *ngIf="temp_order_data != null">
+
+                                <ion-item class="input-item with-icon" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap" position="stacked">開始及結束日期</ion-label>
+                                    <ion-input
+                                        *ngIf="temp_order_data.start_date != null && temp_order_data.start_date != '' && temp_order_data.end_date != null && temp_order_data.end_date != ''"
+                                        readonly
+                                        value="{{temp_order_data.start_date | date : 'yyyy-MM-dd'}} - {{temp_order_data.end_date | date : 'yyyy-MM-dd'}}"
+                                        type="text"></ion-input>
+                                    <ion-input
+                                        *ngIf="!(temp_order_data.start_date != null && temp_order_data.start_date != '' && temp_order_data.end_date != null && temp_order_data.end_date != '')"
+                                        readonly value="" type="text"></ion-input>
+                                    <ion-icon (click)="openCalendar()" slot="end" name="calendar"></ion-icon>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size="12" *ngIf="(car_data$ | async) != null">
+                                <div class="ion-padding plan-detail">
+                                    <ion-row>
+
+                                        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                            <h2>車輛價錢：</h2>
+                                            <div class="">
+                                                <h3 class="plan">日租 {{(car_data$ | async).price_per_day |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}}</h3>
+                                                <h3 class="plan"
+                                                    *ngFor="let item of (car_data$ | async).offer_plan_list">
+                                                    {{item.minimum_rental_days}}日或以上: 日租 {{item.price_per_day |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}}
+                                                    <ng-container
+                                                        *ngIf="item.minimum_rental_days >= 30">(每月{{item.price_per_day*item.minimum_rental_days
+                                                        | currency:'HKD':'symbol-narrow':'1.0-1'}})</ng-container>
+                                                </h3>
+                                            </div>
+                                        </ion-col>
+                                        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                            <h2>車輛推廣活動：</h2>
+                                            <div *ngIf="(available_campaign_data$ | async) != null">
+                                                <h3 class="">{{(available_campaign_data$ | async)?.zh_title}}</h3>
+                                                <p class="">{{(available_campaign_data$ | async)?.zh_description}}</p>
+                                            </div>
+                                        </ion-col>
+                                        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                            <h2>所選日期租用金額：</h2>
+                                            <div class="">
+                                                <h3 *ngIf="booking_days != null">租{{booking_days}}日</h3>
+                                                <!-- <ion-skeleton-text *ngIf="booking_days == null" animated style="width: 30%; height: 1rem;">
+                        </ion-skeleton-text> -->
+                                                <h1 class="total-amount" *ngIf="car_rental_amount != null">
+                                                    {{car_rental_amount | currency:'HKD':'symbol-narrow':'1.0-1'}}</h1>
+                                                <!-- <ion-skeleton-text *ngIf="car_rental_amount == null" animated style="width: 50%; height: 2rem;">
+                        </ion-skeleton-text> -->
+                                            </div>
+                                        </ion-col>
+                                    </ion-row>
+                                </div>
+                            </ion-col>
+
+
+                            <ng-container *ngIf="(car_data$ | async) != null">
+
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                    <ion-img class="fit-content"
+                                        *ngIf="(car_data$ | async)?.cover_img_url_list?.length > 0"
+                                        [src]="('media_url' | env)+(car_data$ | async)?.cover_img_url_list[0]"></ion-img>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">ID</ion-label>
+                                        <ion-input readonly [value]="(car_data$ | async).id" type="text"></ion-input>
+                                    </ion-item>
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">品牌</ion-label>
+                                        <ion-input [value]="(car_data$ | async).brand" type="text"></ion-input>
+                                    </ion-item>
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">型號</ion-label>
+                                        <ion-input readonly [value]="(car_data$ | async).model" type="text"></ion-input>
+                                    </ion-item>
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">車牌</ion-label>
+                                        <ion-input readonly [value]="(car_data$ | async).plate" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">引擎</ion-label>
+                                        <ion-select disabled [value]="(car_data$ | async).engine" multiple="false"
+                                            cancelText="取消" okText="確認">
+                                            <ion-select-option value="diesel">柴油</ion-select-option>
+                                            <ion-select-option value="hybrid">混合動力</ion-select-option>
+                                            <ion-select-option value="electric">電動</ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">年份</ion-label>
+                                        <ion-input readonly [value]="(car_data$ | async).year" type="text"></ion-input>
+                                    </ion-item>
+                                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">顏色</ion-label>
+                                        <ion-input readonly="true" [value]="(car_data$ | async).color_zh_name"
+                                            type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                            </ng-container>
+
+                        </ion-row>
+                    </ion-col>
+
+                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12"
+                        *ngIf="temp_order_data != null && temp_order_data.car_id != null && temp_order_data.start_date != null && temp_order_data.start_date != ''">
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>租用細節</ion-label>
+                                </div>
+                                <br>
+                                <ion-button *ngIf="!('production' | env)" (click)="selectOrderDetailForDevOnly()"
+                                    fill="outline">
+                                    DEV only
+                                </ion-button>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">取車時間({{temp_order_data.start_date}})</ion-label>
+                                    <ion-select (ionChange)="pickUpTimeChange($event)"
+                                        [(ngModel)]="temp_order_data.pick_up_data.time" multiple="false" cancelText="取消"
+                                        okText="確認">
+                                        <ion-select-option *ngFor="let item of padTimeZero(pickup_hour_list)"
+                                            [value]="item">{{item}}
+                                        </ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">還車時間({{temp_order_data.end_date}})</ion-label>
+                                    <ion-select (ionChange)="returnTimeChange($event)"
+                                        [(ngModel)]="temp_order_data.return_data.time" multiple="false" cancelText="取消"
+                                        okText="確認">
+                                        <ion-select-option *ngFor="let item of padTimeZero(selectable_return_hour_list)"
+                                        [value]="item">{{item}}
+                                        </ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">租用停車場</ion-label>
+                                    <ion-select (ionChange)="parkingChange($event)" [value]="temp_order_data.parking_id"
+                                        multiple="false" cancelText="取消" okText="確認">
+                                        <ion-select-option [value]="null">不加租停車場</ion-select-option>
+                                        <ion-select-option *ngFor="let item of (rentable_parking_data_list$ | async)"
+                                            [value]="item.id">
+                                            {{item.zh_name}}
+                                            <ng-container
+                                                *ngIf="temp_order_data.booking_date_list != null && temp_order_data.booking_date_list.length >= 30">(月租{{item.price_per_month
+                                                | currency:'HKD':'symbol-narrow':'1.0-1'}})</ng-container>
+                                            <ng-container
+                                                *ngIf="temp_order_data.booking_date_list != null && temp_order_data.booking_date_list.length < 30">(免費)</ng-container>
+                                        </ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">交車方法</ion-label>
+                                    <ion-select (ionChange)="pickUpSelectionChange($event)"
+                                        [(ngModel)]="pickup_selection" multiple="false" cancelText="取消" okText="確認">
+                                        <ion-select-option value="parking">預設取車點</ion-select-option>
+                                        <ion-select-option value="custom">上門交車</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+
+                            <ng-container *ngIf="pickup_selection != null">
+                                <ng-container *ngIf="pickup_selection == 'custom'">
+                                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                            <ion-label position="stacked">地區</ion-label>
+                                            <ion-select (ionChange)="districtChange($event, 'pickup')" multiple="false"
+                                                cancelText="取消" okText="確認">
+                                                <ion-select-option
+                                                    value="香港">香港(+{{dataService.system_data$.value.hong_kong_island_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                                <ion-select-option
+                                                    value="九龍">九龍(+{{dataService.system_data$.value.kowloon_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                                <ion-select-option
+                                                    value="新界">新界(+{{dataService.system_data$.value.new_territories_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                            </ion-select>
+                                        </ion-item>
+                                    </ion-col>
+
+                                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                            <ion-label position="stacked">現場收費</ion-label>
+                                            <ion-input [(ngModel)]="temp_order_data.pick_up_data.charge"
+                                                type="text"></ion-input>
+                                        </ion-item>
+                                    </ion-col>
+                                </ng-container>
+
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">取車地址</ion-label>
+                                        <ion-input [readonly]="pickup_selection == 'parking'"
+                                            [(ngModel)]="temp_order_data.pick_up_data.address" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                            </ng-container>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">還車方法</ion-label>
+                                    <ion-select (ionChange)="returnSelectionChange($event)"
+                                        [(ngModel)]="return_selection" multiple="false" cancelText="取消" okText="確認">
+                                        <ion-select-option value="parking">預設還車點</ion-select-option>
+                                        <ion-select-option value="custom">上門交車</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+
+                            <ng-container *ngIf="return_selection != null">
+                                <ng-container *ngIf="return_selection == 'custom'">
+                                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                            <ion-label position="stacked">地區</ion-label>
+                                            <ion-select (ionChange)="districtChange($event, 'return')" multiple="false"
+                                                cancelText="取消" okText="確認">
+                                                <ion-select-option
+                                                    value="香港">香港(+{{dataService?.system_data$.value.hong_kong_island_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                                <ion-select-option
+                                                    value="九龍">九龍(+{{dataService?.system_data$.value.kowloon_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                                <ion-select-option
+                                                    value="新界">新界(+{{dataService?.system_data$.value.new_territories_custom_pick_up_charge
+                                                    |
+                                                    currency:'HKD':'symbol-narrow':'1.0-1'}})</ion-select-option>
+                                            </ion-select>
+                                        </ion-item>
+                                    </ion-col>
+
+                                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                        <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                            <ion-label position="stacked">現場收費</ion-label>
+                                            <ion-input [(ngModel)]="temp_order_data.return_data.charge"
+                                                type="text"></ion-input>
+                                        </ion-item>
+                                    </ion-col>
+                                </ng-container>
+
+                                <ion-col *ngIf="return_selection == 'parking'" size-xs="12" size-sm="12" size-md="6"
+                                    size-lg="6">
+                                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">選擇還車點</ion-label>
+                                        <ion-select (ionChange)="returnpParkingSelectionChange($event)"
+                                            [(ngModel)]="temp_order_data.return_data.parking_id" multiple="false"
+                                            cancelText="取消" okText="確認">
+                                            <ion-select-option [value]="item?.id"
+                                                *ngFor="let item of (drop_off_parking_data_list$ | async)">{{item?.zh_name}}</ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+                                </ion-col>
+
+                                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">還車地址</ion-label>
+                                        <ion-input [readonly]="return_selection == 'parking'"
+                                            [(ngModel)]="temp_order_data.return_data.address" type="text"></ion-input>
+                                    </ion-item>
+                                </ion-col>
+                            </ng-container>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label position="stacked">保障方案</ion-label>
+                                    <ion-select (ionChange)="selectInsurancePlan($event)" multiple="false" cancelText="取消" okText="確認">
+                                        <ion-select-option *ngIf="insurance_price_tier_one_percentage != null" value="1">免賠償方案({{price_per_day*insurance_price_tier_one_percentage/100 | currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
+                                        <ion-select-option *ngIf="insurance_price_tier_two_percentage != null" value="2">自負額方案({{price_per_day*insurance_price_tier_two_percentage/100 | currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
+                                        <ion-select-option value="null">基本保障(免費)</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-col>
+
+                        </ion-row>
+                    </ion-col>
+
+                    <ng-container
+                        *ngIf="temp_order_data != null && temp_order_data.car_id != null && temp_order_data.start_date != null && temp_order_data.start_date != '' ">
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                            *ngIf="(available_equipment_data_list$ | async) != null">
+                            <ion-row class="default-container">
+                                <ion-col size="12">
+                                    <div class="title-with-icon">
+                                        <ion-label>租用設備</ion-label>
+                                    </div>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                                    <div
+                                        *ngIf="temp_order_data.booking_date_list != null && temp_order_data.booking_date_list.length < 30">
+                                        <h3 class="ion-text-center">只限月租</h3>
+                                    </div>
+                                    <div *ngIf="(available_equipment_data_list$ | async) != null">
+                                        <h3 class="ion-text-center"
+                                            *ngIf="(available_equipment_data_list$ | async)?.length == 0">沒有設備可租</h3>
+                                        <ion-item class="equipment-item ion-margin-bottom"
+                                            *ngFor="let item of (available_equipment_data_list$ | async)" lines="none">
+                                            <ion-label class="ion-text-wrap">
+                                                {{item?.zh_name}} (+{{item?.price_per_month |
+                                                currency:'HKD':'symbol-narrow':'1.0-1'}}/月）
+                                                <br> 可租用數量：{{item?.available_equipment_data_list?.length}}
+                                            </ion-label>
+
+                                            <ion-icon style="cursor: pointer;" (click)="removeEquipmentToCart(item)"
+                                                name="remove" slot="end"></ion-icon>
+                                            <ion-icon style="cursor: pointer;" (click)="addEquipmentToCart(item)"
+                                                name="add" slot="end"></ion-icon>
+                                            <ion-text class="quantity">
+                                                <h1>{{getOrderEquipmentQuantityByCategory(item.category)}}</h1>
+                                            </ion-text>
+                                        </ion-item>
+                                    </div>
+                                </ion-col>
+                            </ion-row>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                            *ngIf="(available_product_data_list$ | async) != null">
+                            <ion-row class="default-container">
+                                <ion-col size="12">
+                                    <div class="title-with-icon">
+                                        <ion-label>加購品</ion-label>
+                                    </div>
+                                </ion-col>
+                                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                                    <div
+                                        *ngIf=" (available_product_data_list$ | async) == null || (available_product_data_list$ | async)?.length == 0">
+                                        <h3 class="ion-text-center">沒有加購品可選購</h3>
+                                    </div>
+                                    <div
+                                        *ngIf="(available_product_data_list$ | async) != null && (available_product_data_list$ | async)?.length > 0">
+                                        <ion-item class="product-item ion-margin-bottom"
+                                            *ngFor="let item of (available_product_data_list$ | async)" lines="none">
+                                            <ion-label class="ion-text-wrap">
+                                                {{item?.zh_name}}(+{{item?.price |
+                                                currency:'HKD':'symbol-narrow':'1.0-1'}})
+                                                <br> 存貨：{{item?.inventory}}
+                                            </ion-label>
+
+                                            <ion-icon style="cursor: pointer;" (click)="removeProductToCart(item)"
+                                                name="remove" slot="end"></ion-icon>
+                                            <ion-icon style="cursor: pointer;" (click)="addProductToCart(item)"
+                                                name="add" slot="end"></ion-icon>
+                                            <ion-text class="quantity">
+                                                <h1>{{getOrderProductQuantityByProductId(item.id)}}</h1>
+                                            </ion-text>
+                                        </ion-item>
+                                    </div>
+                                </ion-col>
+                            </ion-row>
+                        </ion-col>
+                    </ng-container>
+
+                </ng-container>
+            </ion-row>
+
+            <ion-button *ngIf="temp_order_data != null" color="secondary" (click)="generatePaymentDataList()"
+                expand="block" fill="solid">
+                {{payment_data_list != null ? '重新產生帳單' : '產生帳單'}}
+            </ion-button>
+
+            <ion-row *ngIf="payment_data_list != null">
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+                    <ion-row class="default-container">
+                        <ion-col size="12"
+                            *ngIf="temp_order_data.booking_date_list != null && temp_order_data.booking_date_list.length > 30 && payment_data_list.length == 1 ">
+                            <div>
+                                月租帳單設定：<br>
+                                - 每月(1-30/31)一張帳單<br>
+                                - 到期付款日為每月1號 (除首張帳單) <br>
+                                - 如月租客，第一張帳單只有5日或以下，須同時繳交下一個月
+                            </div>
+                        </ion-col>
+                        <ion-col size="12">
+                            <div class="title-with-two-icon">
+                                <div class="">
+                                    <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
+                                    <ion-label>首張帳單詳情</ion-label>
+                                </div>
+                            </div>
+                        </ion-col>
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">
+                                {{payment_data_list[0]?.booking_date_list.length}}日租金
+                                <br> 
+                                <span *ngIf="payment_data_list[0]?.booking_date_list.length > 1">({{payment_data_list[0]?.booking_date_list[0]}} - {{payment_data_list[0]?.booking_date_list[payment_data_list[0]?.booking_date_list.length-1]}})</span>
+                                <span *ngIf="payment_data_list[0]?.booking_date_list.length == 1">({{payment_data_list[0]?.booking_date_list[0]}})</span>
+                                <ng-container
+                                    *ngIf="payment_data_list[0]?.campaign_type==undefined && payment_data_list[0]?.free_booking_days != null && payment_data_list[0]?.free_booking_days > 0">
+                                    <br> 免租{{payment_data_list[0]?.free_booking_days}}日
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="payment_data_list[0]?.campaign_type!=undefined && payment_data_list[0]?.campaign_type!=null && payment_data_list[0]?.campaign_type=='free_booking_days' && payment_data_list[0]?.free_booking_days != null && payment_data_list[0]?.free_booking_days > 0">
+                                    <br> 免租{{payment_data_list[0]?.free_booking_days}}%
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="payment_data_list[0]?.campaign_type!=undefined && payment_data_list[0]?.campaign_type!=null && payment_data_list[0]?.campaign_type=='percentage_off' && payment_data_list[0]?.percentage_off != null && payment_data_list[0]?.percentage_off > 0">
+                                    <br> 免租{{payment_data_list[0]?.percentage_off}}%
+                                </ng-container>
+                            </ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label>{{payment_data_list[0]?.rental_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+
+                        <ion-col size="6" class="ion-text-left">
+                            <!-- (click)="commonService?.openCMSPage('/coupon-detail?coupon_id='+payment_data.coupon_id, 'root')" -->
+                            <ion-label class="amount-title">
+                                <ng-container
+                                    *ngIf="payment_data_list[0].discount_type == '' || payment_data_list[0].discount_type == 'coupon'">
+                                    優惠券折扣
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="payment_data_list[0].discount_type != '' && payment_data_list[0].discount_type == 'deposit_discount'">
+                                    按金折扣
+                                </ng-container>
+                            </ion-label>
+                            <ion-button
+                                *ngIf="payment_data_list[0].coupon_id != null && payment_data_list[0].coupon_id != ''"
+                                color="secondary"
+                                (click)="commonService?.openCMSPage('/coupon-detail?coupon_id='+payment_data_list[0].coupon_id, 'blank')"
+                                fill="outline" shape="round">
+                                查看優惠券
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right ion-align-self-center">
+                            <ion-label>
+                                {{payment_data_list[0]?.discount_amount | currency:'HKD':'symbol-narrow':'1.0-1'}}
+                            </ion-label>
+                        </ion-col>
+
+                        <div class="divider"></div>
+
+                        <ng-container
+                            *ngIf="payment_data_list[0].deposit_amount != null && payment_data_list[0].deposit_amount > 0">
+                            <ion-col size="6" class="ion-text-left">
+                                <ion-label class="amount-title">按金</ion-label>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <ion-label>{{payment_data_list[0].deposit_amount |
+                                    currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                            </ion-col>
+                        </ng-container>
+
+                        <ng-container>
+                            <ion-col size="6" class="ion-text-left">
+                                <ion-label class="amount-title">保障方案</ion-label>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <ion-label>HK${{payment_data_list[0].insurance_amount | number}}</ion-label>
+                            </ion-col>
+                        </ng-container>
+        
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">停車場租金</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label>{{payment_data_list[0]?.parking_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+                        <div class="divider"></div>
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">設備租金</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label>{{payment_data_list[0]?.equipment_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">加購品</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label>{{payment_data_list[0]?.product_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+                        <div class="divider"></div>
+
+
+                        <ion-col size="6" class="ion-text-left ion-align-self-center">
+                            <ion-label class="amount-title">罰款</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-input min="0" class="ion-text-right"
+                                    [(ngModel)]="payment_data_list[0].penality_amount" type="number"></ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <div class="divider"></div>
+
+
+                        <ng-container
+                            *ngIf="!('production' | env) || ((admin_data$ | async) && (admin_data$ | async)?.authority_list.includes(authority.offer_discount))">
+                            <ion-col size="6" class="ion-text-left">
+                                <ion-label class="amount-title">內部額外折扣</ion-label>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-input min="0" class="ion-text-right"
+                                        [(ngModel)]="payment_data_list[0].internal_discount_amount"
+                                        type="number"></ion-input>
+                                </ion-item>
+                            </ion-col>
+
+
+                            <ion-col size="6" class="ion-text-left">
+                                <ion-label class="amount-title">內部額外收費</ion-label>
+                            </ion-col>
+                            <ion-col size="6" class="ion-text-right">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-input min="0" class="ion-text-right"
+                                        [(ngModel)]="payment_data_list[0].internal_charge_amount"
+                                        type="number"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                        </ng-container>
+
+                        <div class="divider"></div>
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">信用卡額外收費</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label>{{payment_data_list[0].credit_card_extra_charge_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+                        <div class="divider"></div>
+
+
+                        <ion-col size="6" class="ion-text-left">
+                            <ion-label class="amount-title">總額</ion-label>
+                        </ion-col>
+                        <ion-col size="6" class="ion-text-right">
+                            <ion-label class="total-amount">{{payment_data_list[0].total_amount |
+                                currency:'HKD':'symbol-narrow':'1.0-1'}}</ion-label>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                            <ion-button (click)="recalculatePayment()" color="secondary" expand="block" fill="outline"
+                                shape="round">
+                                重新計算帳單
+                            </ion-button>
+                        </ion-col>
+                        <!-- <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+              <ion-button *ngIf="recalculated_payment_data != null" (click)="updatePaymentAmount()" color="secondary"
+                expand="block" fill="outline" shape="round">
+                更新帳單
+              </ion-button>
+            </ion-col> -->
+                    </ion-row>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                                <ion-label *ngIf="temp_order_data.campaign_data == null">優惠券</ion-label>
+                                <ion-label *ngIf="temp_order_data.campaign_data != null">
+                                    {{'已加入推廣：'+temp_order_data.campaign_data.zh_title}}
+                                    <br> 優惠券不能與推廣活動同時使用
+                                </ion-label>
+                            </div>
+                            <div *ngIf="temp_order_data.campaign_data == null">
+                                <div class="coupon-div ion-margin-bottom">
+                                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">優惠碼</ion-label>
+                                        <ion-input [(ngModel)]="coupon_code" type="text">
+                                        </ion-input>
+                                    </ion-item>
+                                    <ion-button [disabled]="coupon_code == null || coupon_code == ''" class="major_btn"
+                                        (click)="applyDiscount('coupon', coupon_code)" expand="block">
+                                        使用優惠碼
+                                    </ion-button>
+                                </div>
+                                <div
+                                    *ngIf="(usable_coupon_data_list$ | async) != null && (usable_coupon_data_list$ | async).length > 0">
+                                    <ion-item button detailIcon="false" class="coupon-item" lines="none"
+                                        *ngFor="let item of (usable_coupon_data_list$ | async)">
+                                        <ion-label class="ion-text-wrap">
+                                            {{item.zh_title}}
+                                            <br>
+                                            <span *ngIf="item.discount_type == 'amount'">
+                                                {{-item.discount_amount | currency:'HKD':'symbol-narrow':'1.0-1'}}
+                                            </span>
+                                            <span *ngIf="item.discount_type == 'percentage'">
+                                                {{(100-item.discount_amount)}}折
+                                            </span>
+                                            <br>
+                                            <span *ngIf="item.expiry_date != null && item.expiry_date != ''">
+                                                到期日：{{item.expiry_date | date : 'yyyy-MM-dd HH:mm'}}</span>
+                                        </ion-label>
+                                        <ion-button color="secondary" (click)="applyDiscount('coupon', item.code)"
+                                            fill="clear">
+                                            使用
+                                        </ion-button>
+                                    </ion-item>
+                                </div>
+                                <div
+                                    *ngIf="(dataService.awaiting_application_deposit_amount$ | async) != null && (dataService.awaiting_application_deposit_amount$ | async) > 0 && (dataService.awaiting_application_deposit_create_date$ | async) < payment_data_list[0].create_date ">
+                                    <ion-item button detailIcon="false" class="coupon-item" lines="none">
+                                        <ion-label class="ion-text-wrap">
+                                            按金客戶：9折優惠
+                                        </ion-label>
+                                        <ion-button color="secondary" (click)="applyDiscount('deposit_discount')"
+                                            fill="clear">
+                                            使用
+                                        </ion-button>
+                                    </ion-item>
+                                </div>
+
+                            </div>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <!-- <ion-row class="default-container">
+                        <ion-col size="12">
+                            <ng-container *ngIf="payment_data_list[0].total_amount > 0">
+                                <div class="title-with-icon">
+                                    <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                                    <ion-label>選擇付款方式</ion-label>
+                                </div>
+                                <div>
+                                    <ion-item
+                                        *ngIf="payment_data_list[0].payment_method == null || payment_data_list[0].payment_method == '' || payment_data_list[0].payment_method == 'bank_transfer' && payment_data_list[0].total_amount > 0"
+                                        (click)="changePaymentMethod('credit_card')" class="payment-method-btn" button
+                                        detail="false" lines="none">
+                                        <ion-icon slot="end" src="assets/icon/visa.svg"></ion-icon>
+                                        <ion-icon slot="end" src="assets/icon/master.svg"></ion-icon>
+                                        <ion-label>
+                                            信用卡
+                                            {{'(附加HK$'+(payment_data_list[0].credit_card_extra_charge_amount|number)+'手續費)'}}
+                                        </ion-label>
+                                    </ion-item>
+                                    <ion-item
+                                        *ngIf="payment_data_list[0].payment_method == null || payment_data_list[0].payment_method == '' || payment_data_list[0].payment_method == 'credit_card'"
+                                        (click)="changePaymentMethod('bank_transfer')" class="payment-method-btn" button
+                                        detail="false" lines="none">
+                                        <ion-icon slot="end" src="assets/icon/bank_transfer.svg"></ion-icon>
+                                        <ion-label>銀行轉帳</ion-label>
+                                    </ion-item>
+                                </div>
+                                <br>
+                                <div
+                                    *ngIf="payment_data_list[0].payment_method != null || payment_data_list[0].payment_method == ''">
+                                    <mat-accordion class="payment-mat-accoardion">
+                                        <mat-expansion-panel
+                                            *ngIf="payment_data_list[0].payment_method == 'credit_card'"
+                                            expanded="true">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    信用卡
+                                                    {{'(附加HK$'+(payment_data_list[0].credit_card_extra_charge_amount|number)+'手續費)'}}
+                                                </mat-panel-title>
+                                                <mat-panel-description>
+                                                    <mat-icon class="ion-margin-end" svgIcon="visa"></mat-icon>
+                                                    <mat-icon svgIcon="master"></mat-icon>
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+
+                                            <mat-form-field class="full-width" appearance="outline" floatLabel="auto">
+                                                <mat-label>信用卡號碼</mat-label>
+                                                <input
+                                                    onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                                                    autocomplete="off" matInput [formControl]="credit_card_number"
+                                                    required>
+                                                <mat-error
+                                                    *ngIf="credit_card_number.invalid">{{getErrorMessage('credit_card_number')}}
+                                                </mat-error>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="full-width" appearance="outline" floatLabel="auto">
+                                                <mat-label>持卡人全名</mat-label>
+                                                <input #first_input type="text" autocomplete="off" matInput
+                                                    [formControl]="credit_card_holder_name" required>
+                                                <mat-error *ngIf="credit_card_holder_name.invalid">
+                                                    {{getErrorMessage('credit_card_holder_name')}}
+                                                </mat-error>
+                                            </mat-form-field>
+
+
+                                            <mat-form-field class="full-width" appearance="outline" floatLabel="auto">
+                                                <mat-label>信用卡到期(MM/YY)</mat-label>
+                                                <input autocomplete="off" matInput [formControl]="expiry_month_year"
+                                                    required>
+                                                <mat-error
+                                                    *ngIf="expiry_month_year.invalid">{{getErrorMessage('expiry_month_year')}}
+                                                </mat-error>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="full-width" appearance="outline" floatLabel="auto">
+                                                <mat-label>cvv</mat-label>
+                                                <input
+                                                    onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                                                    autocomplete="off" matInput [formControl]="cvv" required>
+                                                <mat-error *ngIf="cvv.invalid">{{getErrorMessage('cvv')}}</mat-error>
+                                            </mat-form-field>
+
+
+                                        </mat-expansion-panel>
+
+                                        <mat-expansion-panel
+                                            *ngIf="payment_data_list[0].payment_method == 'bank_transfer'"
+                                            expanded="true">
+                                            <mat-expansion-panel-header>
+                                                <mat-panel-title>
+                                                    銀行轉帳
+                                                </mat-panel-title>
+                                                <mat-panel-description>
+                                                    <mat-icon svgIcon="bank_transfer"></mat-icon>
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+
+                                            <div>
+                                                <h3>銀行資料：</h3>
+                                                <div class="ion-padding" style="white-space: pre-line;">
+                                                    {{dataService?.system_data$.value.bank_transfer_info}}
+                                                </div>
+                                            </div>
+                                            <ion-button class="upload-btn"
+                                                (click)="triggerImgUpload('bank_transfer_img_url')" expand="block"
+                                                fill="solid">
+                                                <ion-icon slot="start" name="cloud-upload"></ion-icon>
+                                                上載圖片
+                                            </ion-button>
+                                            <ion-img *ngIf="bank_transfer_img_url.value != ''"
+                                                [src]="('media_url' | env)+bank_transfer_img_url.value">
+                                            </ion-img>
+
+                                        </mat-expansion-panel>
+                                    </mat-accordion>
+                                </div>
+                            </ng-container>
+                        </ion-col>
+                    </ion-row> -->
+
+                </ion-col>
+
+                <ion-col *ngIf="payment_data_list.length > 1" size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
+                                <ion-label>所有帳單</ion-label>
+                            </div>
+                            <div>
+                                月租帳單設定：<br>
+                                - 每月(1-30/31)一張帳單<br>
+                                - 到期付款日為每月1號 (除首張帳單) <br>
+                                - 如月租客，第一張帳單只有5日或以下，須同時繳交下一個月
+                            </div>
+                        </ion-col>
+                        <ion-col size="12">
+                            <ion-slides [options]="paymentSlideOpts" mode="ios" pager="ios" scrollbar="ios">
+                                <ion-slide *ngFor="let item of payment_data_list">
+                                    <app-payment-slider class="full-width"
+                                        [new_payment_data]="item"></app-payment-slider>
+                                </ion-slide>
+                            </ion-slides>
+                        </ion-col>
+                    </ion-row>
+                </ion-col>
+
+            </ion-row>
+
+        </ion-grid>
+    </div>
+
+</ion-content>

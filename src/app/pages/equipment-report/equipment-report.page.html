@@ -1,0 +1,227 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+
+    <ion-buttons slot="end">
+        <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
+            <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
+            管理員通知
+        </ion-button>
+    </ion-buttons>
+
+</ion-header>
+
+<ion-content class="bg-color">
+
+    <div class="ion-margin">
+        <ion-row>
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" class="ion-align-self-center">
+                <mat-form-field appearance="outline" style="display: none;">
+                    <mat-label>Month and Year</mat-label>
+                    <input matInput [matDatepicker]="dp" [formControl]="date">
+                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                    <mat-datepicker touchUi #dp startView="multi-year" (yearSelected)="chosenYearHandler($event)" (monthSelected)="chosenMonthHandler($event, dp)" panelClass="example-month-picker">
+                    </mat-datepicker>
+                </mat-form-field>
+
+                <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+                    <ion-input placeholder="選擇月份" readonly value="{{selected_year_month != null && selected_year_month != '' ? (selected_year_month.split('-')[0]+'年'+selected_year_month.split('-')[1]+'月') : ''}}" type="text"></ion-input>
+                    <ion-icon style="cursor: pointer;" *ngIf="(selected_year_month != null && selected_year_month != '')" (click)="resetFilterDate()" slot="end" name="close-outline"></ion-icon>
+                    <mat-datepicker-toggle slot="end" matSuffix [for]="dp"></mat-datepicker-toggle>
+                </ion-item>
+            </ion-col>
+
+            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6" class="ion-align-self-center">
+                <ion-select (ionChange)="getEquipmentSummaryReportList()" class="filter-ion-select" interface="popover" mode="ios" [(ngModel)]="selected_company" multiple="false" cancelText="取消" okText="確認" placeholder="選擇公司">
+                    <ion-select-option value="">全部公司</ion-select-option>
+                    <ion-select-option *ngFor="let item of all_equipment_company_list" [value]="item">{{item}}
+                    </ion-select-option>
+                </ion-select>
+            </ion-col>
+
+        </ion-row>
+    </div>
+
+    <div class="ion-margin table_container">
+        <ion-row class="table_header full-width hidden-sm-down">
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    日期
+                </ion-button>
+            </ion-col>
+            <ion-col size="3">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    公司
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    銷量
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    租務額
+                </ion-button>
+            </ion-col>
+            <ion-col size="3"></ion-col>
+        </ion-row>
+
+        <ng-container *ngIf="dataService?.table_data_list == null">
+            <ion-row class="table_content full-width ske_table_content" *ngFor="let item of [].constructor(10)">
+
+                <ion-col size="2">
+                </ion-col>
+                <ion-col size="3">
+                </ion-col>
+                <ion-col size="2">
+                </ion-col>
+                <ion-col size="2">
+                </ion-col>
+                <ion-col size="3">
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null && dataService?.table_data_list.length == 0">
+            <ion-row class="table_content full-width ske_table_content">
+                <ion-col size="12">
+                    <h3>找不到報表</h3>
+                </ion-col>
+            </ion-row>
+        </ng-container>
+
+        <ng-container *ngIf="dataService?.table_data_list != null">
+            <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">日期：</span>
+                    <span>{{item?.year_month || '全部日子'}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <span class="hidden-md-up">公司：</span>
+                    <span>{{item?.company}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">銷量：</span>
+                    <span>
+            {{item?.sales_quantity}}
+          </span>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">租務額：</span>
+                    <span>
+            {{item?.sales_amount | currency : 'HKD' :'symbol':'1.0-1'}}
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <ion-button *ngIf="item.order_data_list != null && item.order_data_list.length > 0" (click)="selected_summary = item" class="default-ion-btn" fill="clear">
+                        查看或更改
+                    </ion-button>
+                    <ion-button class="default-ion-btn" fill="clear">
+                        下載
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+
+        </ng-container>
+    </div>
+
+
+    <div class="ion-margin table_container" *ngIf="selected_summary != null">
+        <ion-row class="table_header full-width hidden-sm-down">
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    租務日期
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    設備
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    租貸期
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    訂單
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    數量
+                </ion-button>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+                    租貸金額
+                </ion-button>
+            </ion-col>
+        </ion-row>
+
+        <ng-container *ngIf="selected_summary != null">
+            <ion-row class="table_content full-width" *ngFor="let item of selected_summary.order_data_list">
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">租務日期：</span>
+                    <span>{{item?.create_date | date : 'yyyy-MM-dd'}}</span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">設備：</span>
+                    <span>
+            <ng-container *ngFor="let ed of item.equipment_data_list">
+              <ng-container *ngIf="selected_summary.equipment_id_list.includes(ed.id)">
+                {{ed?.zh_name}} <br>
+              </ng-container>
+            </ng-container>
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">租貸期：</span>
+                    <span>
+            {{item?.start_date | date : 'yyyy-MM-dd'}} 
+            <br>
+            至
+            <br>
+            {{item?.end_date | date : 'yyyy-MM-dd'}}
+          </span>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">訂單：</span>
+                    <span>
+            <ion-button (click)="commonService?.openCMSPage('/order-detail?order_id='+item.id, 'blank')"
+            class="default-ion-btn" fill="clear">
+            查看訂單
+          </ion-button>
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">數量：</span>
+                    <span>
+            1
+          </span>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+                    <span class="hidden-md-up">租貸金額：</span>
+                    <span>
+            <ng-container *ngFor="let ed of item.equipment_data_list">
+              <ng-container *ngIf="selected_summary.equipment_id_list.includes(ed.id)">
+                {{ed?.price_per_month | currency : 'HKD' :'symbol':'1.0-1'}} <br>
+              </ng-container>
+            </ng-container>
+          </span>
+                </ion-col>
+            </ion-row>
+
+        </ng-container>
+    </div>
+
+
+</ion-content>

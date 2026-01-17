@@ -1,0 +1,236 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">維修項目</ion-title>
+
+    <ng-container *ngIf="maintenance_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(maintenance_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true; maintenance_data = checking_maintenance_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="maintenance_id == null">
+      <ion-button fill="clear" (click)="createNewMaintenance()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立維修項目
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="maintenance_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="maintenance_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="maintenance_data.disabled" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">每月限定一次</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="maintenance_data.free_once_per_month" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">顯示於app供用戶預約</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="maintenance_data.allow_user_booking" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">服務中文名</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="maintenance_data.zh_service_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">服務英文名</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="maintenance_data.en_service_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">app排序</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="maintenance_data.index" type="number"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇提供服務的車房<br>（如不選將不顯示於app）</ion-label>
+            <ionic-selectable (onSearch)="searchFactory($event)" [disabled]="readonly"
+              [(ngModel)]="maintenance_data.appliable_factory_id_list" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="(all_factory_data_list$ | async)" [canClear]="true" [canSearch]="true"
+              [isMultiple]="true" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.zh_name}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img *ngIf="port.cover_img_url_list.length > 0" class="select-end-img"
+                  [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                <div class="ionic-selectable-value-item"
+                  *ngFor="let port of maintenance_data.appliable_factory_id_list">
+                  {{getFactoryDataById(port)?.zh_name}}
+                </div>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+          <div class="img-container" *ngIf="maintenance_data.icon_url != null && maintenance_data.icon_url != ''">
+            <ion-img style="width: fit-content; margin: auto;"
+              [src]="('media_url' | env)+maintenance_data.icon_url">
+            </ion-img>
+            <ion-button (click)="maintenance_data.icon_url = ''" fill="clear">
+              <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <ion-button color="secondary" (click)="triggerImgUpload()" expand="block" fill="outline" shape="round">
+            上載icon
+          </ion-button>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-text color="dark">
+            <h3>分類</h3>
+          </ion-text>
+          <ion-text *ngIf="maintenance_data.maintenance_category_list.length <= 0" color="dark">
+            <h4>在右方加入分類</h4>
+          </ion-text>
+          <div *ngIf="maintenance_data.maintenance_category_list.length > 0" cdkDropList class="example-list"
+            (cdkDropListDropped)="drop($event)">
+            <div class="example-box" [cdkDragDisabled]="readonly" *ngFor="let item of maintenance_data.maintenance_category_list; let i = index"
+              cdkDrag>
+              <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+              {{getMaintenanceCategoryDataById(item.maintenance_category_id)?.zh_name}}
+              <div>
+                <ion-icon style="font-size: 24px;" name="eye-outline" [color]="subcategory_index == i ? 'success' : ''"
+                  (click)="selectCategory(i)"></ion-icon>
+                <ion-icon *ngIf="!readonly"  class="ion-margin-start" style="font-size: 24px;" name="close-circle-outline" color="danger"
+                  (click)="maintenance_data.maintenance_category_list.splice(i, 1); subcategory_index = null;"></ion-icon>
+              </div>
+
+            </div>
+          </div>
+
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-text color="dark">
+            <h3>子分類</h3>
+          </ion-text>
+          <ion-text
+            *ngIf="subcategory_index != null && maintenance_data.maintenance_category_list[subcategory_index].children.length <= 0"
+            color="dark">
+            <h4>在右方加入子分類</h4>
+          </ion-text>
+          <div
+            *ngIf="subcategory_index != null && maintenance_data.maintenance_category_list[subcategory_index].children.length > 0"
+            cdkDropList class="example-list" (cdkDropListDropped)="drop2($event)">
+            <div class="example-box"  [cdkDragDisabled]="readonly"
+              *ngFor="let id of maintenance_data.maintenance_category_list[subcategory_index].children; let i = index" cdkDrag>
+              <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+              {{getMaintenanceCategoryDataById(id)?.zh_name}} {{getMaintenanceCategoryDataById(id)?.en_name}}
+              <div>
+                <ion-icon *ngIf="!readonly" class="ion-margin-start" style="font-size: 24px;" name="close-circle-outline" color="danger"
+                (click)="maintenance_data.maintenance_category_list[subcategory_index].children.splice(i, 1);"></ion-icon>
+              </div>
+            </div>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4" *ngIf="!readonly">
+          <ion-text color="dark">
+            <h3>所有分類</h3>
+          </ion-text>
+          <div *ngIf="maintenance_category_data == null">
+            <ion-item class="maintenance-category-item" *ngFor="let item of all_maintenane_category_data_list">
+              <ion-label>{{item?.zh_name}} {{item?.en_name}}</ion-label>
+              <ion-icon class="clickable" (click)="addCategory(item)" slot="end" name="add" color="tertiary"></ion-icon>
+              <ion-icon class="clickable" (click)="maintenance_category_data = item" slot="end" name="create-outline"
+                color="tertiary"></ion-icon>
+              <ion-icon class="clickable" (click)="commonService?.deleteDataAlert(item)" slot="end"
+                name="close-circle-outline" color="danger"></ion-icon>
+
+            </ion-item>
+          </div>
+
+          <ion-button *ngIf="maintenance_category_data == null" color="secondary"
+            (click)="setNewMaintenanceCategoryDataTemplate()" expand="block" fill="outline">
+            新增維修分類
+          </ion-button>
+
+          <div *ngIf="maintenance_category_data != null" class="ion-margin-bottom">
+            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">維修分類中文名</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="maintenance_category_data.zh_name" type="text"></ion-input>
+            </ion-item>
+            <br>
+            <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+              <ion-label class="ion-text-wrap" position="stacked">維修分類英文名</ion-label>
+              <ion-input [readonly]="readonly" [(ngModel)]="maintenance_category_data.en_name" type="text"></ion-input>
+            </ion-item>
+          </div>
+          <ion-button *ngIf="maintenance_category_data != null" [disabled]="maintenance_category_data.zh_name == ''"
+            color="secondary" (click)="createNewMaintenanceCategory()" expand="block" fill="outline">
+            {{maintenance_category_data.id == null ? '新增維修分類' : '更新'}}
+          </ion-button>
+          <ion-button *ngIf="maintenance_category_data != null" color="medium"
+            (click)="maintenance_category_data = null" expand="block" fill="outline">
+            取消
+          </ion-button>
+
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

@@ -1,0 +1,88 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+
+    <ion-title class="hidden-xs-down">行車證簽收確認書</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="save()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        產生PDF
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+  <div class="ion-margin" *ngIf="order_data != null">
+    <ion-grid>
+      <ion-row>
+
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-label>租用人資料</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+              <ion-item class="input-item" mode="md" lines='none' button='false'>
+                <ion-label class="ion-text-wrap" position="stacked">英文全名</ion-label>
+                <ion-input [(ngModel)]="vls.user_en_full_name" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <br>
+          <ion-row class="default-container">
+            <ion-col size="12">
+              <div class="title-with-icon">
+                <ion-label>車輛資料</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+              <ion-item class="input-item" mode="md" lines='none' button='false'>
+                <ion-label class="ion-text-wrap" position="stacked">車牌</ion-label>
+                <ion-input [(ngModel)]="vls.car_plate" type="text"></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <br>
+          <ion-row class="default-container">
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+              <div>
+                <h2>客人簽名</h2>
+                <canvas class="signature-pad-canvas" #canvas2 width="250" height="200"
+                  style="touch-action: none;"></canvas>
+                <div>
+                  <ion-button color="secondary" (click)="signaturePad2.clear();" fill="outline">
+                    清除簽名
+                  </ion-button>
+                </div>
+              </div>
+            </ion-col>
+            <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+            </ion-col>
+          </ion-row>
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+<ion-footer class="hidden-sm-up ion-no-border">
+  <ion-toolbar>
+    <ion-button color="secondary" fill="outline" (click)="save()" expand="block">
+      <ion-icon slot="start" name="save"></ion-icon>
+      產生PDF
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

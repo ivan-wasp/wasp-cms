@@ -1,0 +1,226 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">Supercharge紀錄</ion-title>
+
+    <ion-label style="font-weight: bolder; padding-right: 24px;" slot="end"
+      *ngIf="total_charging_fee != null">總充電費：{{total_charging_fee | currency : 'HKD' :'symbol':'1.0-1'}}</ion-label>
+    <!-- <ion-buttons slot="end" (click)="getSuperchargeHistoryDataList(true)">
+          <ion-button fill="clear" class="export-excel-btn">
+              <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
+              輸出至Excel
+          </ion-button>
+      </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+
+  <div class="ion-margin">
+    <ion-row>
+      <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+        <mat-form-field appearance="fill" style="display: none;">
+          <mat-label>充電日期</mat-label>
+          <mat-date-range-input [rangePicker]="picker2">
+            <input #start_date2 [value]="start_date != null && start_date != '' ? start_date.split('T')[0] : ''"
+              matStartDate placeholder="開始日期">
+            <input #end_date2 [value]="end_date != null && end_date != '' ? end_date.split('T')[0] : ''" matEndDate
+              placeholder="結束日期" (dateChange)="selectionBookingDateChanged(start_date2, end_date2)">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-date-range-picker touchUi #picker2></mat-date-range-picker>
+        </mat-form-field>
+        <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
+          <ion-input placeholder="充電日期"
+            *ngIf="start_date != null && start_date != '' && end_date != null && end_date != ''" readonly
+            value="{{start_date | date : 'yyyy-MM-dd'}} - {{end_date | date : 'yyyy-MM-dd'}}" type="text"></ion-input>
+          <ion-input placeholder="充電日期"
+            *ngIf="!(start_date != null && start_date != '' && end_date != null && end_date != '')" readonly value=""
+            type="text"></ion-input>
+          <ion-icon *ngIf="(start_date != null && start_date != '') || (end_date != null && end_date != '')"
+            (click)="resetBookingDate()" slot="end" name="close-outline"></ion-icon>
+          <mat-datepicker-toggle slot="end" matSuffix [for]="picker2"></mat-datepicker-toggle>
+        </ion-item>
+      </ion-col>
+      <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center">
+        <ion-select (ionChange)="resetAndGetData($event)" class="filter-ion-select" interface="popover" mode="ios"
+          [(ngModel)]="car_id" multiple="false" cancelText="取消" okText="確認" placeholder="Tesla車輛">
+          <ion-select-option value="">全部Tesla</ion-select-option>
+          <ion-select-option *ngFor="let item of (all_tesla_car_data_list$ | async)"
+            [value]="item.id">{{item?.plate}}</ion-select-option>
+        </ion-select>
+      </ion-col>
+
+    </ion-row>
+  </div>
+  <div class="ion-margin table_container">
+    <ion-row class="table_header full-width hidden-sm-down">
+      <ion-col size="1">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          Session ID
+        </ion-button>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          充電開始日期時間
+        </ion-button>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          充電完結日期時間
+        </ion-button>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          解栓日期時間
+        </ion-button>
+      </ion-col>
+      <ion-col size="1.5">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          車輛
+        </ion-button>
+      </ion-col>
+      <ion-col size="1.5">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          地點
+        </ion-button>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button disabled class="disabled default-ion-btn fit-content sort_header_btn">
+          充電費(超時罰款)
+        </ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ng-container *ngIf="dataService?.table_data_list == null">
+      <ion-row class="table_content full-width ske_table_content">
+        <ion-col size="12">
+          <h3>請先選擇日期</h3>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+
+    <ng-container *ngIf="dataService?.table_data_list != null && dataService?.table_data_list.length == 0">
+      <ion-row class="table_content full-width ske_table_content">
+        <ion-col size="12">
+          <h3>找不到Tesla紀錄</h3>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+
+    <ng-container *ngIf="dataService?.table_data_list != null">
+      <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+        <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
+          <span class="hidden-md-up">Session ID：</span>
+          <span>{{item.sessionId}}</span>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <span class="hidden-md-up">充電開始日期時間：</span>
+          <span>{{item?.chargeStartDateTime | date : 'yyyy-MM-dd HH:mm'}}</span>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <span class="hidden-md-up">充電完結日期時間：</span>
+          <span>{{item?.chargeStopDateTime | date : 'yyyy-MM-dd HH:mm'}}</span>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <span class="hidden-md-up">解栓日期時間</span>
+          <span>{{item?.unlatchDateTime | date : 'yyyy-MM-dd HH:mm'}}</span>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+          <span class="hidden-md-up">車輛：</span>
+          <span>
+            {{getCarDataByVin(item.vin)?.model}}
+            <br>
+            {{getCarDataByVin(item.vin)?.plate}}
+          </span>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
+          <span class="hidden-md-up">地點：</span>
+          <span>
+            {{item?.siteLocationName}}
+          </span>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="2" size-lg="2">
+          <span class="hidden-md-up">充電費(超時罰款)：</span>
+          <span>
+            {{item?.fees[0]?.totalDue | currency : 'HKD' :'symbol':'1.0-1'}} <span
+              *ngIf="item?.fees[1]?.totalDue > 0">({{item?.fees[1]?.totalDue | currency : 'HKD'
+              :'symbol':'1.0-1'}})</span>
+          </span>
+        </ion-col>
+      </ion-row>
+
+      <!-- <ion-row class="table_footer full-width" *ngIf="dataService?.table_data_list.length > 0">
+        <ion-col size-xs="12" size-sm="12" size-md="8" size-lg="8">
+          <div class="nav_container space_between full-width">
+            <div class="left_part">
+              <ion-button [disabled]="page == 1" (click)="goPreviousPage()"
+                class="default-ion-btn fit-content nav_page_btn">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+                <span class="ion-margin-start" class="hidden-sm-down">上一頁</span>
+              </ion-button>
+            </div>
+            <div class="middle_part">
+              <ion-button *ngIf="page != 1" (click)="selectPage(1)" class="default-ion-btn fit-content page_num_btn">
+                <ion-icon name="caret-back-outline"></ion-icon>
+              </ion-button>
+              <ion-button *ngIf="page-2 >= 1" (click)="selectPage(page-2)"
+                class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                {{page-2}}
+              </ion-button>
+              <ion-button *ngIf="page-1 >= 1" (click)="selectPage(page-1)"
+                class="default-ion-btn fit-content page_num_btn">
+                {{page-1}}
+              </ion-button>
+              <ion-button (click)="selectPage(page)" class="default-ion-btn fit-content current_page_num_btn">
+                {{page}}
+              </ion-button>
+              <ion-button *ngIf="page+1 <= dataService?.table_data_number_of_page" (click)="selectPage(page+1)"
+                class="default-ion-btn fit-content page_num_btn">
+                {{page+1}}
+              </ion-button>
+              <ion-button *ngIf="page+2 <= dataService?.table_data_number_of_page" (click)="selectPage(page+2)"
+                class="default-ion-btn fit-content page_num_btn hidden-sm-down">
+                {{page+2}}
+              </ion-button>
+              <ion-button *ngIf="page != dataService?.table_data_number_of_page"
+                (click)="selectPage(dataService.table_data_number_of_page)"
+                class="default-ion-btn fit-content page_num_btn">
+                <ion-icon name="caret-forward-outline"></ion-icon>
+              </ion-button>
+            </div>
+            <div class="right_part">
+              <ion-button [disabled]="page == dataService?.table_data_number_of_page" (click)="goNextPage()"
+                class="default-ion-btn fit-content nav_page_btn">
+                <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+
+                <span class="ion-margin-end" class="hidden-sm-down">下一頁</span>
+              </ion-button>
+            </div>
+          </div>
+
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <div class="table_pagination_option">
+            <p class="display_info">
+              顯示
+              {{(page-1)*limit+dataService?.table_data_list.length}}／{{dataService?.table_data_total_number}}（共{{dataService.table_data_number_of_page}}頁）
+            </p>
+            <mat-select (selectionChange)="limitChange($event)" class="table_limit" [value]="limit.toString()">
+              <mat-option value="10">10</mat-option>
+              <mat-option value="25">25</mat-option>
+              <mat-option value="50">50</mat-option>
+              <mat-option value="100">100</mat-option>
+              <mat-option value="500">500</mat-option>
+            </mat-select>
+          </div>
+
+        </ion-col>
+      </ion-row> -->
+    </ng-container>
+  </div>
+</ion-content>

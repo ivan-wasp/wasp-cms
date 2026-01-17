@@ -1,0 +1,308 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+
+
+    <ion-title class="hidden-xs-down">Blog</ion-title>
+
+    <ng-container *ngIf="custom_page_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(custom_page_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="readonly = true ; custom_page_data = checking_custom_page_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="custom_page_id == null">
+      <ion-button fill="clear" (click)="createNewCustomPage()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        建立Blog
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="custom_page_data">
+    <ion-grid>
+      <ion-row class="default-container">
+        <ion-col size="12">
+          <div class="title-with-icon">
+            <ion-label>基本設定</ion-label>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label>禁用</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.disabled"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label>Shortlisted</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.shortlisted"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label>熱門</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.popular"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label>顯示於App</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.app_visible"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label>顯示於Web</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.web_visible"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+
+          <mat-form-field appearance="outline" style="display: none;">
+            <input #release_date matInput [matDatepicker]="picker" (dateChange)="selectionDateChanged($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker touchUi #picker></mat-datepicker>
+          </mat-form-field>
+
+          <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+            button='false'>
+            <ion-label position="stacked">發佈日期</ion-label>
+            <ion-input readonly [value]="custom_page_data.release_date  | date : 'yyyy-MM-dd HH:mm'" type="text">
+            </ion-input>
+            <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix [for]="picker">
+            </mat-datepicker-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">Short name(顯示於url)(eg. tesla-rent-to-buy)</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.short_name" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文標題</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.zh_title" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文標題</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.en_title" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">中文分類</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.zh_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">英文分類</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.en_category" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item with-icon" style="z-index: 99;" [ngClass]="{'readonly': readonly}" mode="md"
+            lines='none' button='false'>
+            <ion-label position="stacked">分類字體顏色</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.category_color" type="text"></ion-input>
+            <ion-icon slot="end" [style.color]="custom_page_data.category_color" cpPositionRelativeToArrow="true"
+              cpOutputFormat="HEX" [(colorPicker)]="custom_page_data.category_color" name="ellipse"></ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">只有Youtube影片(沒有內文直接前往youtube)</ion-label>
+            <ion-toggle [disabled]="readonly" slot="end" [(ngModel)]="custom_page_data.youtube_only"></ion-toggle>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">Youtube link</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.youtube_url" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-slides mode="ios" pager="false" scrollbar="ios">
+            <ion-slide *ngFor="let item of custom_page_data.banner_img_url_list; let i = index">
+              <ion-img [src]="('media_url' | env)+item">
+              </ion-img>
+            </ion-slide>
+          </ion-slides>
+          <ion-button *ngIf="!readonly" color="dark" (click)="triggerImgUpload('banner_img_url_list')" fill="solid"
+            expand="block">
+            上載封面圖片
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container" *ngIf="custom_page_data.app_visible == true">
+        <ion-col size="12">
+          <div class="title-with-icon">
+            <ion-label>App設定</ion-label>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item [ngClass]="{'readonly': readonly}" class="input-item" mode="md" lines='none' button='false'>
+            <ion-select [disabled]="readonly" [(ngModel)]="custom_page_data.link_to" multiple="false" cancelText="取消"
+              okText="確認">
+              <ion-select-option value="">沒有連結</ion-select-option>
+              <ion-select-option value="car">車</ion-select-option>
+              <ion-select-option value="static_page">固定頁面</ion-select-option>
+              <ion-select-option value="custom_page">Blog</ion-select-option>
+              <ion-select-option value="url">URL</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item [ngClass]="{'readonly': readonly}" *ngIf="custom_page_data.link_to == 'url' && readonly"
+            class="input-item" mode="md" lines='none' button='false'>
+            {{custom_page_data.url}}
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item *ngIf="custom_page_data.link_to == 'url' && !readonly" [ngClass]="{'readonly': readonly}" mode="md"
+            lines='none' button='false'>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.url" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item [ngClass]="{'readonly': readonly}" *ngIf="custom_page_data.link_to == 'car' && readonly"
+            class="input-item" mode="md" lines='none' button='false'>
+            {{getCarInfo(custom_page_data.car_id)?.model}} - {{getCarInfo(custom_page_data.car_id)?.plate}}
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item *ngIf="custom_page_data.link_to == 'car' && !readonly" [ngClass]="{'readonly': readonly}" mode="md"
+            lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇車輛</ion-label>
+            <ionic-selectable (onSearch)="commonService?.searchCar($event)" (onChange)="carChange($event)"
+              [(ngModel)]="custom_page_data.car_id" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate"
+              [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="false"
+              confirmButtonText="確認" closeButtonText="取消" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                {{port.model}} - {{port.plate}}
+              </ng-template>
+              <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+
+          <ion-item *ngIf="custom_page_data.link_to == 'static_page'" [ngClass]="{'readonly': readonly}" mode="md"
+            lines='none' button='false'>
+            <ion-label position="stacked">選擇</ion-label>
+            <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+              [(ngModel)]="custom_page_data.static_page_url">
+              <ion-select-option *ngFor="let d of static_page_url_list" [value]="d.url">{{d.name}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item *ngIf="custom_page_data.link_to == 'custom_page'" [ngClass]="{'readonly': readonly}" mode="md"
+            lines='none' button='false'>
+            <ion-label position="stacked">選擇Blog</ion-label>
+            <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+              [(ngModel)]="custom_page_data.custom_page_id">
+              <ion-select-option *ngFor="let d of all_custom_page_data_list" [value]="d.id">{{d.zh_title}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+
+          <ion-item *ngIf="custom_page_data.link_to != ''" class="input-item" [ngClass]="{'readonly': readonly}"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">button中文文字</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.zh_button_title" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+          <ion-item *ngIf="custom_page_data.link_to != ''" class="input-item" [ngClass]="{'readonly': readonly}"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">button英文文字</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="custom_page_data.en_button_title" type="text"></ion-input>
+          </ion-item>
+
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container" *ngIf="!readonly">
+        <ion-col size="12">
+          <div class="title-with-icon">
+            <ion-label>上載圖片for內文使用</ion-label>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-button *ngIf="!readonly" color="dark" (click)="triggerImgUpload('html_content_img_url')" fill="solid"
+            expand="block">
+            上載圖片
+          </ion-button>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-item *ngIf="html_content_img_url != null && html_content_img_url != ''" class="input-item" [ngClass]="{'readonly': readonly}"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">圖片url</ion-label>
+            <ion-input readonly [value]="('media_url' | env)+html_content_img_url" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+        <ion-col size="12">
+          <div class="title-with-icon">
+            <ion-label>內文</ion-label>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+          <div class="NgxEditor__Wrapper">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
+            <ngx-editor [editor]="editor" [(ngModel)]="custom_page_data.html_content" [disabled]="readonly"
+              [placeholder]="'輸入頁面內容'">
+            </ngx-editor>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

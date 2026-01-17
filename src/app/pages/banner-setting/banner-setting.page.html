@@ -1,0 +1,168 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title class="hidden-xs-down">Banner</ion-title>
+
+        <ng-container>
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="cancelEdit()">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+                <ion-button fill="clear" (click)="newBanner()">
+                    <ion-icon slot="start" name="new_banner"></ion-icon>
+                    加新Banner
+                </ion-button>
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+    </ion-toolbar>
+</ion-header>
+<ion-content class="default_bg_color">
+    <input style="display: none;" type="file" #upload_img accept="image/x-png,image/png,image/jpeg"
+        (change)="uploadImg()">
+
+    <ion-grid>
+        <ion-row>
+            <ion-col size="12">
+
+
+                <div class="sorting_container ion-margin">
+                    <div cdkDropList class="sort-list" (cdkDropListDropped)="drop($event)">
+                        <div class="sort-box">
+                            <ion-icon class="sort-icon invisible" name="reorder-two-outline"></ion-icon>
+                            <!-- <div class="img_container">
+                                Banner
+                            </div> -->
+                            <ion-label class="img_container">Banner</ion-label>
+                            <ion-label class="name">連結</ion-label>
+                            <ion-label class="sku"></ion-label>
+                        </div>
+                        <ng-container *ngIf="(system_data$ | async) != null && (system_data$ | async).banner != null">
+                            <div class="sort-box" *ngFor="let item of (system_data$ | async).banner; let i = index"
+                                cdkDrag [cdkDragDisabled]="readonly">
+
+                                <ion-icon class="sort-icon" name="reorder-two-outline"></ion-icon>
+                                <div class="img_container ion-padding-end">
+                                    <!-- <ion-thumbnail *ngIf="item.img_url_list.length > 0">
+                                        <img [src]="apiService?.media_url+item.img_url_list[0]">
+                                    </ion-thumbnail> -->
+                                    <ng-container *ngIf="item.img != null && item.img!=''">
+                                        <img [src]="('media_url' | env)+item.img">
+                                    </ng-container>
+                                    <ng-container *ngIf="!readonly">
+                                        <ion-button slot="end" class="default_ion_btn" (click)="uploadImage(i)">
+                                            上傳
+                                        </ion-button>
+                                    </ng-container>
+                                    <ng-container *ngIf="readonly">
+
+                                    </ng-container>
+                                </div>
+                                <ion-label class="name">
+
+                                    <!-- <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">顯示於App頁目</ion-label>
+                                        <ion-select [disabled]="readonly" multiple="true" cancelText="取消" okText="確認" [(ngModel)]="item.app_page_display_list">
+                                            <ion-select-option *ngFor="let d of app_page_list" [value]="d">{{d}}
+                                            </ion-select-option>
+                                        </ion-select>
+                                    </ion-item> -->
+
+                                    <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                        <ion-select [disabled]="readonly" [(ngModel)]="item.link_to" multiple="false"
+                                            cancelText="取消" okText="確認">
+                                            <ion-select-option value="">沒有連結</ion-select-option>
+                                            <ion-select-option value="car">車</ion-select-option>
+                                            <ion-select-option value="static_page">固定頁面</ion-select-option>
+                                            <ion-select-option value="custom_page">自定頁面</ion-select-option>
+                                            <ion-select-option value="url">URL</ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+                                    <ion-item *ngIf="item.link_to == 'url' && readonly" class="input-item" mode="md"
+                                        lines='none' button='false'>
+                                        {{item.url}}
+                                    </ion-item>
+                                    <ion-item *ngIf="item.link_to == 'url' && !readonly"
+                                        [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                                        <ion-input [readonly]="readonly" [(ngModel)]="item.url" type="text"></ion-input>
+                                    </ion-item>
+                                    <ion-item *ngIf="item.link_to == 'car' && readonly" class="input-item" mode="md"
+                                        lines='none' button='false'>
+                                        {{getCarInfo(item.car_id).model}} - {{getCarInfo(item.car_id).plate}}
+                                    </ion-item>
+                                    <ion-item *ngIf="item.link_to == 'car' && !readonly"
+                                        [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                                        <ion-label class="ion-text-wrap">選擇車輛</ion-label>
+                                        <ionic-selectable (onSearch)="commonService?.searchCar($event)"
+                                            (onChange)="carChange($event, i)" [(ngModel)]="item.car_id"
+                                            itemValueField="id" shouldStoreItemValue="id" itemTextField="plate"
+                                            [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true"
+                                            [isMultiple]="false" confirmButtonText="確認" closeButtonText="取消"
+                                            [hasVirtualScroll]="true">
+                                            <ng-template ionicSelectableItemTemplate let-port="item"
+                                                let-isPortSelected="isItemSelected">
+                                                {{port.model}} - {{port.plate}}
+                                            </ng-template>
+                                            <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                                let-isPortSelected="isItemSelected">
+                                                <img class="select-end-img"
+                                                    [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                                            </ng-template>
+                                        </ionic-selectable>
+                                    </ion-item>
+
+                                    <ion-item *ngIf="item.link_to == 'static_page'" [ngClass]="{'readonly': readonly}"
+                                        mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">選擇固定頁面</ion-label>
+                                        <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+                                            [(ngModel)]="item.static_page_url">
+                                            <ion-select-option *ngFor="let d of static_page_url_list" [value]="d.url">
+                                                {{d.name}}
+                                            </ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+
+                                    <ion-item *ngIf="item.link_to == 'custom_page'" [ngClass]="{'readonly': readonly}"
+                                        mode="md" lines='none' button='false'>
+                                        <ion-label position="stacked">選擇自定頁面</ion-label>
+                                        <ion-select [disabled]="readonly" multiple="false" cancelText="取消" okText="確認"
+                                            [(ngModel)]="item.custom_page_id">
+                                            <ion-select-option *ngFor="let d of all_custom_page_data_list"
+                                                [value]="d.id">{{d.title}}
+                                            </ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+
+
+                                </ion-label>
+                                <ion-label class="sku">
+                                    <ng-container *ngIf="!readonly">
+                                        <ion-button slot="end" class="default_ion_btn" (click)="remove(i)">
+                                            移除
+                                        </ion-button>
+                                    </ng-container>
+                                </ion-label>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+
+</ion-content>

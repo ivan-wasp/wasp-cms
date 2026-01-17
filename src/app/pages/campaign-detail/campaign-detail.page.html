@@ -1,0 +1,223 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">活動</ion-title>
+
+        <ng-container *ngIf="campaign_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="tertiary" fill="outline" (click)="commonService?.openCMSPage('/notification-detail?user_id_list='+encodeArray(campaign_data.user_id_list), 'blank')">
+                    <ion-icon slot="start" name="mail"></ion-icon>
+                    發送通知
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(campaign_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; campaign_data = checking_campaign_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="campaign_id == null">
+            <ion-button fill="clear" (click)="createNewCampaign()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立活動
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <div class="ion-margin" *ngIf=" campaign_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="campaign_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="campaign_data.disabled" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">中文標題</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="campaign_data.zh_title" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">英文標題</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="campaign_data.en_title" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label position="stacked">中文描述</ion-label>
+                        <ion-textarea [readonly]="readonly" [(ngModel)]="campaign_data.zh_description" type="text"></ion-textarea>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">英文描述</ion-label>
+                        <ion-textarea [readonly]="readonly" [(ngModel)]="campaign_data.en_description" type="text"></ion-textarea>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">最少預約日數</ion-label>
+                        <ion-input min="1" [readonly]="readonly" [(ngModel)]="campaign_data.minimum_booking_days" type="number">
+                        </ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">最多預約日數</ion-label>
+                        <ion-input min="1" [readonly]="readonly" [(ngModel)]="campaign_data.maximum_booking_days" type="number">
+                        </ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">免租金類型</ion-label>
+                        <!-- <ion-input min="1" [readonly]="readonly" [(ngModel)]="campaign_data.campaign_type" type="text">
+            </ion-input> -->
+                        <ion-select [disabled]="readonly" [(ngModel)]="campaign_data.campaign_type" multiple="false" cancelText="取消" okText="確認">
+                            <ion-select-option value="free_booking_days">按日</ion-select-option>
+                            <ion-select-option value="percentage_off">按百分比</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="campaign_data.campaign_type=='free_booking_days'">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">免租金日數</ion-label>
+                        <ion-input min="1" [readonly]="readonly" [(ngModel)]="campaign_data.free_booking_days" type="number">
+                        </ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="campaign_data.campaign_type=='percentage_off'">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">免租金百分比</ion-label>
+                        <ion-input min="1" [readonly]="readonly" [(ngModel)]="campaign_data.percentage_off" type="number">
+                        </ion-input>
+                    </ion-item>
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <mat-form-field appearance="fill" style="display: none;">
+                        <mat-label>開始及結束日期</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                            <input #start_date [value]="campaign_data.start_date != null && campaign_data.start_date != '' ? campaign_data.start_date.split('T')[0] : ''" disabled="true" matStartDate placeholder="開始日期">
+                            <input #end_date [value]="campaign_data.expiry_date != null && campaign_data.expiry_date != '' ? campaign_data.expiry_date.split('T')[0] : ''" disabled="true" matEndDate placeholder="結束日期" (dateChange)="selectionChanged(start_date, end_date)">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker touchUi #picker [disabled]="readonly"></mat-date-range-picker>
+                    </mat-form-field>
+                    <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">開始及結束日期</ion-label>
+                        <ion-input *ngIf="campaign_data.start_date != null && campaign_data.start_date != '' && campaign_data.expiry_date != null && campaign_data.expiry_date != ''" readonly value="{{campaign_data.start_date | date : 'yyyy-MM-dd HH:mm'}} - {{campaign_data.expiry_date | date : 'yyyy-MM-dd HH:mm'}}"
+                            type="text"></ion-input>
+                        <ion-input *ngIf="!(campaign_data.start_date != null && campaign_data.start_date != '' && campaign_data.expiry_date != null && campaign_data.expiry_date != '')" readonly value="" type="text"></ion-input>
+                        <ion-icon *ngIf="!readonly && ((campaign_data.start_date != null && campaign_data.start_date != '') || (campaign_data.expiry_date != null && campaign_data.expiry_date != ''))" (click)="resetCampaignDate()" slot="end" name="close-outline"></ion-icon>
+                        <mat-datepicker-toggle slot="end" matSuffix [for]="picker"></mat-datepicker-toggle>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">選擇限定使用的車輛（必須選擇）</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly" [(ngModel)]="campaign_data.car_id_list" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="true"
+                            confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                {{port.model}} - {{port.plate}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemEndTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                <img class="select-end-img" *ngIf="port?.cover_img_url_list != null && port?.cover_img_url_list.length > 0" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                <div class="ionic-selectable-value-item" *ngFor="let port of campaign_data.car_id_list">
+                                    {{getCarDataById(port)?.plate}} ({{getCarDataById(port)?.model}})
+                                </div>
+                            </ng-template>
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">選擇限定使用的用戶（如不選將全部可用）</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly" [(ngModel)]="campaign_data.user_id_list" itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true" [canSearch]="true" [isMultiple]="true"
+                            confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                                {{port.username}} - {{port.zh_full_name}} - {{port.phone}}
+                            </ng-template>
+                            <!-- <ng-template ionicSelectableValueTemplate let-ports="item">
+                                <div class="ionic-selectable-value-item" *ngFor="let port of campaign_data.user_id_list">
+                                    {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username }} ({{getUserDataById(port)?.phone}})
+                                </div>
+                            </ng-template> -->
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+
+                                <ng-container *ngIf="campaign_data.user_id_list.length <= 10">
+                                    <div class="ionic-selectable-value-item" *ngFor="let port of campaign_data.user_id_list;  let i=index;">
+                                        {{getUserDataById(port)?.zh_full_name || getUserDataById(port)?.username}} - {{getUserDataById(port)?.phone}}
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="campaign_data.user_id_list.length > 10">
+                                    已選取{{campaign_data.user_id_list.length}}個用戶
+                                </ng-container>
+                            </ng-template>
+                        </ionic-selectable>
+                    </ion-item>
+                    <ion-button color="dark" (click)="campaign_data.user_id_list = having_deposit_user_id_list" fill="solid">
+                        選擇按金客戶
+                    </ion-button>
+                    <ion-button color="dark" (click)="campaign_data.user_id_list = all_user_id_list_exluding_having_deposit" fill="solid">
+                        選擇所有客戶（不包括按金客戶）
+                    </ion-button>
+                    <ion-button color="dark" (click)="campaign_data.user_id_list = having_past_order_user_id_list" fill="solid">
+                        選擇過往客戶
+                    </ion-button>
+                </ion-col>
+
+            </ion-row>
+        </ion-grid>
+    </div>
+
+
+</ion-content>

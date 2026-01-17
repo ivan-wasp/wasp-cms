@@ -1,0 +1,439 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+        <ion-title class="hidden-xs-down">交還車輛報告 ID:{{return_vehicle_report?.id}}</ion-title>
+
+        <ion-buttons slot="end" *ngIf="return_vehicle_report != null && return_vehicle_report.id != null">
+            <ion-button fill="clear" (click)="generatePdf()">
+                <!-- <ion-icon slot="start" name="document"></ion-icon> -->
+                產生PDF
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="UpdateVehicleRentalAgreement()">
+                <!-- <ion-icon slot="start" name="save"></ion-icon> -->
+                儲存
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+    <div class="ion-margin" *ngIf="order_data != null && return_vehicle_report != null">
+        <ion-grid>
+            <ion-row>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>租用人資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">中文全名</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.zh_full_name"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">英文全名</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.en_full_name"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">身份證號碼</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.identity_number"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡電話</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.phone" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡電郵</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.email" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡地址</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.user_data.address"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>車輛資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">品牌型號(車牌)</ion-label>
+                                <ion-input readonly
+                                    [value]="return_vehicle_report?.car_data?.brand + ' ' + return_vehicle_report?.car_data?.model + ' ('+return_vehicle_report.car_data.plate+')'"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車輛種類</ion-label>
+                                <ion-input [value]="return_vehicle_report?.car_data?.category" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">顏色</ion-label>
+                                <ion-input readonly [value]="return_vehicle_report?.car_data?.color_zh_name"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">年份</ion-label>
+                                <ion-input readonly [value]="return_vehicle_report?.car_data?.year"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>訂單取還車資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">取車日期地點</ion-label>
+                                <ion-input readonly
+                                    [value]="return_vehicle_report?.order_data?.start_date + ' ' + return_vehicle_report?.order_data?.pick_up_data?.time + ' － ' + return_vehicle_report?.order_data?.pick_up_data?.address"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">還車日期地點</ion-label>
+                                <ion-input readonly
+                                    [value]="return_vehicle_report?.order_data?.end_date + ' ' + return_vehicle_report?.order_data?.return_data?.time  + ' － ' + return_vehicle_report?.order_data?.return_data?.address"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>還車狀態</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">里程數</ion-label>
+                                <ion-input
+                                    [readonly]="return_vehicle_report?.keyless_type != '' && return_vehicle_report?.keyless_type != null"
+                                    [(ngModel)]="return_vehicle_report.odometer" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">電/油量百分比</ion-label>
+                                <ion-input
+                                    [readonly]="return_vehicle_report?.keyless_type != '' && return_vehicle_report?.keyless_type != null"
+                                    [(ngModel)]="return_vehicle_report.oil_or_electricity_level"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <mat-form-field appearance="outline" style="display: none;">
+                                <mat-label>還車日期</mat-label>
+                                <input matInput [ngxMatDatetimePicker]="picker"
+                                    [value]="return_vehicle_report.submitted_datetime"
+                                    (dateChange)="submittedDatetimeChange($event)">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <ngx-mat-datetime-picker #picker showSpinners="true" [showSeconds]='showSeconds'
+                                    [stepHour]="stepHour" [stepMinute]="stepMinute" touchUi="true" color="primary"
+                                    [enableMeridian]="enableMeridian" disableMinute="false" hideTime="false">
+                                </ngx-mat-datetime-picker>
+                            </mat-form-field>
+
+                            <ion-item class="input-item with-icon" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">還車日期</ion-label>
+                                <ion-input
+                                    *ngIf="return_vehicle_report.submitted_datetime != null && return_vehicle_report.submitted_datetime != ''"
+                                    readonly
+                                    value="{{return_vehicle_report.submitted_datetime | date : 'yyyy-MM-dd HH:mm'}}"
+                                    type="text">
+                                </ion-input>
+                                <ion-input
+                                    *ngIf="!(return_vehicle_report.submitted_datetime != null && return_vehicle_report.submitted_datetime != '')"
+                                    readonly value="" type="text"></ion-input>
+                                <ion-icon
+                                    *ngIf="(return_vehicle_report.submitted_datetime != null && return_vehicle_report.submitted_datetime != '')"
+                                    (click)="resetSubmittedDatetime()" slot="end" name="close-outline"></ion-icon>
+                                <mat-datepicker-toggle slot="end" matSuffix [for]="picker"></mat-datepicker-toggle>
+                            </ion-item>
+
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-button
+                                [disabled]="return_vehicle_report.latitude == null || return_vehicle_report.longitude == null"
+                                color="secondary" fill="outline"
+                                [href]="'http://maps.google.com/maps?q='+return_vehicle_report.latitude+','+return_vehicle_report.longitude"
+                                target="_blank" expand="block">
+                                <ion-icon slot="start" name="location"></ion-icon>
+                                還車位置
+                            </ion-button>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">還車泊位編號</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.parking_lot_reference_number"
+                                    type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">合約狀態</ion-label>
+                                <ion-select [(ngModel)]="return_vehicle_report.contract_status" multiple="false"
+                                    cancelText="取消" okText="確認" placeholder="請選擇">
+                                    <ion-select-option value="完約交還">完約交還</ion-select-option>
+                                    <ion-select-option value="中斷合約">中斷合約</ion-select-option>
+                                    <ion-select-option value="更換車輛">更換車輛</ion-select-option>
+                                    <ng-container
+                                        *ngIf="return_vehicle_report.contract_status == '' || return_vehicle_report.contract_status == '完約交還' || return_vehicle_report.contract_status == '中斷合約' || return_vehicle_report.contract_status == '更換車輛'">
+                                        <ion-select-option value=" ">自訂(於自訂合約狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+                                    <ng-container
+                                        *ngIf="(return_vehicle_report.contract_status != '' && return_vehicle_report.contract_status != '完約交還' && return_vehicle_report.contract_status != '中斷合約' && return_vehicle_report.contract_status != '更換車輛')">
+                                        <ion-select-option
+                                            [value]="return_vehicle_report.contract_status">自訂(於自訂合約狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3"
+                            *ngIf="(return_vehicle_report.contract_status != '' && return_vehicle_report.contract_status != '完約交還' && return_vehicle_report.contract_status != '中斷合約' && return_vehicle_report.contract_status != '更換車輛')">
+                            <ng-container>
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap" position="stacked">自訂合約狀態</ion-label>
+                                    <ion-input [(ngModel)]="return_vehicle_report.contract_status"
+                                        type="text"></ion-input>
+                                </ion-item>
+                            </ng-container>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap">需要賠償(自動建立賠償)</ion-label>
+                                <ion-toggle slot="end"
+                                    [(ngModel)]="return_vehicle_report.create_compensation"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">報告備注</ion-label>
+                                <ion-input [(ngModel)]="return_vehicle_report.remark" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <!-- <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>訂單資料</ion-label>
+                            </div>
+                        </ion-col>
+
+                         <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">退還按金狀態</ion-label>
+                                <ion-select [(ngModel)]="return_vehicle_report.deposit_status" multiple="false"
+                                    cancelText="取消" okText="確認" placeholder="請選擇">
+                                    <ion-select-option value="退還按金">退還按金</ion-select-option>
+                                    <ion-select-option value="沒收按金">沒收按金</ion-select-option>
+                                    <ion-select-option value="更換車輛">更換車輛</ion-select-option>
+                                    <ng-container
+                                        *ngIf="return_vehicle_report.deposit_status == '' || return_vehicle_report.deposit_status == '退還按金' || return_vehicle_report.deposit_status == '沒收按金' || return_vehicle_report.deposit_status == '更換車輛'">
+                                        <ion-select-option value=" ">自訂(於自訂按金狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+                                    <ng-container
+                                        *ngIf="return_vehicle_report.deposit_status != '' && return_vehicle_report.deposit_status != '退還按金' && return_vehicle_report.deposit_status != '沒收按金' && return_vehicle_report.deposit_status != '更換車輛'">
+                                        <ion-select-option
+                                            [value]="return_vehicle_report.deposit_status">自訂(於自訂按金狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col> 
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ng-container
+                                *ngIf="(return_vehicle_report.deposit_status != '' && return_vehicle_report.deposit_status != '退還按金' && return_vehicle_report.deposit_status != '沒收按金' && return_vehicle_report.deposit_status != '更換車輛')">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap" position="stacked">自訂按金狀態</ion-label>
+                                    <ion-input [(ngModel)]="return_vehicle_report.deposit_status"
+                                        type="text"></ion-input>
+                                </ion-item>
+                            </ng-container>
+                        </ion-col>
+                    </ion-row> -->
+                    <br>
+                    <ng-container *ngFor="let category of carDamageCategory">
+                        <ion-row class="default-container">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>{{'car_damage.'+category | translate}}破損紀錄</ion-label>
+                                </div>
+                            </ion-col>
+                            <ng-container *ngIf="category == cDC.front">
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                                    *ngFor="let subcategory of carDamageFrontSubcategory">
+                                    <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                        *ngIf="getCarDamge(category, subcategory) != null" [options]="slideOpts">
+                                        <ion-slide
+                                            *ngFor="let item of getCarDamge(category, subcategory).img_url_list; let i = index;">
+                                            <div class="slider-img-container">
+                                                <img [src]="('media_url' | env)+item" alt="">
+                                                <ion-icon (click)="removeCarDamageImage(category, subcategory, i)"
+                                                    color="danger" name="close-circle-outline"></ion-icon>
+                                            </div>
+                                        </ion-slide>
+                                    </ion-slides>
+                                    <ion-button color="warning" fill="outline"
+                                        *ngIf="getCarDamge(category, subcategory) != null"
+                                        (click)="addCarDamageToCar(category, subcategory)">
+                                        新增此破損至車輛原有破損位置列表
+                                    </ion-button>
+                                    <ion-button color="secondary" fill="outline"
+                                        (click)="selectImageSource(category, subcategory)">
+                                        上載{{'car_damage.'+subcategory | translate}}圖片（如有）
+                                    </ion-button>
+                                </ion-col>
+                            </ng-container>
+                            <ng-container *ngIf="category == cDC.left_side">
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                                    *ngFor="let subcategory of carDamageLeftSideSubcategory">
+                                    <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                        *ngIf="getCarDamge(category, subcategory) != null" [options]="slideOpts">
+                                        <ion-slide
+                                            *ngFor="let item of getCarDamge(category, subcategory).img_url_list; let i = index;">
+                                            <div class="slider-img-container">
+                                                <img [src]="('media_url' | env)+item" alt="">
+                                                <ion-icon (click)="removeCarDamageImage(category, subcategory, i)"
+                                                    color="danger" name="close-circle-outline"></ion-icon>
+                                            </div>
+                                        </ion-slide>
+                                    </ion-slides>
+                                    <ion-button color="warning" fill="outline"
+                                        *ngIf="getCarDamge(category, subcategory) != null"
+                                        (click)="addCarDamageToCar(category, subcategory)">
+                                        新增此破損至車輛原有破損位置列表
+                                    </ion-button>
+                                    <ion-button color="secondary" fill="outline"
+                                        (click)="selectImageSource(category, subcategory)">
+                                        上載{{'car_damage.'+subcategory | translate}}圖片（如有）
+                                    </ion-button>
+
+                                </ion-col>
+                            </ng-container>
+                            <ng-container *ngIf="category == cDC.right_side">
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                                    *ngFor="let subcategory of carDamageRightSideSubcategory">
+                                    <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                        *ngIf="getCarDamge(category, subcategory) != null" [options]="slideOpts">
+                                        <ion-slide
+                                            *ngFor="let item of getCarDamge(category, subcategory).img_url_list; let i = index;">
+                                            <div class="slider-img-container">
+                                                <img [src]="('media_url' | env)+item" alt="">
+                                                <ion-icon (click)="removeCarDamageImage(category, subcategory, i)"
+                                                    color="danger" name="close-circle-outline"></ion-icon>
+                                            </div>
+                                        </ion-slide>
+                                    </ion-slides>
+                                    <ion-button color="warning" fill="outline"
+                                        *ngIf="getCarDamge(category, subcategory) != null"
+                                        (click)="addCarDamageToCar(category, subcategory)">
+                                        新增此破損至車輛原有破損位置列表
+                                    </ion-button>
+                                    <ion-button color="secondary" fill="outline"
+                                        (click)="selectImageSource(category, subcategory)" expand="block">
+                                        上載{{'car_damage.'+subcategory | translate}}圖片（如有）
+                                    </ion-button>
+                                </ion-col>
+                            </ng-container>
+                            <ng-container *ngIf="category == cDC.rear">
+                                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
+                                    *ngFor="let subcategory of carDamageRearSubcategory">
+                                    <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                        *ngIf="getCarDamge(category, subcategory) != null" [options]="slideOpts">
+                                        <ion-slide
+                                            *ngFor="let item of getCarDamge(category, subcategory).img_url_list; let i = index;">
+                                            <div class="slider-img-container">
+                                                <img [src]="('media_url' | env)+item" alt="">
+                                                <ion-icon (click)="removeCarDamageImage(category, subcategory, i)"
+                                                    color="danger" name="close-circle-outline"></ion-icon>
+                                            </div>
+                                        </ion-slide>
+                                    </ion-slides>
+                                    <ion-button color="warning" fill="outline"
+                                        *ngIf="getCarDamge(category, subcategory) != null"
+                                        (click)="addCarDamageToCar(category, subcategory)">
+                                        新增此破損至車輛原有破損位置列表
+                                    </ion-button>
+                                    <ion-button color="secondary" fill="outline"
+                                        (click)="selectImageSource(category, subcategory)" expand="block">
+                                        上載{{'car_damage.'+subcategory | translate}}圖片（如有）
+                                    </ion-button>
+                                </ion-col>
+                            </ng-container>
+
+                        </ion-row>
+                        <br>
+                    </ng-container>
+
+                    <ion-row class="default-container">
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                            <div>
+                                <h2>客人簽名</h2>
+                                <canvas class="signature-pad-canvas" #canvas width="250" height="200"
+                                    style="touch-action: none;"></canvas>
+                                <div>
+                                    <ion-button color="secondary" (click)="signaturePad.clear();" fill="outline">
+                                        清除簽名
+                                    </ion-button>
+                                    <ion-button color="secondary" (click)="confirmSignature()" fill="outline">
+                                        確認簽名
+                                    </ion-button>
+                                </div>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                            <ion-img style="height: 200px;" *ngIf="return_vehicle_report?.user_signature_img_url != ''"
+                                [src]="('media_url' | env)+return_vehicle_report.user_signature_img_url"></ion-img>
+                        </ion-col>
+                    </ion-row>
+
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </div>
+</ion-content>

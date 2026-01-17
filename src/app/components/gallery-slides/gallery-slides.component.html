@@ -1,0 +1,10 @@
+<div class="container" [style.max-width]="width == '' ? '' : width+'px'">
+  <ion-icon (click)="back()" class="back-btn" name="arrow-back-circle-outline"></ion-icon>
+  <ion-slides #slides mode="ios" pager="true" scrollbar="fales">
+    <ion-slide *ngFor="let item of img_url_list; let i = index">
+      <!-- <img style="max-height: 500px;" [src]="('media_url' | env)+item"> -->
+      <img  [style.max-height]="height == '' ? '500px' : height+'px'"  style="max-height: 500px;" [src]="('media_url' | env)+item">
+    </ion-slide>
+  </ion-slides>
+  <ion-icon (click)="next()" class="next-btn" name="arrow-forward-circle-outline"></ion-icon>
+</div>

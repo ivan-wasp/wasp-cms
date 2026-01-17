@@ -1,0 +1,15 @@
+.box_container {
+  background: var(--ion-background-color);
+  border: 1px solid var(--ion-color-light-shade);
+  ion-input {
+    background: var(--ion-color-light-tint);
+    border-color: var(--ion-color-light);
+  }
+  .forget_pw_btn {
+    background: transparent;
+    padding: 12px;
+    ion-icon {
+      vertical-align: middle;
+    }
+  }
+}

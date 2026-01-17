@@ -1,0 +1,430 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">緊急支援</ion-title>
+
+        <ng-container *ngIf="emergency_id != null">
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(emergency_data)">
+                    <ion-icon slot="start" name="trash"></ion-icon>
+                    刪除
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="readonly">
+                <ion-button fill="clear" (click)="readonly = false">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    修改
+                </ion-button>
+            </ion-buttons>
+
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="readonly = true; emergency_data = checking_emergency_data;">
+                    <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                    取消修改
+                </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end" *ngIf="!readonly">
+                <ion-button fill="clear" (click)="save()">
+                    <ion-icon slot="start" name="save"></ion-icon>
+                    儲存
+                </ion-button>
+            </ion-buttons>
+        </ng-container>
+
+        <ion-buttons slot="end" *ngIf="emergency_id == null">
+            <ion-button fill="clear" (click)="createNewEmergency()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                建立緊急支援
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+    <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+    <div class="ion-margin" *ngIf="emergency_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+                        <ion-input readonly [value]="emergency_data.id" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">禁用</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="emergency_data.disabled"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="emergency_id != null">
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">用戶</ion-label>
+                            <ion-input [readonly]="readonly"
+                                [value]="getUserDataById(emergency_data.user_id)?.zh_full_name" type="text"></ion-input>
+                            <ion-icon
+                                (click)="commonService?.openCMSPage('/user-detail?user_id='+emergency_data.user_id, 'blank')"
+                                slot="end" name="eye"></ion-icon>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電話</ion-label>
+                            <ion-input [readonly]="readonly" [value]="getUserDataById(emergency_data.user_id)?.phone"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                            <ion-input [readonly]="readonly" [value]="getUserDataById(emergency_data.user_id)?.email"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ng-container *ngIf="emergency_id == null">
+                    <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label class="ion-text-wrap">選擇緊急支援的用戶（必選）</ion-label>
+                            <ionic-selectable (onSearch)="commonService?.searchUser($event)" [disabled]="readonly"
+                                [(ngModel)]="emergency_data.user_id" itemValueField="id" shouldStoreItemValue="id"
+                                itemTextField="plate" [items]="(all_user_data_list$ | async)" [canClear]="true"
+                                [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                                closeButtonText="取消" [hasVirtualScroll]="true">
+                                <ng-template ionicSelectableItemTemplate let-port="item"
+                                    let-isPortSelected="isItemSelected">
+                                    {{port.zh_full_name || port.username}} - {{port.phone}}
+                                </ng-template>
+                                <ng-template ionicSelectableValueTemplate let-ports="item">
+                                    {{getUserDataById(emergency_data.user_id)?.zh_full_name}}
+                                    ({{getUserDataById(emergency_data.user_id)?.phone}})
+                                </ng-template>
+                            </ionic-selectable>
+                        </ion-item>
+                        <!-- <ion-button color="dark" (click)="emergency_data.user_id = having_deposit_user_id_list" fill="solid">
+                            選擇按金客戶
+                        </ion-button>
+                        <ion-button color="dark" (click)="emergency_data.user_id = all_user_id_list_exluding_having_deposit" fill="solid">
+                            選擇所有客戶（不包括按金客戶）
+                        </ion-button>
+                        <ion-button color="dark" (click)="emergency_data.user_id = having_past_order_user_id_list" fill="solid">
+                            選擇過往客戶
+                        </ion-button> -->
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">訂單編號</ion-label>
+                        <ion-input [readonly]="readonly" [value]="emergency_data.order_id" type="text"></ion-input>
+
+                        <ion-icon
+                            (click)="commonService?.openCMSPage('/order-detail?order_id='+emergency_data.order_id, 'blank')"
+                            slot="end" name="eye"></ion-icon>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">選擇車輛（必選）</ion-label>
+                        <ionic-selectable (onSearch)="commonService?.searchCar($event)" [disabled]="readonly"
+                            [(ngModel)]="emergency_data.car_id" itemValueField="id" shouldStoreItemValue="id"
+                            itemTextField="plate" [items]="(all_car_data_list$ | async)" [canClear]="true"
+                            [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+                            closeButtonText="取消" [hasVirtualScroll]="true">
+                            <ng-template ionicSelectableItemTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                {{port.model}} - {{port.plate}}
+                            </ng-template>
+                            <ng-template ionicSelectableItemEndTemplate let-port="item"
+                                let-isPortSelected="isItemSelected">
+                                <img class="select-end-img" [src]="('media_url' | env)+port?.cover_img_url_list[0]" />
+                            </ng-template>
+                            <ng-template ionicSelectableValueTemplate let-ports="item">
+                                {{getCarDataById(emergency_data.car_id)?.plate}}
+                                ({{getCarDataById(emergency_data.car_id)?.model}})
+                            </ng-template>
+
+                        </ionic-selectable>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">意外類型</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="emergency_data.accident_type" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="traffic_accident">交通意外</ion-select-option>
+                            <ion-select-option value="vehicle_failure">汽車故障</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <!-- <mat-form-field class="input-item" appearance="outline" [ngClass]="{'readonly': readonly}">
+                        <mat-label>意外日期</mat-label>
+                        <input matInput [readonly]="readonly" [ngxMatDatetimePicker]="picker" [value]="emergency_data.accident_datetime" (dateChange)="appointmentDatetimeChange($event)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <ngx-mat-datetime-picker #picker showSpinners="true" [showSeconds]='showSeconds' [stepHour]="stepHour" [stepMinute]="stepMinute" touchUi="true" color="primary" [enableMeridian]="enableMeridian" disableMinute="false" hideTime="false">
+                        </ngx-mat-datetime-picker>
+                    </mat-form-field> -->
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #start_date matInput [ngxMatDatetimePicker]="picker"
+                            (dateChange)="appointmentDatetimeChange($event)">
+                        <!-- (dateChange)="selectionDateChanged('accident_datetime', start_date)"> -->
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <ngx-mat-datetime-picker #picker showSpinners="true" touchUi="true" color="primary"
+                            disableMinute="false" hideTime="false">
+                        </ngx-mat-datetime-picker>
+                        <!-- <mat-datepicker touchUi #picker showSpinners="true" [showSeconds]='showSeconds' [stepHour]="stepHour" [stepMinute]="stepMinute" touchUi="true" color="primary" [enableMeridian]="enableMeridian" disableMinute="false" hideTime="false"></mat-datepicker> -->
+                    </mat-form-field>
+
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">意外日期</ion-label>
+                        <ion-input readonly [value]="emergency_data.accident_datetime" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker"></mat-datepicker-toggle>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">意外地點</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.accident_location"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">天氣</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="emergency_data.weather" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="sunny">天晴</ion-select-option>
+                            <ion-select-option value="rainy">有雨</ion-select-option>
+                            <ion-select-option value="foggy">有霧</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">車速</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.speed" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">有對方司機資料</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="emergency_data.witness"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="emergency_data.witness == true">
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label position="stacked">對方司機車牌</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.witness_plate"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label position="stacked">對方司機身份證</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.witness_identity"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label position="stacked">對方司機名稱</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.witness_name"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label position="stacked">對方司機電話</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.witness_phone"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">損毀程度</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="emergency_data.damage_level" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="low">低</ion-select-option>
+                            <ion-select-option value="medium">中</ion-select-option>
+                            <ion-select-option value="high">高</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">已報案</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="emergency_data.reported"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+
+                <ng-container *ngIf="emergency_data.reported == true">
+                    <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                            button='false'>
+                            <ion-label position="stacked">報案編號</ion-label>
+                            <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.report_number"
+                                type="text"></ion-input>
+                        </ion-item>
+                    </ion-col>
+                </ng-container>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">賠償金額</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.compensation_amount"
+                            type="number"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="emergency_data.witness_name != ''">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">賠償方</ion-label>
+                        <!-- <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.payer"
+                            type="string"></ion-input> -->
+                        <ion-select [disabled]="readonly" [(ngModel)]="emergency_data.payer" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option
+                                [value]="emergency_data.witness_name">{{emergency_data.witness_name}}</ion-select-option>
+                            <ion-select-option
+                                [value]="getUserDataById(emergency_data.user_id)?.zh_full_name">{{getUserDataById(emergency_data.user_id)?.zh_full_name}}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="emergency_data.status" multiple="false"
+                            cancelText="取消" okText="確認">
+                            <ion-select-option value="in_progress">處理中</ion-select-option>
+                            <ion-select-option value="completed">已完結</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">備注</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="emergency_data.remark" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">對方司機已驗證</ion-label>
+                        <ion-checkbox [disabled]="readonly" [checked]="emergency_data.verified"
+                            slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">驗證日期</ion-label>
+                        <ion-input readonly value="{{emergency_data.verified_datetime | date: 'yyyy-MM-dd HH:mm'}}"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-button color="dark" (click)="requestVerifyCode()" class="default-ion-btn full-width"
+                        fill="outline">
+                        發送和解協議書sms驗證給對方司機
+                    </ion-button>
+                    <ion-button color="dark" (click)="generateSettlementPdf()" class="default-ion-btn full-width"
+                        fill="outline">
+                        產生和解協議書
+                    </ion-button>
+                    <ion-button color="tertiary" *ngIf="emergency_data.settlement_pdf_url != ''"
+                        (click)="commonService.downloadMedia(emergency_data?.settlement_pdf_url, true)"
+                        class="default-ion-btn full-width" fill="outline">
+                        下載和解協議書PDF
+                    </ion-button>
+                </ion-col>
+
+            </ion-row>
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-two-icon">
+                        <div class="">
+                            <ion-icon slot="start" src="assets/icon/gallery_dark.svg"></ion-icon>
+                            <ion-label>損毀圖片</ion-label>
+                        </div>
+                        <ion-icon *ngIf="!readonly" (click)="triggerImgUpload()" class="clickable" slot="start"
+                            name="cloud-upload"></ion-icon>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6"
+                    *ngFor="let item of emergency_data.damage_img_url_list; let i = index">
+                    <div class="img-container">
+                        <ion-img [src]="('media_url' | env)+item"></ion-img>
+                        <ion-button (click)="emergency_data.damage_img_url_list.splice(i, 1)" fill="clear"
+                            *ngIf="!readonly">
+                            <ion-icon slot="icon-only" color="danger" name="close-circle-outline"></ion-icon>
+                        </ion-button>
+                    </div>
+                </ion-col>
+
+            </ion-row>
+
+        </ion-grid>
+    </div>
+
+
+</ion-content>

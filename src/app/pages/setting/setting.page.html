@@ -1,0 +1,279 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+        <ion-title class="hidden-xs-down">系統設定</ion-title>
+
+        <ion-buttons slot="end">
+            <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
+                <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
+                管理員通知
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="readonly">
+            <ion-button fill="clear" (click)="readonly = false">
+                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                修改
+            </ion-button>
+        </ion-buttons>
+
+        <ion-buttons slot="end" *ngIf="!readonly">
+            <ion-button fill="clear" (click)="readonly = true">
+                <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+                取消修改
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end" *ngIf="!readonly">
+            <ion-button fill="clear" (click)="save()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                儲存
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <!-- <iframe width="100%" height="500px" src="https://hk.tracksolidpro.com/tools/device/video/56eed55a2330d2037376bcf97079c9a9aa4965064eb52a10a0c845df014f5d25be3bc1261573b74c9db64c3bc205244a" ></iframe> -->
+
+    <div class="ion-margin" *ngIf=" system_data != null">
+        <ion-grid>
+
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>系統</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap">啟用sms</ion-label>
+                        <ion-checkbox [disabled]="readonly" [(ngModel)]="system_data.enable_sms" slot="end"></ion-checkbox>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">拖車聯絡電話（sms及聯絡電話）</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.towing_service_phone" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">拖車聯絡電話 2（sms及聯絡電話）</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.towing_service_phone2" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>admin email (所有admin電郵將傳送至以下電郵）</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngFor="let item of system_data.admin_email_list; let i = index; trackBy: customTrackBy">
+                    <ion-item class="input-item with-icon" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">電郵</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.admin_email_list[i]" type="text"></ion-input>
+                        <ion-icon *ngIf="!readonly" slot="end" class="clickable" name="trash" (click)="system_data.admin_email_list.splice(i, 1)"></ion-icon>
+                    </ion-item>
+
+                </ion-col>
+                <ion-col size="12" *ngIf="!readonly">
+                    <div>
+                        <ion-button color="secondary" (click)="system_data.admin_email_list.push('')" fill="outline" shape="round">
+                            新增電郵
+                        </ion-button>
+                    </div>
+                </ion-col>
+            </ion-row>
+
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>公司資料</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">公司地址（顯示於app)</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.company_address" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">公司電郵（顯示於app)</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.company_email" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">公司名稱（顯示於app)</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.company_name" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">公司電話（顯示於app)</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.company_phone" type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+            <br>
+
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>推薦人優惠券</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label position="stacked">優惠類型</ion-label>
+                        <ion-select [disabled]="readonly" [(ngModel)]="system_data.referral_coupon_type" multiple="false" cancelText="取消" okText="確認">
+                            <ion-select-option value="percentage">百分比</ion-select-option>
+                            <ion-select-option value="price">現金</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">優惠數值</ion-label>
+                        <ion-input min="1" [max]="system_data.referral_coupon_type == 'percentage' ? '99' : '9999999999999'" [readonly]="readonly" [(ngModel)]="system_data.referral_coupon_amount" type="number"></ion-input>
+                    </ion-item>
+                    <ion-text class="hint" *ngIf="system_data.referral_coupon_type == 'percentage'">
+                        減{{system_data.referral_coupon_amount/100 | percent}}
+                    </ion-text>
+                    <ion-text class="hint" *ngIf="system_data.referral_coupon_type == 'price'">
+                        減${{system_data.referral_coupon_amount | number}}
+                    </ion-text>
+                </ion-col>
+
+            </ion-row>
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>預約維修</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">客人預約維修最少提前N日</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.minimum_appointment_day_in_advance" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">客人預約維修最多預約N日後</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.maximum_appointment_day_in_advance" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+            <br>
+            <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <!-- <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon> -->
+                        <ion-label>預約租車</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">客人預約租車最多預約N月後</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.maximum_booking_month_in_advance" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">兩張訂單取車及還車時間最少相隔N小時</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.minimun_hour_interval_between_pickup_return" type="number" min="0" max="23"></ion-input>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">時間格式：3小時輸入 3</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">可選最早取還車時間</ion-label>
+                        <ion-input (ionInput)="ionInput('starting_hour_to_allow_pickup')" [readonly]="readonly" [(ngModel)]="system_data.starting_hour_to_allow_pickup" type="number" min="1" max="23"></ion-input>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">時間格式：HH:mm 24小時制 (e.g. 9)</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">可選最遲取還車時間</ion-label>
+                        <ion-input  (ionInput)="ionInput('ending_hour_to_allow_return')" [readonly]="readonly" [(ngModel)]="system_data.ending_hour_to_allow_return" type="number" min="1" max="23"></ion-input>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">時間格式：HH:mm 24小時制 (e.g. 21)</ion-text>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly"  mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">N時間之前取車，另一張訂單將不能同日預約還車</ion-label>
+                        <ion-input readonly [(ngModel)]="system_data.maximum_pick_time_to_allow_another_return" type="text"></ion-input>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">時間格式：HH:mm 24小時制 (e.g. 13:00)</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item readonly"  mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">N時間之後還車，另一張訂單將不能同日預約取車</ion-label>
+                        <ion-input readonly [(ngModel)]="system_data.maximum_return_time_to_allow_another_pickup" type="text"></ion-input>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">時間格式：HH:mm 24小時制 (e.g. 13:00)</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">港島上門交車現場收費</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.hong_kong_island_custom_pick_up_charge" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">九龍上門交車現場收費</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.kowloon_custom_pick_up_charge" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">新界上門交車現場收費</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.new_territories_custom_pick_up_charge" type="number" min="0"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">逾期交租每天罰N％帳單租金金額</ion-label>
+                        <ion-input [readonly]="readonly" [(ngModel)]="system_data.penality_percentage" type="number" min="0">
+                        </ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+            <br>
+            <!-- <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-label>銀行轉帳資料（顯示於app）</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">銀行轉帳資料</ion-label>
+                        <ion-textarea [readonly]="readonly" rows="6" [(ngModel)]="system_data.bank_transfer_info" type="text"></ion-textarea>
+                    </ion-item>
+                </ion-col>
+            </ion-row> -->
+
+        </ion-grid>
+    </div>
+</ion-content>

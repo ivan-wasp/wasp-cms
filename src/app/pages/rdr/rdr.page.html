@@ -1,0 +1,223 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="bg-major-color">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+
+
+
+
+        <ion-title class="hidden-xs-down">退回按金報告</ion-title>
+
+        <ion-buttons class="hidden-sm-down" slot="end">
+            <ion-button fill="clear" (click)="tempSave()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                暫存資料
+            </ion-button>
+            <ion-button fill="clear" (click)="save()">
+                <ion-icon slot="start" name="save"></ion-icon>
+                產生PDF
+            </ion-button>
+        </ion-buttons>
+
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+    <div class="ion-margin" *ngIf="deposit_data != null">
+        <ion-grid>
+            <ion-row>
+
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>申請人資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">中文全名</ion-label>
+                                <ion-input [(ngModel)]="rdr.user_zh_full_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">英文全名</ion-label>
+                                <ion-input [(ngModel)]="rdr.user_en_full_name" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">身份證號碼</ion-label>
+                                <ion-input [(ngModel)]="rdr.user_identity_number" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">聯絡電話</ion-label>
+                                <ion-input [(ngModel)]="rdr.user_phone" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">地址</ion-label>
+                                <ion-input [(ngModel)]="rdr.user_address" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>車輛資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車牌</ion-label>
+                                <ion-input [(ngModel)]="rdr.car_plate" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車輛品牌</ion-label>
+                                <ion-input [(ngModel)]="rdr.car_brand" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">車輛型號</ion-label>
+                                <ion-input [(ngModel)]="rdr.car_model" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>訂單資料</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">合約租期</ion-label>
+                                <ion-input [(ngModel)]="rdr.order_start_date_end_date" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">按金額</ion-label>
+                                <ion-input [(ngModel)]="rdr.deposit_amount" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="ios" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">合約狀態</ion-label>
+                                <ion-select [(ngModel)]="rdr.contract_status" multiple="false" cancelText="取消" okText="確認" placeholder="請選擇">
+                                    <ion-select-option value="完約交還">完約交還</ion-select-option>
+                                    <ion-select-option value="中斷合約">中斷合約</ion-select-option>
+                                    <ion-select-option value="更換車輛">更換車輛</ion-select-option>
+                                    <!-- <ion-select-option value="">自訂(於自訂合約狀態欄輸入)</ion-select-option> -->
+                                    <ng-container *ngIf="rdr.contract_status == '' || rdr.contract_status == '完約交還' || rdr.contract_status == '中斷合約' || rdr.contract_status == '更換車輛'">
+                                        <ion-select-option value=" ">自訂(於自訂合約狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+                                    <ng-container *ngIf="(rdr.contract_status != '' && rdr.contract_status != '完約交還' && rdr.contract_status != '中斷合約' && rdr.contract_status != '更換車輛')">
+                                        <ion-select-option [value]="rdr.contract_status">自訂(於自訂合約狀態欄輸入)</ion-select-option>
+                                    </ng-container>
+                                </ion-select>
+                            </ion-item>
+                        </ion-col>
+                        <ng-container *ngIf="(rdr.contract_status != '' && rdr.contract_status != '完約交還' && rdr.contract_status != '中斷合約' && rdr.contract_status != '更換車輛') || on_contract_status">
+                            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap" position="stacked">自訂合約狀態</ion-label>
+                                    <ion-input (ionFocus)="on_contract_status=true" (ionBlur)="on_contract_status=false" [(ngModel)]="rdr.contract_status" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                        </ng-container>
+                        <ng-container *ngIf="rdr.contract_status == '更換車輛'">
+                            <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap" position="stacked">新車牌號碼</ion-label>
+                                    <ion-input [(ngModel)]="rdr.new_plate" type="text"></ion-input>
+                                </ion-item>
+                            </ion-col>
+                        </ng-container>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">安排報價服務</ion-label>
+                                <ion-toggle slot="end" [(ngModel)]="rdr.quotation"></ion-toggle>
+                            </ion-item>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                            <ion-item class="input-item" mode="md" lines='none' button='false'>
+                                <ion-label class="ion-text-wrap" position="stacked">維修費用</ion-label>
+                                <ion-input [(ngModel)]="rdr.repair_fee" type="text"></ion-input>
+                            </ion-item>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size="12">
+                            <div class="title-with-icon">
+                                <ion-label>違例事項紀錄</ion-label>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-reorder-group (ionItemReorder)="doReorder($event)" disabled="false">
+                                <ion-item class="img-item" lines="none" *ngFor="let item of rdr.violation_data_list; let i = index">
+                                    <ion-reorder slot="start"></ion-reorder>
+                                    <ion-label>
+                                        日期：{{item?.create_date | date : 'yyyy-MM-dd'}}&nbsp;&nbsp; 違例事項：{{item?.contravention_type}}&nbsp;&nbsp; 罰款：HK${{item?.amount | number}}</ion-label>
+                                    <ion-icon slot="end" (click)="rdr.violation_data_list.splice(i, 1)" color="danger" class="remove-icon" name="trash-outline"></ion-icon>
+                                </ion-item>
+                            </ion-reorder-group>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+                            <div>
+                                <h2>客人簽名</h2>
+                                <canvas class="signature-pad-canvas" #canvas2 width="250" height="200" style="touch-action: none;"></canvas>
+                                <div>
+                                    <ion-button color="secondary" (click)="signaturePad2.clear();" fill="outline">
+                                        清除簽名
+                                    </ion-button>
+                                </div>
+                            </div>
+                        </ion-col>
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="6">
+                        </ion-col>
+                    </ion-row>
+
+                </ion-col>
+            </ion-row>
+            <br>
+            <ion-row class="default-container">
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-button color="secondary" fill="outline" (click)="selectImageSource()" expand="block">
+                        上載支票相片
+                    </ion-button>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngIf="rdr.cheque_img_url != null && rdr.cheque_img_url != ''">
+                    <ion-img [src]="('media_url' | env)+rdr.cheque_img_url"></ion-img>
+                </ion-col>
+
+            </ion-row>
+
+        </ion-grid>
+    </div>
+</ion-content>
+<ion-footer class="hidden-sm-up ion-no-border">
+    <ion-toolbar>
+        <ion-button color="secondary" fill="outline" (click)="save()" expand="block">
+            <ion-icon slot="start" name="save"></ion-icon>
+            產生PDF
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

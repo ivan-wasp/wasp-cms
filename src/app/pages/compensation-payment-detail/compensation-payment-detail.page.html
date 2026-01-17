@@ -1,0 +1,313 @@
+<input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-major-color">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title class="hidden-xs-down">賠償</ion-title>
+
+    <ng-container *ngIf="compensation_payment_id != null">
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button color="danger" fill="clear" (click)="commonService?.deleteDataAlert(compensation_payment_data)">
+          <ion-icon slot="start" name="trash"></ion-icon>
+          刪除
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="readonly">
+        <ion-button fill="clear" (click)="readonly = false">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          修改
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear"
+          (click)="readonly = true ; compensation_payment_data = checking_compensation_payment_data;">
+          <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
+          取消修改
+        </ion-button>
+      </ion-buttons>
+      <ion-buttons slot="end" *ngIf="!readonly">
+        <ion-button fill="clear" (click)="save()">
+          <ion-icon slot="start" name="save"></ion-icon>
+          儲存
+        </ion-button>
+      </ion-buttons>
+    </ng-container>
+
+    <ion-buttons slot="end" *ngIf="compensation_payment_id == null">
+      <ion-button fill="clear" (click)="createNewCompensationPayment()">
+        <ion-icon slot="start" name="save"></ion-icon>
+        新增賠償
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-color">
+  <input style="display: none;" type="file" #upload_img accept="image/x-png,image/jpeg" (change)="uploadImg()">
+
+  <div class="ion-margin" *ngIf="compensation_payment_data != null">
+    <ion-grid>
+
+      <ion-row class="default-container">
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+          *ngIf="compensation_payment_id == null || compensation_payment_id == ''">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">選擇訂單</ion-label>
+            <ionic-selectable (onSearch)="searchOrder($event)" [disabled]="readonly"
+              [(ngModel)]="compensation_payment_data.order_id" itemValueField="id" shouldStoreItemValue="id"
+              itemTextField="plate" [items]="all_order_data_list" [canClear]="true" [canSearch]="true"
+              [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
+              (onChange)="orderChange($event)" [hasVirtualScroll]="true">
+              <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected">
+                Order ID: {{port.id}} ； {{port.user_zh_full_name}}({{port.user_phone}}) ； {{port.brand}} {{port.model}}
+                ({{port.plate}}) ； {{port.start_date}}至{{port.end_date}}
+              </ng-template>
+              <ng-template ionicSelectableValueTemplate let-ports="item">
+                {{getOrderDataById(compensation_payment_data.order_id)?.plate}}
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="6" size-md="23" size-lg="3" *ngIf="compensation_payment_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">ID</ion-label>
+            <ion-input readonly [value]="compensation_payment_data.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="compensation_payment_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+            <ion-input readonly [value]="compensation_payment_data.create_date | date : 'yyyy-MM-dd HH:mm'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="compensation_payment_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">禁用</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="compensation_payment_data.disabled" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3" *ngIf="user_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">用戶 (電話)</ion-label>
+            <ion-input readonly [value]="user_data.zh_full_name+ ' ('+user_data.phone+')'" type="text"></ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/user-detail?user_id='+user_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="order_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">訂單編號 (租用期)</ion-label>
+            <ion-input readonly [value]="order_data.id+' ('+order_data.start_date+ ' - '+order_data.end_date+')'"
+              type="text"></ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/order-detail?order_id='+order_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="car_data != null">
+          <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">車輛 (車牌)</ion-label>
+            <ion-input readonly [value]="car_data.brand+' '+car_data.model+' ('+car_data.plate+')'" type="text">
+            </ion-input>
+            <ion-icon (click)="commonService.openCMSPage('/car-detail?car_id='+car_data.id, 'blank')" slot="end"
+              name="eye">
+            </ion-icon>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="compensation_payment_id != null">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">狀態</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="compensation_payment_data.status" multiple="false"
+              cancelText="取消" okText="確認">
+              <ion-select-option [value]="compensationPaymentStatus.awaiting_quotation">待報價</ion-select-option>
+              <ion-select-option [value]="compensationPaymentStatus.awaiting_payment">待付款</ion-select-option>
+              <ion-select-option [value]="compensationPaymentStatus.awaiting_verification">審核中</ion-select-option>
+              <ion-select-option [value]="compensationPaymentStatus.paid">已繳付</ion-select-option>
+              <ion-select-option [value]="compensationPaymentStatus.cancelled">已取消</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item
+            *ngIf="compensation_payment_data.status == compensationPaymentStatus.awaiting_payment && checking_compensation_payment_data.status != compensationPaymentStatus.awaiting_payment"
+            class="input-item ion-margin" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">傳送車輛賠償報價發出通知給客人(in-app, sms)</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="send_quotation_created_notification" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item readonly" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+            button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">報價日期</ion-label>
+            <ion-input [readonly]="true"
+              [value]="compensation_payment_data.quotation_datetime | date : 'yyyy-MM-dd HH:mm'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="compensation_payment_data.remark" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="compensation_payment_id != null">
+          <ion-button color="secondary" *ngIf="compensation_payment_data.return_vehicle_report_pdf_url != ''"
+            (click)="commonService.downloadMedia(compensation_payment_data?.return_vehicle_report_pdf_url, true)"
+            class="default-ion-btn full-width" fill="outline">
+            下載還車報告
+          </ion-button>
+          <ion-button *ngIf="!readonly && compensation_payment_data.return_vehicle_report_id == null" color="dark"
+            (click)="getRvrData()" class="default-ion-btn full-width" fill="outline">
+            重新搜尋交還車報告(必須儲存)
+          </ion-button>
+          <ion-button *ngIf="compensation_payment_data.return_vehicle_report_id != null" color="dark"
+            (click)="generateQuotationPdf()" class="default-ion-btn full-width" fill="outline">
+            產生用戶報價PDF
+          </ion-button>
+          <ion-button color="tertiary" *ngIf="compensation_payment_data.quotation_pdf_url != ''"
+            (click)="commonService.downloadMedia(compensation_payment_data?.quotation_pdf_url, true)"
+            class="default-ion-btn full-width" fill="outline">
+            下載用戶報價PDF
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <br>
+      <ion-row class="default-container" *ngIf="compensation_payment_id != null">
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">報價</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="compensation_payment_data.compensation_price" type="number">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="compensation_payment_id != null">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">賠償到期日</ion-label>
+            <ion-input readonly [value]="compensation_payment_data.expiry_date | date : 'yyyy-MM-dd HH:mm'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">付款方式</ion-label>
+            <ion-select [disabled]="readonly" [(ngModel)]="compensation_payment_data.payment_method" multiple="false"
+              cancelText="取消" okText="確認">
+              <ion-select-option value="bank_transfer">銀行轉帳</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="credit_card">信用卡</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="fps">FPS(AirWallex)</ion-select-option>
+              <ion-select-option [disabled]="('production' | env)" value="alipayhk">AlipayHK</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+          *ngIf="compensation_payment_data.payment_method != null && compensation_payment_data.payment_method != '' && compensation_payment_data.payment_method == 'bank_transfer'">
+          <ion-button
+            *ngIf="compensation_payment_data.payment_order_data != null && compensation_payment_data.payment_order_data != ''"
+            download (click)="commonService?.openPage(compensation_payment_data.payment_order_data, true, true)"
+            expand="block" fill="outline" shape="round" color="secondary">
+            下載轉帳證明
+          </ion-button>
+          <ion-img
+            *ngIf="compensation_payment_data.payment_order_data != null && compensation_payment_data.payment_order_data != ''"
+            [src]="commonService.media_url()+compensation_payment_data.payment_order_data"></ion-img>
+          <ion-button *ngIf="!readonly" expand="block" fill="outline" shape="round" color="secondary"
+            (click)="triggerImgUpload()">
+            上載轉帳證明
+          </ion-button>
+          <ion-button
+            *ngIf="!readonly && compensation_payment_data.payment_order_data != null && compensation_payment_data.payment_order_data != ''"
+            expand="block" fill="outline" shape="round" color="danger" (click)="removeImg(compensation_payment_data)">
+            移除轉帳證明
+          </ion-button>
+        </ion-col>
+
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+          *ngIf="compensation_payment_data.payment_method != null && compensation_payment_data.payment_method != '' && (compensation_payment_data.payment_method == 'credit_card' || compensation_payment_data.payment_method == 'alipayhk') && compensation_payment_data.payment_order_data != null && compensation_payment_data.payment_order_data != ''">
+          <ion-item *ngIf="compensation_payment_data?.payment_order_data?.receipt_url" class="input-item readonly"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">stripe參考編號</ion-label>
+            <ion-input readonly [value]="compensation_payment_data?.payment_order_data?.id" type="text"></ion-input>
+          </ion-item>
+          <ion-button *ngIf="compensation_payment_data?.payment_order_data?.receipt_url"
+            (click)="commonService?.openPage(compensation_payment_data.payment_order_data.receipt_url, true, false)"
+            expand="block" fill="outline" shape="round" color="secondary">
+            查看stripe收據
+          </ion-button>
+          <ion-button *ngIf="compensation_payment_data?.payment_order_data?.charges?.data[0].receipt_url"
+            (click)="commonService?.openPage(compensation_payment_data.payment_order_data.charges?.data[0].receipt_url, true, false)"
+            expand="block" fill="outline" shape="round" color="secondary">
+            查看stripe收據
+          </ion-button>
+          <ion-item *ngIf="compensation_payment_data?.payment_order_data?.pspReference" class="input-item readonly" mode="md"
+            lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
+            <ion-input readonly [value]="compensation_payment_data?.payment_order_data?.pspReference" type="text"></ion-input>
+          </ion-item>
+          <ion-item *ngIf="compensation_payment_data?.payment_order_data?.additionalData?.cardSummary" class="input-item readonly"
+            mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
+            <ion-input readonly
+              [value]="compensation_payment_data?.payment_order_data?.additionalData?.cardSummary+' ('+compensation_payment_data?.payment_order_data?.additionalData?.paymentMethod+')'"
+              type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+          *ngIf="compensation_payment_data.payment_method != null && compensation_payment_data.payment_method != '' && (compensation_payment_data.payment_method == 'fps' || compensation_payment_data.payment_method == 'alipayhk')  && !compensation_payment_data.payment_order_data.hasOwnProperty('pspReference')">
+          <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
+            <ion-input readonly [value]="compensation_payment_data?.payment_order_data?.id" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+      <br>
+      <ion-row class="default-container">
+        <ion-col size="12">
+          <div class="title-with-icon">
+            <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon>
+            <ion-label> 保險數據 </ion-label>
+          </div>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">意外事件(計算入保險數據)</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="compensation_payment_data.accident" slot="end">
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">公司損失金額(人、車等)</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="compensation_payment_data.self_liability_amount"
+              type="number">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap" position="stacked">第三者損失金額(人、車等)</ion-label>
+            <ion-input [readonly]="readonly" [(ngModel)]="compensation_payment_data.third_party_liability_amount"
+              type="number">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+
+</ion-content>

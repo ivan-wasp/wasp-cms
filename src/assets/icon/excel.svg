@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30.207" height="28.32" viewBox="0 0 30.207 28.32">
+  <g id="_001-excel" data-name="001-excel" transform="translate(0 -15.989)">
+    <g id="Group_81" data-name="Group 81" transform="translate(0 15.989)">
+      <g id="Group_80" data-name="Group 80">
+        <path id="Path_75" data-name="Path 75" d="M29.263,19.767H16.991V16.935a.941.941,0,0,0-.342-.727.928.928,0,0,0-.776-.2L.77,18.84a.941.941,0,0,0-.77.927V40.534a.943.943,0,0,0,.77.927l15.1,2.832a.888.888,0,0,0,.174.017.944.944,0,0,0,.944-.944V40.534H29.263a.944.944,0,0,0,.944-.944V20.711A.944.944,0,0,0,29.263,19.767ZM12.981,33.305a.943.943,0,1,1-1.42,1.242L8.817,31.411l-2.407,3.1a.945.945,0,0,1-1.491-1.161L7.55,29.963,4.954,27a.944.944,0,0,1,1.422-1.242l2.356,2.692,2.8-3.595a.944.944,0,0,1,1.49,1.161L10,29.893Zm15.338,5.341H16.991V36.758h2.832a.944.944,0,0,0,0-1.888H16.991V32.982h2.832a.944.944,0,0,0,0-1.888H16.991V29.206h2.832a.944.944,0,0,0,0-1.888H16.991V25.43h2.832a.944.944,0,0,0,0-1.888H16.991V21.655H28.319Z" transform="translate(0 -15.989)" fill="#333"/>
+      </g>
+    </g>
+    <g id="Group_83" data-name="Group 83" transform="translate(22.655 23.542)">
+      <g id="Group_82" data-name="Group 82">
+        <path id="Path_76" data-name="Path 76" d="M386.832,144.011h-1.888a.944.944,0,0,0,0,1.888h1.888a.944.944,0,0,0,0-1.888Z" transform="translate(-384 -144.011)" fill="#333"/>
+      </g>
+    </g>
+    <g id="Group_85" data-name="Group 85" transform="translate(22.655 27.318)">
+      <g id="Group_84" data-name="Group 84">
+        <path id="Path_77" data-name="Path 77" d="M386.832,208.011h-1.888a.944.944,0,0,0,0,1.888h1.888a.944.944,0,0,0,0-1.888Z" transform="translate(-384 -208.011)" fill="#333"/>
+      </g>
+    </g>
+    <g id="Group_87" data-name="Group 87" transform="translate(22.655 31.094)">
+      <g id="Group_86" data-name="Group 86">
+        <path id="Path_78" data-name="Path 78" d="M386.832,272.011h-1.888a.944.944,0,0,0,0,1.888h1.888a.944.944,0,0,0,0-1.888Z" transform="translate(-384 -272.011)" fill="#333"/>
+      </g>
+    </g>
+    <g id="Group_89" data-name="Group 89" transform="translate(22.655 34.87)">
+      <g id="Group_88" data-name="Group 88">
+        <path id="Path_79" data-name="Path 79" d="M386.832,336.011h-1.888a.944.944,0,0,0,0,1.888h1.888a.944.944,0,0,0,0-1.888Z" transform="translate(-384 -336.011)" fill="#333"/>
+      </g>
+    </g>
+  </g>
+</svg>
