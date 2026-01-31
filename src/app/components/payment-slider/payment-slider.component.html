@@ -189,7 +189,7 @@
                                 <ion-select-option value="cancelled">已取消</ion-select-option>
                                 <ion-select-option value="awaiting_payment">未付款</ion-select-option>
                                 <ion-select-option value="awaiting_verification">審核中</ion-select-option>
-                                <ion-select-option value="paid">已繳付</ion-select-option>
+                                <ion-select-option [disabled]="payment_data.deposit_amount > 0" value="paid">已繳付</ion-select-option>
                             </ion-select>
                         </ion-item>
                         <ion-text color="secondary" class="hint"
