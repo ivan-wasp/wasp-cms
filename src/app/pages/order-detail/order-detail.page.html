@@ -789,7 +789,7 @@
                             <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                                 button='false'>
                                 <ion-label class="ion-text-wrap" position="stacked">取車時間</ion-label>
-                                <ion-input [readonly]="readonly" [disabled]="order_data?.car_data?.keyless_type != ''"
+                                <ion-input [readonly]="readonly"
                                     [(ngModel)]="order_data.pick_up_data.time" type="text"></ion-input>
                             </ion-item>
                             <ion-text color="secondary" class="hint">格式必須為24小時 (e.g. 15:00)</ion-text>
@@ -799,7 +799,7 @@
                             <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                                 button='false'>
                                 <ion-label class="ion-text-wrap" position="stacked">還車時間</ion-label>
-                                <ion-input [readonly]="readonly" [disabled]="order_data?.car_data?.keyless_type != ''"
+                                <ion-input [readonly]="readonly"
                                     [(ngModel)]="order_data.return_data.time" type="text"></ion-input>
                             </ion-item>
                             <ion-text color="secondary" class="hint">格式必須為24小時 (e.g. 15:00)</ion-text>
