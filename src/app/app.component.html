@@ -21,7 +21,7 @@
                 </ion-toolbar>
 
             </ion-header>
-            <ion-content class="bg-color">
+            <ion-content class="bg-color" scrollY="true">
                 <div class="ion-text-center">
                     <img style="width: 150px;" src="assets/icon/wasp_logo.png" alt="">
 
@@ -29,6 +29,21 @@
 
                 <ion-row class="row_div"
                     *ngIf="authService.adminData.value != null && authService.adminData.value?.type != adminType.maintainer && authService.adminData.value?.type != adminType.owner && authService.adminData.value?.type != adminType.buyer && authService.adminData.value?.type != adminType.sales && authService.adminData.value?.type != adminType.pickup_dropoff">
+                    <!-- <ion-accordion-group *ngFor="let item of appPages" value="{{item.title}}">
+                        <ion-accordion [value]="item.title">
+                            <ion-item slot="header">
+                                <ion-icon name="language" slot="start"></ion-icon>
+                                <ion-label>{{item?.title}}</ion-label>
+                            </ion-item>
+                            <div class="ion-padding" slot="content">
+         
+                                <ion-item *ngFor="let subItem of item.page_list">
+                                    <ion-label>{{subItem?.title}}</ion-label>
+                                </ion-item>
+     
+                            </div>
+                        </ion-accordion>
+                    </ion-accordion-group> -->
                     <ng-container *ngFor="let p of appPages; let i = index">
                         <ion-col size="6" class="ion-no-padding">
                             <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">

@@ -248,7 +248,7 @@ export class ApiService {
     return new Promise((resolve, reject) => {
       if(loadding) this.commonService.isLoading = true;
       this.http.post(environment.api_url, body.toString(), headers).subscribe(async (res: any) => {
-        // console.log(path);
+        console.log(res);
         if(loadding) this.commonService.isLoading = false;
         if (res != null){
           const response: Response = res;

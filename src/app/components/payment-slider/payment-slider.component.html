@@ -10,8 +10,7 @@
                             <ion-icon slot="start" src="assets/icon/dollar_dark.svg"></ion-icon>
                             <ion-label>帳單詳情</ion-label>
                         </div>
-                        <div
-                            *ngIf="((admin_data | async) != null && (admin_data | async)?.type == adminType.admin)">
+                        <div *ngIf="((admin_data | async) != null && (admin_data | async)?.type == adminType.admin)">
                             <ion-button fill="clear" (click)="readonly = false" *ngIf="readonly">
                                 <ion-icon slot="start" src="assets/icon/edit.svg"></ion-icon>
                                 <ion-text color="secondary">修改</ion-text>
@@ -29,14 +28,16 @@
                     </div>
                 </ion-col>
 
-                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
                     <ion-button class="default-ion-btn" fill="clear" expand="block"
                         [disabled]="payment_data.invoice_url == null || payment_data.invoice_url == ''"
                         (click)="commonService?.openPage(payment_data.invoice_url, true, true)">
                         查看Invoice
                     </ion-button>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
+                    *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
                     <ion-button (click)="generateInvoice()" class="default-ion-btn" fill="clear" expand="block">
                         產生Invoice
                     </ion-button>
@@ -152,12 +153,15 @@
                     <ion-item *ngIf="payment_data?.payment_order_data?.pspReference" class="input-item readonly"
                         mode="md" lines='none' button='false'>
                         <ion-label class="ion-text-wrap" position="stacked">Adyen參考編號</ion-label>
-                        <ion-input readonly [value]="payment_data?.payment_order_data?.pspReference" type="text"></ion-input>
+                        <ion-input readonly [value]="payment_data?.payment_order_data?.pspReference"
+                            type="text"></ion-input>
                     </ion-item>
-                    <ion-item *ngIf="payment_data?.payment_order_data?.additionalData?.cardSummary" class="input-item readonly"
-                        mode="md" lines='none' button='false'>
+                    <ion-item *ngIf="payment_data?.payment_order_data?.additionalData?.cardSummary"
+                        class="input-item readonly" mode="md" lines='none' button='false'>
                         <ion-label class="ion-text-wrap" position="stacked">信用卡尾數</ion-label>
-                        <ion-input readonly [value]="payment_data?.payment_order_data?.additionalData?.cardSummary+' ('+payment_data?.payment_order_data?.additionalData?.paymentMethod+')'" type="text"></ion-input>
+                        <ion-input readonly
+                            [value]="payment_data?.payment_order_data?.additionalData?.cardSummary+' ('+payment_data?.payment_order_data?.paymentMethod+')'"
+                            type="text"></ion-input>
                     </ion-item>
                 </ion-col>
                 <ng-container
@@ -168,16 +172,16 @@
                             <ion-input readonly [value]="payment_data?.payment_order_data?.id" type="text"></ion-input>
                         </ion-item>
                     </ion-col>
-                    <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
-                        <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
-                            button='false'>
-                            <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
-                            <ion-input readonly
-                                [value]="payment_data.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
-                                type="text"></ion-input>
-                        </ion-item>
-                    </ion-col>
                 </ng-container>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                        <ion-input readonly
+                            [value]="payment_data.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
                 <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                     <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
                         <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
@@ -189,7 +193,8 @@
                                 <ion-select-option value="cancelled">已取消</ion-select-option>
                                 <ion-select-option value="awaiting_payment">未付款</ion-select-option>
                                 <ion-select-option value="awaiting_verification">審核中</ion-select-option>
-                                <ion-select-option [disabled]="payment_data.deposit_amount > 0" value="paid">已繳付</ion-select-option>
+                                <ion-select-option [disabled]="payment_data.deposit_amount > 0"
+                                    value="paid">已繳付</ion-select-option>
                             </ion-select>
                         </ion-item>
                         <ion-text color="secondary" class="hint"
