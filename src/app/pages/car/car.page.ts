@@ -151,8 +151,6 @@ export class CarPage implements OnInit {
     if (this.auth.adminData.value?.type == AdminType.owner) {
       send_data['car_id_list'] = this.auth.adminData.value.owner_car_id_list;
     }
-    console.log(JSON.stringify(send_data));
-    // this.commonService.isLoading = true;
 
     this.apiService.postFromServer(ApiPath.get_car_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
       console.log(res);

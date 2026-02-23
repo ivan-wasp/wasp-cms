@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,6 +11,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { NgCalendarModule } from 'ionic2-calendar';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { SharedComponentsModule } from 'src/app/components/shared-components.module';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
   imports: [
@@ -21,8 +22,11 @@ import { SharedComponentsModule } from 'src/app/components/shared-components.mod
     MaterialModule,
     NgCalendarModule,
     NgxChartsModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    // GoogleMapsModule
   ],
-  declarations: [HomePage]
+  declarations: [HomePage],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+
 })
-export class HomePageModule {}
+export class HomePageModule { }

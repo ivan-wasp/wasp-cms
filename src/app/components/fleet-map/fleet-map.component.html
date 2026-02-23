@@ -1,0 +1,32 @@
+<google-map height="55%" width="100%" [zoom]="zoom" [center]="center" [options]="options">
+  <map-marker #somemarker="mapMarker" *ngFor="let marker of markers" [position]="marker.position"
+    [options]="marker.options" [title]="marker.title"
+    (mapClick)="openInfoWindow(somemarker, marker)">
+  </map-marker>
+  <map-info-window style="background-color: red;">
+    <!-- <ion-avatar *ngFor="let item of applicable_car_data_list">
+      <img [src]="('media_url' | env) + item.cover_img_url_list[0]" />
+    </ion-avatar> -->
+    <h3 class="ion-text-center">{{selected_marker?.title}}</h3>
+    <ion-card *ngFor="let item of selected_marker?.applicable_car_data_list">
+      <ion-card-header>
+        <h3>{{item?.brand}} {{item?.model}} - {{item?.plate}}</h3>
+        <img style="width: 200px;" [src]="('media_url' | env) + item.cover_img_url_list[0]" alt="">
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item (click)="commonService?.openCMSPage('/car-detail?car_id='+item.id, 'root')" button detail lines="none"
+          class="option-item">
+          <ion-icon slot="start" src="assets/icon/car.svg"></ion-icon>
+          <ion-label class="ion-text-wrap">車輛資料</ion-label>
+        </ion-item>
+        <ng-container *ngIf="auth.adminData.value != null && auth.adminData.value.type != adminType.buyer">
+          <ion-item button detail lines="none" class="option-item"
+            (click)="commonService?.openCMSPage('/order?page=1&limit=10&sorting=null&direction=null&key_word=&status=&create_date_start=&create_date_end=&target_start_day=&target_end_day=&user_id=&car_id='+item.id, 'blank')">
+            <ion-icon slot="start" src="assets/icon/sales.svg"></ion-icon>
+            <ion-label class="ion-text-wrap">租務紀錄</ion-label>
+          </ion-item>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
+  </map-info-window>
+</google-map>

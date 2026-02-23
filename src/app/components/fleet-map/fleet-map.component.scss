@@ -1,0 +1,23 @@
+::ng-deep .gm-ui-hover-effect {
+  span {
+    color-scheme: none !important;
+  }
+}
+
+// ::ng-deep .gm-style-iw{
+//    max-height: 700px !important;
+// }
+
+ion-card {
+  ion-card-header {
+    font-weight: bold;
+    text-align: center;
+  }
+  .option-item {
+    --border-radius: 5px;
+    --background: #333333;
+    --color: #fff;
+    margin: 6px 0;
+    cursor: pointer;
+  }
+}

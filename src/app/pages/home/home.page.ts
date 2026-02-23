@@ -171,6 +171,9 @@ export class HomePage implements OnInit {
   admin_data$: Observable<AdminData> = this.authService.adminData.pipe();
 
 
+
+
+
   public get adminType(): typeof AdminType {
     return AdminType;
   }

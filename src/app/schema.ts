@@ -1538,6 +1538,7 @@ export interface VehicleRentalAgreement {
     order_data: OrderData;
     admin_id: number;
     admin_username: string;
+    status_img_url_list: string[];
     car_damage_list: CarDamage[];
     oil_or_electricity_level: number;
     odometer: string;
@@ -1567,6 +1568,7 @@ export interface ReturnVehicleReport {
     admin_username: string;
     contract_status: string;
     deposit_status: string;
+    status_img_url_list: string[];
     car_damage_list: CarDamage[];
     oil_or_electricity_level: number;
     odometer: string;
@@ -1775,6 +1777,7 @@ export interface InspectionData {
     keyless_type: KeylessType;
     obd_number: string;
     car_img_url_list: string[];
+    car_inside_img_url_list: string[];
     inspection_car_damage_list: InspectionCarDamage[];
     return_datetime: Date | string;
     inspection_start_datetime: Date | string;
@@ -1785,6 +1788,7 @@ export interface InspectionData {
     remove_from_fleet_remark: string;
     remove_from_fleet_email_sent: string;
     printed: boolean;
+    remark: string;
 }
 
 export enum InspectionStatus {

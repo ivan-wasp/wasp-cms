@@ -30,6 +30,7 @@ import localeHk from '@angular/common/locales/zh-Hant-HK';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SharedComponentsModule } from './components/shared-components.module';
 
+
 registerLocaleData(localeHk, 'zh-HK');
 
 export function createTranslateLoader(http: HttpClient) {
@@ -37,42 +38,42 @@ export function createTranslateLoader(http: HttpClient) {
 }
 
 @NgModule({
-    declarations: [AppComponent],
-    imports: [
-        BrowserModule,
-        IonicModule.forRoot(),
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        HttpClientModule,
-        ReactiveFormsModule,
-        MatSnackBarModule,
-        MaterialModule,
-        NgxChartsModule,
-        NgxMatDatetimePickerModule,
-        NgCalendarModule,
-        // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
-        ServiceWorkerModule.register('./offline-service-worker.js', { enabled: environment.production }),
-        NgxEditorModule,
-        QRCodeModule,
-        TranslateModule.forRoot({
-            loader: {
-              provide: TranslateLoader,
-              useFactory: (createTranslateLoader),
-              deps: [HttpClient]
-            }
-          }),
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    MatSnackBarModule,
+    MaterialModule,
+    NgxChartsModule,
+    NgxMatDatetimePickerModule,
+    NgCalendarModule,
+    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ServiceWorkerModule.register('./offline-service-worker.js', { enabled: environment.production }),
+    NgxEditorModule,
+    QRCodeModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (createTranslateLoader),
+        deps: [HttpClient]
+      }
+    }),
 
-        SharedComponentsModule
-    ],
-    providers: [
-        StatusBar,
-        SplashScreen,
-        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-        { provide: MAT_DATE_LOCALE, useValue: 'zh-HK' },
-        { provide: LOCALE_ID, useValue: 'zh-hk'},
-        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-        
-    ],
-    bootstrap: [AppComponent]
+    SharedComponentsModule
+  ],
+  providers: [
+    StatusBar,
+    SplashScreen,
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: MAT_DATE_LOCALE, useValue: 'zh-HK' },
+    { provide: LOCALE_ID, useValue: 'zh-hk' },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+
+  ],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

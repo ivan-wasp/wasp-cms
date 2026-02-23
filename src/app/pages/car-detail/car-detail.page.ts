@@ -608,7 +608,7 @@ export class CarDetailPage implements OnInit {
       this.car_data.maximum_return_time_to_allow_another_pickup = "20:00";
       this.car_data.starting_hour_to_allow_pickup = 0;
       this.car_data.ending_hour_to_allow_return = 23;
-      this.car_data.minimun_hour_interval_between_pickup_return = 1;
+      this.car_data.minimun_hour_interval_between_pickup_return = 2;
     } else {
       this.car_data.maximum_pick_time_to_allow_another_return = "";
       this.car_data.maximum_return_time_to_allow_another_pickup = "";

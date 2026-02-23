@@ -1206,4 +1206,15 @@ export class DataService {
     });
   }
 
+  getAllRentalPointParkingDataWithApplicableCarDataList(): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      this.apiService.postFromServer(ApiPath.get_all_rental_point_parking_data_with_applicable_car_data_list, null, true).then((res: Response) => {
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      })
+    });
+  }
+
 }

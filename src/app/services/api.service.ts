@@ -214,6 +214,7 @@ export enum ApiPath {
   get_jimi_device_location = 'get_jimi_device_location',
   get_jimi_user_device_location_list = 'get_jimi_user_device_location_list',
   lock_unlock_obd_by_device_id = 'lock_unlock_obd_by_device_id',
+  get_all_rental_point_parking_data_with_applicable_car_data_list = 'get_all_rental_point_parking_data_with_applicable_car_data_list',
 }
 
 @Injectable({

@@ -87,7 +87,8 @@
                         </ion-col>
                         <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
                             <ion-item class="input-item" mode="md" lines='none' button='false'>
-                                <ion-label class="ion-text-wrap" position="stacked">最少兩年「一年暫準執照（P牌）及最少 一年正式執照」</ion-label>
+                                <ion-label class="ion-text-wrap" position="stacked">最少兩年「一年暫準執照（P牌）及最少
+                                    一年正式執照」</ion-label>
                                 <ion-toggle disabled slot="end"
                                     [(ngModel)]="vehicle_rental_agreement.user_data.two_year_driving_experience"></ion-toggle>
                             </ion-item>
@@ -194,8 +195,10 @@
                                 取車位置
                             </ion-button>
                         </ion-col>
-                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12" *ngIf="vehicle_rental_agreement.feedbacks.length > 0">
-                            <ion-chip color="secondary" mode="ios" outline="true" *ngFor="let item of vehicle_rental_agreement.feedbacks">
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12"
+                            *ngIf="vehicle_rental_agreement.feedbacks.length > 0">
+                            <ion-chip color="secondary" mode="ios" outline="true"
+                                *ngFor="let item of vehicle_rental_agreement.feedbacks">
                                 <ion-label>{{item}}</ion-label>
                             </ion-chip>
                         </ion-col>
@@ -205,7 +208,27 @@
                                 <ion-input [(ngModel)]="vehicle_rental_agreement.remark" type="text"></ion-input>
                             </ion-item>
                         </ion-col>
-                  
+
+                    </ion-row>
+                    <br>
+                    <ion-row class="default-container">
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>車輛外觀及內部相片</ion-label>
+                                </div>
+                            </ion-col>
+
+                            <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                *ngIf="vehicle_rental_agreement.status_img_url_list?.length > 0" [options]="slideOpts">
+                                <ion-slide
+                                    *ngFor="let item of vehicle_rental_agreement.status_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img style="max-height: 400px;" [src]="('media_url' | env)+item" alt="">
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                        </ion-col>
                     </ion-row>
 
                     <br>

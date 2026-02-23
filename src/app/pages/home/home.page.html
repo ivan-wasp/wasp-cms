@@ -23,13 +23,15 @@
 <ion-content>
     <ion-grid>
 
-        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+        <ion-row
+            *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
             <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                 <ion-button class="neutral" expand="block" fill="clear"
                     (click)="commonService?.openCMSPage('/car-overview', 'root')">
                     <!-- <ion-icon slot="start" src="assets/icon/bar_chart.svg"></ion-icon> -->
                     <ion-label class="ion-text-left ion-text-wrap">
-                        <h2 *ngIf="year_month == ''" class="amount" color="light">{{occupancy_rate*100 | number : '1.0-1'}}%</h2>
+                        <h2 *ngIf="year_month == ''" class="amount" color="light">{{occupancy_rate*100 | number :
+                            '1.0-1'}}%</h2>
 
                         <h2 class="subtitle" color="light">
                             現時出租率
@@ -360,7 +362,8 @@
                     </ion-col>
                     <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
 
-                        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+                        <ion-row
+                            *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
                             <ion-col size="6">
                                 <h2>{{selected_date | date : 'yyyy-MM-dd'}}</h2>
                             </ion-col>
@@ -471,7 +474,8 @@
             </ion-col>
         </ion-row>
 
-        <ion-row *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
+        <ion-row
+            *ngIf="(admin_data$ | async)?.type == adminType.admin || (admin_data$ | async)?.type == adminType.sales">
             <ion-col size-xs="12" size-sm="12" size-md="5" size-lg="5">
 
                 <ion-row class="default-container">

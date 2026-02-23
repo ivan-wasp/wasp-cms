@@ -297,6 +297,28 @@
                         </ion-col>
                     </ion-row> -->
                     <br>
+
+                    <ion-row class="default-container">
+                        <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                            <ion-col size="12">
+                                <div class="title-with-icon">
+                                    <ion-label>車輛外觀及內部相片</ion-label>
+                                </div>
+                            </ion-col>
+
+                            <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                                *ngIf="return_vehicle_report.status_img_url_list?.length > 0" [options]="slideOpts">
+                                <ion-slide
+                                    *ngFor="let item of return_vehicle_report.status_img_url_list; let i = index;">
+                                    <div class="slider-img-container">
+                                        <img style="max-height: 400px;" [src]="('media_url' | env)+item" alt="">
+                                    </div>
+                                </ion-slide>
+                            </ion-slides>
+                        </ion-col>
+                    </ion-row>
+                    <br>
+
                     <ng-container *ngFor="let category of carDamageCategory">
                         <ion-row class="default-container">
                             <ion-col size="12">

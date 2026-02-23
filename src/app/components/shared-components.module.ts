@@ -7,6 +7,8 @@ import { RbbPaymentComponent } from './rbb-payment/rbb-payment.component';
 import { StatusChipComponent } from './status-chip/status-chip.component';
 import { EnvPipe } from '../pipes/env.pipe';
 import { GallerySlidesComponent } from './gallery-slides/gallery-slides.component';
+import { FleetMapComponent } from './fleet-map/fleet-map.component';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 
 
@@ -14,7 +16,8 @@ import { GallerySlidesComponent } from './gallery-slides/gallery-slides.componen
   imports: [
     CommonModule,
     IonicModule.forRoot(),
-    FormsModule
+    FormsModule,
+    GoogleMapsModule
   ],
   exports: [
     EnvPipe,
@@ -22,14 +25,16 @@ import { GallerySlidesComponent } from './gallery-slides/gallery-slides.componen
     PaymentSliderComponent,
     RbbPaymentComponent,
     StatusChipComponent,
-    GallerySlidesComponent
+    GallerySlidesComponent,
+    FleetMapComponent
   ],
   declarations: [
     EnvPipe,
     PaymentSliderComponent,
     RbbPaymentComponent,
     StatusChipComponent,
-    GallerySlidesComponent
+    GallerySlidesComponent,
+    FleetMapComponent
   ],
 })
 export class SharedComponentsModule { }
