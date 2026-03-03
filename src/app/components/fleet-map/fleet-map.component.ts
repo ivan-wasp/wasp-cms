@@ -263,7 +263,7 @@ export class FleetMapComponent implements OnInit {
 
   markers: any[] = [];
 
-  selected_marker: any[] = null;
+  selected_marker: any = null;
 
   all_rental_point_parking_data_list$: Observable<ParkingData[]> = this.dataService.parking_data_list$.pipe(
     map((p: ParkingData[]) => {
@@ -278,7 +278,7 @@ export class FleetMapComponent implements OnInit {
   }
   constructor(
     private dataService: DataService,
-    private auth: AuthService,
+    public auth: AuthService,
     public commonService: CommonService
   ) {
   }

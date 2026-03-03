@@ -416,6 +416,23 @@ export class CommonService {
     return (environment.media_url);
   }
 
+  searchAdmin(event: {
+    component: IonicSelectableComponent,
+    text: string
+  }) {
+    let text = event.text.trim().toLowerCase();
+    event.component.startSearch();
+    if (this.dataService.all_admin_data_list$.value != null){
+      event.component.items = this.dataService.all_admin_data_list$.value.filter(admin => {
+        return admin.id.toString().toLowerCase().indexOf(text) !== -1 ||
+          admin.phone.toLowerCase().indexOf(text) !== -1 ||
+          admin.email.toLowerCase().indexOf(text) !== -1 ||
+          admin.username.toLowerCase().indexOf(text) !== -1
+      });
+    }
+    event.component.endSearch();
+  }
+
   searchUser(event: {
     component: IonicSelectableComponent,
     text: string

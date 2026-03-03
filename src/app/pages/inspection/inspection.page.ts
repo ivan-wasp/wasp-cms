@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonicSelectableComponent } from 'ionic-selectable';
 import { Observable } from 'rxjs';
-import { CarData, InspectionData, InspectionStatus } from 'src/app/schema';
+import { AdminData, CarData, InspectionData, InspectionStatus } from 'src/app/schema';
 import { ApiPath, ApiService, Response } from 'src/app/services/api.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -21,9 +21,10 @@ export class InspectionPage implements OnInit {
   page = null;
 
   all_car_data_list$: Observable<CarData[]> = this.dataService.car_data_list$.pipe();
+  all_admin_data_list$: Observable<AdminData[]> = this.dataService.all_admin_data_list$.pipe();
 
   status = null;
-  user_id = null;
+  admin_id = null;
   car_id = null;
 
   @ViewChild('ionSelectable') ionSelectable: IonicSelectableComponent;
@@ -50,27 +51,28 @@ export class InspectionPage implements OnInit {
       this.direction = (params && params.direction && params.direction != null ? (params.direction) : "DESC");
 
       this.status = (params && params.status ? (params.status) : "");
-      // this.user_id = (params && params.user_id ? (params.user_id) : "");
+      this.admin_id = (params && params.admin_id ? (params.admin_id) : "");
       this.car_id = (params && params.car_id ? (params.car_id) : "");
     });
   }
 
 
   ngOnInit() {
-    if (this.dataService.table_data_list != null){
+    if (this.dataService.table_data_list != null) {
       this.sorting = null;
       this.direction = null;
       this.page = 1;
     }
     this.getInspectionDataList();
-    if (this.dataService.car_data_list$.value == null){
+    if (this.dataService.car_data_list$.value == null) {
       this.dataService.getAllCarData();
+      this.dataService.getAllAdminData();
     }
   }
 
 
   getInspectionDataList(export_to_excel?: boolean) {
-    if (!export_to_excel){
+    if (!export_to_excel) {
       this.dataService.resetTableData();
     }
 
@@ -82,27 +84,28 @@ export class InspectionPage implements OnInit {
 
       status: this.status,
       car_id: this.car_id,
+      admin_id: this.admin_id,
       export_to_excel: export_to_excel ?? false
     }
     console.log(JSON.stringify(send_data));
     // this.commonService.isLoading = true;
 
     this.apiService.postFromServer(ApiPath.get_inspection_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
-      if (send_data.export_to_excel){
-        if (this.dataService.table_data_list == null || this.dataService.table_data_list.length == 0){
+      if (send_data.export_to_excel) {
+        if (this.dataService.table_data_list == null || this.dataService.table_data_list.length == 0) {
           return this.commonService.openSnackBar("沒有資料");
         }
-        else{
-          if (res.result == 'success' && res.data != ''){
+        else {
+          if (res.result == 'success' && res.data != '') {
             return this.commonService.downloadMedia(res.data, true);
           }
-          else{
+          else {
             return this.commonService.openErrorSnackBar();
           }
         }
       }
 
-      let new_path = `/inspection?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&status=${this.status}&car_id=${this.car_id||''}`;
+      let new_path = `/inspection?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&status=${this.status}&car_id=${this.car_id || ''}&admin_id=${this.admin_id || ''}`;
       if (this.location.path() != new_path) {
         this.location.replaceState(new_path);
       }
@@ -114,9 +117,9 @@ export class InspectionPage implements OnInit {
         this.dataService.table_data_number_of_page = Math.ceil(res.data.total_number / this.limit);
 
         this.dataService.table_data_list.forEach((d: InspectionData, index) => {
-            if (d.inspection_start_datetime != ''){
-              this.dataService.table_data_list[index]['duration'] = this.diffTwoDateInMinutes(d.inspection_start_datetime, (d.inspection_end_datetime != '' ? d.inspection_end_datetime : new Date()))
-            }
+          if (d.inspection_start_datetime != '') {
+            this.dataService.table_data_list[index]['duration'] = this.diffTwoDateInMinutes(d.inspection_start_datetime, (d.inspection_end_datetime != '' ? d.inspection_end_datetime : new Date()))
+          }
         });
 
       } else {
@@ -125,7 +128,7 @@ export class InspectionPage implements OnInit {
     });
 
   }
-  
+
   switchSorting(sorting) {
     if (this.sorting == sorting && this.direction == 'DESC') {
       this.direction = 'ASC';
@@ -146,7 +149,7 @@ export class InspectionPage implements OnInit {
   }
 
   selectPage(page) {
-    if (this.page == page){
+    if (this.page == page) {
       return;
     }
     this.page = page;
@@ -177,7 +180,7 @@ export class InspectionPage implements OnInit {
     this.getInspectionDataList();
   }
 
-  resetAndGetData(event){
+  resetAndGetData(event) {
     this.sorting = null;
     this.direction = null;
     this.page = 1;
@@ -188,18 +191,18 @@ export class InspectionPage implements OnInit {
     return this.dataService.car_data_list$.value != null ? this.dataService.car_data_list$.value.filter(d => d.id == id)[0] : null;
   }
 
-  onCarChange(event){
+  onCarChange(event) {
     this.resetAndGetData(null);
   }
 
   onOpen(event: { component: IonicSelectableComponent }) {
-    if (this.dataService.user_data_list$.value == null) {
-      this.dataService.getAllUserData();
+    if (this.dataService.all_admin_data_list$.value == null) {
+      this.dataService.getAllAdminData();
     }
   }
 
   onCarOpen(event: { component: IonicSelectableComponent }) {
-    if (this.dataService.car_data_list$.value.length == 0){
+    if (this.dataService.car_data_list$.value.length == 0) {
       this.showCarLoading();
       this.dataService.getAllCarData();
       this.hideCarLoading();
@@ -221,6 +224,14 @@ export class InspectionPage implements OnInit {
     // Calculate difference between two dates in minutes
     let dif = (ed - sd);
     return Math.round((dif / 1000) / 60);
+  }
+
+  getAdminDataById(id) {
+    return this.dataService.all_admin_data_list$.value != null ? this.dataService.all_admin_data_list$.value.filter(d => d.id == id)[0] : null;
+  }
+
+  onAdminChange(event) {
+    this.getInspectionDataList();
   }
 
 }
