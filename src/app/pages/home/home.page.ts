@@ -202,6 +202,10 @@ export class HomePage implements OnInit {
     this.getDataForCalendar(firstDay, lastDay, false);
 
     this.getCarDataList();
+    
+    if (this.dataService.dashboard_keyless_car_list_with_inspection_summary$.value == null) {
+      this.dataService.getAllKeylessCarListWithInspectionSummary();
+    }
 
     // this.getLineChartData();
 

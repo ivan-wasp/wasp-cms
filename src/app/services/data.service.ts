@@ -56,6 +56,8 @@ export class DataService {
   awaiting_application_deposit_amount$ = new BehaviorSubject<number>(null);
   awaiting_application_deposit_create_date$ = new BehaviorSubject<string>(null);
 
+  dashboard_keyless_car_list_with_inspection_summary$ = new BehaviorSubject<any[]>(null);
+
   constructor(
     public auth: AuthService,
     public commonService: CommonService,
@@ -1209,6 +1211,18 @@ export class DataService {
   getAllRentalPointParkingDataWithApplicableCarDataList(): Promise<Response> {
     return new Promise((resolve, reject) => {
       this.apiService.postFromServer(ApiPath.get_all_rental_point_parking_data_with_applicable_car_data_list, null, true).then((res: Response) => {
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      })
+    });
+  }
+
+  getAllKeylessCarListWithInspectionSummary(): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      this.apiService.postFromServer(ApiPath.get_all_keyless_car_list_with_inspection_summary, null, true).then((res: Response) => {
+        this.dashboard_keyless_car_list_with_inspection_summary$.next(res.data);
         resolve(res);
       }).catch(err => {
         console.error(err);

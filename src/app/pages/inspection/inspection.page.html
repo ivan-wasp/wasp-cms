@@ -8,12 +8,12 @@
 
     <ion-title class="hidden-xs-down">車輛檢查</ion-title>
 
-    <!-- <ion-buttons slot="end" (click)="getCompensationDataList(true)">
-          <ion-button fill="clear" class="export-excel-btn">
-              <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
-              輸出至Excel
-          </ion-button>
-      </ion-buttons> -->
+    <ion-buttons slot="end" (click)="getInspectionDataList(true)">
+      <ion-button fill="clear" class="export-excel-btn">
+        <ion-icon slot="start" src="assets/icon/excel.svg"></ion-icon>
+        輸出至Excel
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -63,11 +63,11 @@
               {{getAdminDataById(admin_id)?.username}}
             </ng-container>
           </ion-label>
-          <ionic-selectable *ngIf="(all_admin_data_list$ | async) != null" #ionSelectable (onOpen)="onOpen($event)" (onChange)="onAdminChange($event)"
-            (onSearch)="commonService?.searchAdmin($event)" [(ngModel)]="admin_id" itemValueField="id"
-            shouldStoreItemValue="id" itemTextField="plate" [items]="(all_admin_data_list$ | async)" [canClear]="true"
-            [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選" closeButtonText="取消"
-            [hasVirtualScroll]="true">
+          <ionic-selectable *ngIf="(all_admin_data_list$ | async) != null" #ionSelectable (onOpen)="onOpen($event)"
+            (onChange)="onAdminChange($event)" (onSearch)="commonService?.searchAdmin($event)" [(ngModel)]="admin_id"
+            itemValueField="id" shouldStoreItemValue="id" itemTextField="plate" [items]="(all_admin_data_list$ | async)"
+            [canClear]="true" [canSearch]="true" [isMultiple]="false" confirmButtonText="確認" clearButtonText="全部反選"
+            closeButtonText="取消" [hasVirtualScroll]="true">
             <ng-template ionicSelectableItemTemplate let-port="item" let-isPortSelected="isItemSelected"
               [hasVirtualScroll]="true">
               {{port.username}} - {{port.phone}}
