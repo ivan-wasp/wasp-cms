@@ -476,29 +476,28 @@
         </ion-row>
         <br>
         <ion-row>
-            <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="2"
+            <ion-col size-xs="6" size-sm="6" size-md="3" size-lg="2"
                 *ngFor="let item of (dataService.dashboard_keyless_car_list_with_inspection_summary$ | async)">
                 <ion-card style="margin: 0;">
                     <ion-card-header>
                         <img style="width: 100%;" *ngIf="item?.cover_img_url_list[0]"
                             [src]="('media_url' | env)+item.cover_img_url_list[0]" />
-                        <ion-card-subtitle>{{item?.plate}} <br> {{item?.brand}} {{item?.model}}</ion-card-subtitle>
-                        <ion-card-title>
-                            此日期後還車需檢查車輛：<br>{{item?.booking_dates != null && item?.booking_dates.length > 0 ?
-                            item?.booking_dates[item?.booking_dates.length - 1] : 'NA'}}
-                            <br>
-                            <br>
-
-                        </ion-card-title>
-                        <ion-card-content style="padding: 0;">
-                            <h4> 上次完成檢查日期：<br>{{item?.last_inspection_end_datetime != null ?
-                                (item?.last_inspection_end_datetime | date : 'yyyy-MM-dd') : 'NA'}}</h4>
-                            <ion-button *ngIf="item?.last_inspection_id != null"
-                                (click)="commonService?.openCMSPage('/inspection-detail?inspection_id='+item.last_inspection_id, 'blank')"
-                                expand="block" color="secondary" fill="outline">
-                                查看上次檢查報告
-                            </ion-button>
-                        </ion-card-content>
+                        <h3 style="color: #000000;">{{item?.plate}} {{item?.brand}} {{item?.model}}</h3>
+                        <h4 margin-top: 4px;>
+                            此日期後還車需檢查車輛：
+                        </h4>
+                        <p style="color: #000000;">{{item?.booking_dates != null && item?.booking_dates.length > 0 ?
+                            item?.booking_dates[item?.booking_dates.length - 1] : '暫時不用檢查' }}</p>
+                        <h4 margin-top: 4px;> 上次完成檢查日期：</h4>
+                        <p style="color: #000000;">
+                            {{item?.last_inspection_end_datetime != null ?
+                            (item?.last_inspection_end_datetime | date : 'yyyy-MM-dd') : '未有'}}
+                        </p>
+                        <ion-button *ngIf="item?.last_inspection_id != null"
+                            (click)="commonService?.openCMSPage('/inspection-detail?inspection_id='+item.last_inspection_id, 'blank')"
+                            expand="block" color="secondary" fill="outline">
+                            查看上次檢查報告
+                        </ion-button>
                     </ion-card-header>
                 </ion-card>
             </ion-col>
