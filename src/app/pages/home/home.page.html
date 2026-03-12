@@ -483,12 +483,12 @@
                         <img style="width: 100%;" *ngIf="item?.cover_img_url_list[0]"
                             [src]="('media_url' | env)+item.cover_img_url_list[0]" />
                         <h3 style="color: #000000;">{{item?.plate}} {{item?.brand}} {{item?.model}}</h3>
-                        <h4 margin-top: 4px;>
+                        <h4 style="margin-top: 4px;">
                             此日期後還車需檢查車輛：
                         </h4>
                         <p style="color: #000000;">{{item?.booking_dates != null && item?.booking_dates.length > 0 ?
                             item?.booking_dates[item?.booking_dates.length - 1] : '暫時不用檢查' }}</p>
-                        <h4 margin-top: 4px;> 上次完成檢查日期：</h4>
+                        <h4 style="margin-top: 4px;"> 上次完成檢查日期：</h4>
                         <p style="color: #000000;">
                             {{item?.last_inspection_end_datetime != null ?
                             (item?.last_inspection_end_datetime | date : 'yyyy-MM-dd') : '未有'}}
