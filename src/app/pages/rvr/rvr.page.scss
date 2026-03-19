@@ -1,31 +1,44 @@
 canvas {
-    border: 3px dashed gray;
+  border: 3px dashed gray;
 }
 
 .img-item {
-    // position: relative;
-    // .remove-icon{
-    //     position: absolute;
-    //     right: 12px;
-    //     top: 12px;
-    //     font-size: 1.6rem;
-    //     cursor: pointer;
-    // }
-    .remove-icon {
-        font-size: 1.6rem;
-        cursor: pointer;
-    }
+  // position: relative;
+  // .remove-icon{
+  //     position: absolute;
+  //     right: 12px;
+  //     top: 12px;
+  //     font-size: 1.6rem;
+  //     cursor: pointer;
+  // }
+  .remove-icon {
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
 }
 
 .slider-img-container {
-    position: relative;
-    ion-icon {
-        font-size: 1.8rem;
-        cursor: pointer;
-        position: absolute;
-        right: 16px;
-        top: 16px;
-        background: #ffffff47;
-        border-radius: 50%;
-    }
+  position: relative;
+  ion-icon {
+    font-size: 1.8rem;
+    cursor: pointer;
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: #ffffff47;
+    border-radius: 50%;
+  }
+}
+.not-submitted-blocking {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 99;
+  h1 {
+    text-align: center;
+    font-weight: bold;
+    padding-top: 20%;
+    color: var(--ion-color-warning);
+  }
 }

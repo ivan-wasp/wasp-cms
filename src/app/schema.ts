@@ -1550,6 +1550,8 @@ export interface VehicleRentalAgreement {
     remark: string;
     user_signature_img_url: string;
     feedbacks: string[];
+    submitted_email_sent: boolean;
+    checked_admin_id: number | null;
     // odometer_value: string; revoked
 }
 
@@ -1584,6 +1586,8 @@ export interface ReturnVehicleReport {
     create_compensation: boolean;
     user_signature_img_url: string;
     parking_lot_reference_number: string;
+    submitted_email_sent: boolean;
+    checked_admin_id: number | null;
     // gas_refill: boolean; revoked
     // mileage: string; revoked
 }

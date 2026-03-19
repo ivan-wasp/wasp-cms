@@ -790,7 +790,7 @@ export class DataService {
     });
   }
 
-  updateVehicleRentalAgreement(vehicle_rental_agreement: VehicleRentalAgreement): Promise<any> {
+  updateVehicleRentalAgreement(vehicle_rental_agreement: VehicleRentalAgreement | any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.apiService.postFromServer(ApiPath.update_vehicle_rental_agreement, vehicle_rental_agreement, true).then((res: Response) => {
         resolve(res);
@@ -801,7 +801,7 @@ export class DataService {
     });
   }
 
-  updateReturnVehicleReport(return_vehicle_report: ReturnVehicleReport): Promise<any> {
+  updateReturnVehicleReport(return_vehicle_report: ReturnVehicleReport | any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.apiService.postFromServer(ApiPath.update_return_vehicle_report, return_vehicle_report, true).then((res: Response) => {
         resolve(res);

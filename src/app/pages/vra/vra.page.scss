@@ -50,3 +50,16 @@ canvas {
 //     border: none;
 //     background: white;
 // }
+.not-submitted-blocking {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 99;
+  h1 {
+    text-align: center;
+    font-weight: bold;
+    padding-top: 20%;
+    color: var(--ion-color-warning);
+  }
+}

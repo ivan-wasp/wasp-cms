@@ -337,4 +337,21 @@ export class RvrPage implements OnInit {
     this.return_vehicle_report.submitted_datetime = '';
   }
 
+  async ReportChecked() {
+    let send_data = {
+      id: this.return_vehicle_report.id,
+      checked_admin_id: this.auth.getParsedAdminToken().id
+    }
+    console.log("send_data: ", send_data);
+    const update_return_vehicle_report: Response = await this.dataService.updateReturnVehicleReport(send_data);
+    console.log(update_return_vehicle_report);
+    if (update_return_vehicle_report.result == 'success') {
+      this.return_vehicle_report = update_return_vehicle_report.data;
+      this.commonService.openSnackBar("儲存成功");
+    }
+    else {
+      this.commonService.openErrorSnackBar();
+    }
+  }
+
 }
