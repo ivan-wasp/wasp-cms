@@ -6,6 +6,18 @@
 
         <ion-title class="hidden-xs-down">交還車輛報告 ID:{{return_vehicle_report?.id}}</ion-title>
 
+        <ion-buttons slot="end" *ngIf="return_vehicle_report != null && return_vehicle_report.id != null && return_vehicle_report.submitted && return_vehicle_report?.checked_admin_id == null">
+            <ion-button expand="block" fill="solid" color="secondary" (click)="ReportChecked()">
+                標記為完成檢查
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end" *ngIf="return_vehicle_report != null && return_vehicle_report.id != null && return_vehicle_report.submitted && return_vehicle_report?.checked_admin_id != null">
+            <ion-button expand="block" fill="outline" color="success" >
+                <ion-icon slot="start" name="checkbox-outline"></ion-icon>
+                此報告已完成檢查
+            </ion-button>
+        </ion-buttons>
+
         <ion-buttons slot="end" *ngIf="return_vehicle_report != null && return_vehicle_report.id != null">
             <ion-button fill="clear" (click)="generatePdf()">
                 <!-- <ion-icon slot="start" name="document"></ion-icon> -->
@@ -26,7 +38,10 @@
 <ion-content>
 
 
-    <div class="ion-margin" *ngIf="order_data != null && return_vehicle_report != null">
+    <div class="ion-margin" style="position: relative;" *ngIf="order_data != null && return_vehicle_report != null">
+        <div class="not-submitted-blocking" *ngIf="!return_vehicle_report.submitted">
+            <h1>未還車</h1>
+        </div>
         <ion-grid>
             <ion-row>
 

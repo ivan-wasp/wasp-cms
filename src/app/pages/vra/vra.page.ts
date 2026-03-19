@@ -319,4 +319,21 @@ export class VraPage implements OnInit {
     }
   }
 
+    async ReportChecked() {
+    let send_data = {
+      id: this.vehicle_rental_agreement.id,
+      checked_admin_id: this.auth.getParsedAdminToken().id
+    }
+    console.log("send_data: ", send_data);
+    const update_vehicle_rental_agreement: Response = await this.dataService.updateVehicleRentalAgreement(send_data);
+    console.log(update_vehicle_rental_agreement);
+    if (update_vehicle_rental_agreement.result == 'success') {
+      this.vehicle_rental_agreement = update_vehicle_rental_agreement.data;
+      this.commonService.openSnackBar("儲存成功");
+    }
+    else {
+      this.commonService.openErrorSnackBar();
+    }
+  }
+
 }
