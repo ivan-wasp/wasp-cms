@@ -194,7 +194,7 @@ export class CompensationPaymentDetailPage implements OnInit {
       } else {
         switch (res.data) {
           case 'no return vehicle report':
-            this.commonService.openErrorSnackBar("未有交還車輛報告");
+            this.commonService.openErrorSnackBar("未有還車報告");
             break;
         
           default:

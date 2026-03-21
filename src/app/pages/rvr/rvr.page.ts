@@ -261,7 +261,7 @@ export class RvrPage implements OnInit {
     console.log("generate_pdf: ", generate_pdf);
     if (generate_pdf.result == 'success') {
       this.commonService.downloadMedia(generate_pdf.data, true);
-      this.commonService.openSnackBar("已產生交還車輛報告");
+      this.commonService.openSnackBar("已產生還車報告");
 
       if (this.return_vehicle_report.car_data.keyless_type == '') {
         this.presentUpdateOrderStatusActionSheet();

@@ -74,7 +74,7 @@
         </ion-col>
         <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" *ngIf="user_data != null">
           <ion-item class="input-item with-icon readonly" mode="md" lines='none' button='false'>
-            <ion-label class="ion-text-wrap" position="stacked">交還車輛報告</ion-label>
+            <ion-label class="ion-text-wrap" position="stacked">還車報告</ion-label>
             <ion-input readonly [value]="inspection_data.order_id" type="text"></ion-input>
             <ion-icon (click)="commonService.openCMSPage('/rvr?order_id='+inspection_data.order_id, 'blank')" slot="end"
               name="eye">
