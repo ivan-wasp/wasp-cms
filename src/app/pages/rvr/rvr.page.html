@@ -41,7 +41,7 @@
 
 
     <div class="ion-margin" style="position: relative;" *ngIf="order_data != null && return_vehicle_report != null">
-        <div class="not-submitted-blocking" *ngIf="!return_vehicle_report.submitted && return_vehicle_report.keyless_type != ''">
+        <div class="not-submitted-blocking" *ngIf="!return_vehicle_report.submitted && return_vehicle_report.keyless_type != '' && return_vehicle_report.keyless_type != null">
             <h1>未還車</h1>
         </div>
         <ion-grid>
