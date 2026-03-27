@@ -16,6 +16,7 @@ import { default as _rollupMoment, Moment } from 'moment';
 import { AdminData, AdminType, Authority, CarData, Engine, KeylessType, ParkingData } from 'src/app/schema';
 import { ItemReorderEventDetail } from '@ionic/angular';
 import { Observable } from 'rxjs';
+import { get } from 'http';
 const moment = _rollupMoment || _moment;
 
 export const MY_FORMATS = {
@@ -198,7 +199,9 @@ export class CarPage implements OnInit {
 
         if (this.dataService.table_data_list.length > 0) {
           this.getJimiUserDeviceLocationList();
+          this.getObdCrackDataList();
         }
+        console.log(this.dataService.table_data_list.filter(d => d.obd_device_id != null && d.obd_device_id != '').map(d => d.obd_crack_data));
       } else {
         this.commonService.openErrorSnackBar();
       }
@@ -419,6 +422,27 @@ export class CarPage implements OnInit {
       }
       for (let index = 0; index < this.original_table_data_list.length; index++) {
         this.original_table_data_list[index]['jimi_device_location'] = get_jimi_user_device_location_list_result.data.find(d => d.imei == this.original_table_data_list[index]['dashcam_imei'])
+      }
+    }
+  }
+
+  async getObdCrackDataList() {
+    let obd_device_id_list = this.dataService.table_data_list.map(d => d.obd_device_id).filter(odid => odid != null && odid != '');
+    const get_obd_crack_data_list_result: Response = await this.dataService.getObdCrackDataList(obd_device_id_list);
+    if (get_obd_crack_data_list_result.result == 'success') {
+      for (let index = 0; index < this.dataService.table_data_list.length; index++) {
+        if (!get_obd_crack_data_list_result.data.hasOwnProperty(this.dataService.table_data_list[index]['obd_device_id']) || get_obd_crack_data_list_result.data[this.dataService.table_data_list[index]['obd_device_id']] == null) {
+          this.dataService.table_data_list[index]['obd_crack_data'] = null;
+        } else {
+          this.dataService.table_data_list[index]['obd_crack_data'] = get_obd_crack_data_list_result.data[this.dataService.table_data_list[index]['obd_device_id']];
+        }
+      }
+      for (let index = 0; index < this.original_table_data_list.length; index++) {
+        if (!get_obd_crack_data_list_result.data.hasOwnProperty(this.original_table_data_list[index]['obd_device_id']) || get_obd_crack_data_list_result.data[this.original_table_data_list[index]['obd_device_id']] == null) {
+          this.original_table_data_list[index]['obd_crack_data'] = null;
+        } else {
+          this.original_table_data_list[index]['obd_crack_data'] = get_obd_crack_data_list_result.data[this.original_table_data_list[index]['obd_device_id']];
+        }
       }
     }
   }

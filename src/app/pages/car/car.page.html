@@ -215,6 +215,23 @@
               [ngClass]="{'offline': item?.jimi_device_location?.status == '0', 'parked': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '0', 'idle': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '1' && item?.jimi_device_location?.speed == null, 'moving': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '1' && item?.jimi_device_location?.speed != null}"
               [class]="item?.today_status == 'removed' ? 'removed' : (item?.today_status == 'available' ? 'available' : (item?.today_status == 'blocked' ? 'blocked' : (item?.today_status == 'sold' ? 'sold' : (item?.today_status == 'for_sale' ? 'for_sale' : (item?.today_status == 'blocked_maintaining' ? 'blocked_maintaining' : '')))))"
               (mouseover)="hovered_car_id=item.id" (mouseout)="hovered_car_id=null">
+              <div *ngIf="item?.obd_crack_data != null" class="obd-div">
+                <h4 *ngIf="item?.obd_crack_data?.voltage != null">細電:{{item?.obd_crack_data?.voltage}}v</h4>
+                <ng-container *ngIf="item?.obd_crack_data?.oilNum != null">
+                  &nbsp;&nbsp;
+                  <ion-icon name="battery-charging-outline"></ion-icon>
+                  &nbsp;
+                  <h4>{{item?.obd_crack_data?.oilNum/1000 | percent}}</h4>
+
+                </ng-container>
+                <ng-container *ngIf="item?.obd_crack_data?.mhMileage != null">
+                  &nbsp;&nbsp;
+                  <ion-icon name="car-outline"></ion-icon>
+                  &nbsp;
+                  <h4>{{item?.obd_crack_data?.mhMileage | number:'1.0-2'}}km</h4>
+                </ng-container>
+              </div>
+
               <ion-img *ngIf="item?.cover_img_url_list.length > 0"
                 [src]="('media_url' | env)+item?.cover_img_url_list[0]">
               </ion-img>

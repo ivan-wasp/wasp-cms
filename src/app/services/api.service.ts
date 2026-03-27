@@ -216,6 +216,7 @@ export enum ApiPath {
   lock_unlock_obd_by_device_id = 'lock_unlock_obd_by_device_id',
   get_all_rental_point_parking_data_with_applicable_car_data_list = 'get_all_rental_point_parking_data_with_applicable_car_data_list',
   get_all_keyless_car_list_with_inspection_summary = 'get_all_keyless_car_list_with_inspection_summary',
+  get_obd_crack_by_device_id_list = 'get_obd_crack_by_device_id_list',
 }
 
 @Injectable({

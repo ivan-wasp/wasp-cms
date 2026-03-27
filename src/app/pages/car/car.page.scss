@@ -76,3 +76,14 @@ ion-range::part(knob) {
   /* Ensures the icon fits within the knob's shape */
   //   border-radius: 50%;
 }
+
+.obd-div {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: 24px;
+  h4{
+    margin: 0;
+  }
+}

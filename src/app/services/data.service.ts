@@ -1193,6 +1193,20 @@ export class DataService {
     });
   }
 
+  getObdCrackDataList(obd_device_id_list: string[]): Promise<Response> {
+    let send_data = {
+      obd_device_id_list: obd_device_id_list
+    }
+    return new Promise((resolve, reject) => {
+      this.apiService.postFromServer(ApiPath.get_obd_crack_by_device_id_list, send_data, true).then((res: Response) => {
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      })
+    });
+  }
+
   lockUnlockObdByDeviceId(obd_device_id: string, action: 'lock' | 'unlock'): Promise<Response> {
     let send_data = {
       obd_device_id: obd_device_id,
