@@ -137,7 +137,8 @@
                 </ion-col> -->
       </ion-row>
 
-      <ion-row class="default-container" style="max-height: 400px; overflow: hidden;">
+      <ion-row *ngIf="car_data?.dashcam_imei != ''" class="default-container"
+        style="max-height: 400px; overflow: hidden;">
         <ion-col size="12" class="ion-text-center"
           *ngIf="car_data?.dashcam_imei != '' && (admin_data | async) && (admin_data | async)?.authority_list.includes(authority.dashcam_function)">
           <iframe *ngIf="streaming_url != ''" [src]="streaming_url" width="900px" height="715px"
@@ -461,6 +462,64 @@
                   <ion-label position="stacked">維修支出</ion-label>
                   <ion-input readonly [value]="car_data.accumulated_repair_cost" type="number">
                   </ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <br />
+            <ion-row class="default-container">
+              <ion-col size="12">
+                <div class="title-with-icon">
+                  <ion-icon slot="start" src="assets/icon/price_dark.svg"></ion-icon>
+                  <ion-label> 時租計劃 </ion-label>
+                </div>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap">的士</ion-label>
+                  <ion-checkbox [disabled]="true" [checked]="car_data.taxi" slot="end">
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap">開放時租</ion-label>
+                  <ion-checkbox [disabled]="true" [checked]="car_data.hourly_rental_available" slot="end">
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">時租價錢</ion-label>
+                  <ion-input
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [readonly]="readonly" [(ngModel)]="car_data.price_per_hour" type="number" min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label position="stacked">時租封頂價錢(24小時)</ion-label>
+                  <ion-input
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [readonly]="readonly" [(ngModel)]="car_data.price_per_hour_daily_ceiling" type="number"
+                    min="1"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">保險費百分比(1st Tier)</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.insurance_price_tier_one_percentage" type="number" min="1"
+                    max="100"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
+                  <ion-label class="ion-text-wrap" position="stacked">保險費百分比(2nd Tier)</ion-label>
+                  <ion-input [readonly]="readonly"
+                    [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                    [(ngModel)]="car_data.insurance_price_tier_two_percentage" type="number" min="1"
+                    max="100"></ion-input>
                 </ion-item>
               </ion-col>
             </ion-row>

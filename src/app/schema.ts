@@ -216,6 +216,8 @@ export interface UserData {
     auto_charge_stripe_payment_method_id: string;
     auto_charge_adyen_payment_method_id: string;
     bypass_face_matching: boolean;
+    full_classes: string[];
+    driving_license_expiry_date: string;
 }
 
 export interface FavoriteCarModel {
@@ -571,6 +573,10 @@ export interface CarData {
     premium: number;
     keyless_tutorial_video_url: string;
     keyless_tutorial_website_url: string;
+    price_per_hour: number;
+    price_per_hour_daily_ceiling: number;
+    hourly_rental_available: boolean;
+    taxi: boolean;
 }
 
 export enum Engine {
@@ -740,6 +746,7 @@ export interface OrderData {
     unpaid_email_sent: Boolean;
     campaign_data: CampaignData | null;
     insurance_tier: number | null;
+    hourly_rental: boolean;
 }
 
 export interface CartData {

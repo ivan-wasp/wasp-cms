@@ -10,6 +10,8 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { AdminData, AgeGroup, Area, Authority, CarRentingPurpose, CarType, Color, DATA_TYPE, DrivingExperience, Gender, HongKongDistinct, KowloonDistinct, LifeStage, MonthlyLeisureSpendingBudget, NewTerritoriesDistinct, Occupation, Plan } from 'src/app/schema';
 import { Observable } from 'rxjs';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-user-detail',
@@ -33,7 +35,7 @@ import { Observable } from 'rxjs';
   ]
 })
 export class UserDetailPage implements OnInit {
-
+  separatorKeysCodes: number[] = [ENTER, COMMA];
   admin_data: Observable<AdminData> = this.auth.adminData.pipe();
 
   user_id = null;
@@ -94,31 +96,31 @@ export class UserDetailPage implements OnInit {
   public get ageGroup(): typeof AgeGroup {
     return AgeGroup;
   }
-  public get ageGroupList(){
+  public get ageGroupList() {
     return Object.keys(AgeGroup);
   }
   public get Gender(): typeof Gender {
     return Gender;
   }
-  public get genderList(){
+  public get genderList() {
     return Object.values(Gender);
   }
   public get Occupation(): typeof Occupation {
     return Occupation;
   }
-  public get occupationList(){
+  public get occupationList() {
     return Object.values(Occupation);
   }
   public get drivingExperience(): typeof DrivingExperience {
     return DrivingExperience;
   }
-  public get drivingExperienceList(){
+  public get drivingExperienceList() {
     return Object.values(DrivingExperience);
   }
   public get lifeStage(): typeof LifeStage {
     return LifeStage;
   }
-  public get lifeStageList(){
+  public get lifeStageList() {
     return Object.values(LifeStage);
   }
   constructor(
@@ -145,7 +147,7 @@ export class UserDetailPage implements OnInit {
       this.getUserData();
       this.getUserDeposit();
     }
-    else{
+    else {
       this.readonly = false;
       this.setNewUserDataTemplate();
     }
@@ -198,7 +200,7 @@ export class UserDetailPage implements OnInit {
 
   async getUserData() {
     const get_user_data_result: Response = await this.dataService.getUserDataById(this.user_id);
-    if (get_user_data_result.result == 'success'){
+    if (get_user_data_result.result == 'success') {
       this.user_data = JSON.parse(JSON.stringify(get_user_data_result.data));
       this.checking_user_data = JSON.parse(JSON.stringify(get_user_data_result.data));
       console.log("user_data: ", this.user_data);
@@ -339,7 +341,7 @@ export class UserDetailPage implements OnInit {
           case res.data == 'phone registered':
             this.commonService.openErrorSnackBar("電話號碼已註冊");
             break;
-        
+
           default:
             this.commonService.openErrorSnackBar("未能更新資料");
             break;
@@ -377,7 +379,7 @@ export class UserDetailPage implements OnInit {
         this.checking_user_data = JSON.parse(JSON.stringify(res.data));
         this.commonService.openSnackBar("已建立資料");
         setTimeout(() => {
-          this.location.replaceState('/user-detail?user_id='+res.data.id);
+          this.location.replaceState('/user-detail?user_id=' + res.data.id);
         }, 1000);
       } else {
         switch (true) {
@@ -396,12 +398,12 @@ export class UserDetailPage implements OnInit {
           case res.data == 'invalid referrer code':
             this.commonService.openErrorSnackBar("被推薦碼不正確");
             break;
-        
+
           default:
             this.commonService.openErrorSnackBar("未能建立資料");
             break;
         }
-      
+
       }
     }, err => {
       this.commonService.openErrorSnackBar();
@@ -415,5 +417,26 @@ export class UserDetailPage implements OnInit {
       this.user_data[field] = date.value.substring(0, 10);
     }
   }
+
+
+  add(event: MatChipInputEvent, type: 'email' | 'phone'): void {
+    const value = (event.value || '').trim();
+    // Add our fruit
+    if (value) {
+      this.user_data.full_classes.push(value);
+    }
+    // Clear the input value
+    if (event.input) {
+      event.input.value = '';
+    }
+  }
+
+  remove(value: string, type: 'email' | 'phone'): void {
+    const index = this.user_data.full_classes.indexOf(value);
+    if (index >= 0) {
+      this.user_data.full_classes.splice(index, 1);
+    }
+  }
+
 
 }

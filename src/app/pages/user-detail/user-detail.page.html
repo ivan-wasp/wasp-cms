@@ -101,46 +101,85 @@
                 </ion-col>
             </ion-row>
             <ion-row class="default-container">
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2" *ngIf="user_id != null">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="user_id != null">
                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                         <ion-label position="stacked">ID</ion-label>
                         <ion-input readonly [value]="user_data.id" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label position="stacked">用戶名稱</ion-label>
                         <ion-input [readonly]="readonly" [(ngModel)]="user_data.username" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label position="stacked">電話</ion-label>
                         <ion-input [readonly]="readonly" [(ngModel)]="user_data.phone" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label position="stacked">電郵</ion-label>
                         <ion-input [readonly]="readonly" [(ngModel)]="user_data.email" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <!-- <ion-item *ngIf="readonly" class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">執照類別</ion-label>
+                        <ion-input [readonly]="readonly" [value]="user_data.full_classes.join(', ')"
+                            type="text"></ion-input>
+                    </ion-item> -->
+                    <mat-form-field class="input-mat-form full-width" [ngClass]="{'readonly': readonly}"
+                        appearance="outline" floatLabel="never">
+                        <mat-label>執照類別</mat-label>
+                        <mat-chip-list #chipList>
+                            <mat-chip *ngFor="let license of user_data.full_classes"
+                                (removed)="remove(license, 'license')">
+                                {{license}}
+                                <mat-icon *ngIf="!readonly" matChipRemove>cancel</mat-icon>
+                            </mat-chip>
+                            <input [readonly]="readonly" [placeholder]="readonly ? '' : '輸入執照類別後按enter...'"
+                                [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                                (matChipInputTokenEnd)="add($event, 'license')">
+                        </mat-chip-list>
+                    </mat-form-field>
+
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <mat-form-field appearance="outline" style="display: none;">
+                        <input #driving_license_expiry_date matInput [matDatepicker]="picker"
+                            (dateChange)="selectionDateChanged('driving_license_expiry_date', driving_license_expiry_date)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker></mat-datepicker>
+                    </mat-form-field>
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label position="stacked">車牌到期日</ion-label>
+                        <ion-input readonly [(ngModel)]="user_data.driving_license_expiry_date" type="text"></ion-input>
+                        <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
+                            [for]="picker"></mat-datepicker-toggle>
+                    </ion-item>
+                    <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                         <ion-label position="stacked">推薦碼</ion-label>
                         <ion-input readonly [value]="user_data.referral_code" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                         <ion-label position="stacked">被推薦碼</ion-label>
                         <ion-input readonly [value]="user_data.referrer_code" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="2" size-lg="2" *ngIf="deposit_amount != null">
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3" *ngIf="deposit_amount != null">
                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                         <ion-label position="stacked">未申請退還按金</ion-label>
                         <ion-input readonly [value]="deposit_amount" type="text"></ion-input>
@@ -156,9 +195,11 @@
                     <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label class="ion-text-nowrap">已綁定信用卡
-                            <span *ngIf="user_data?.auto_charge_adyen_payment_method_id != ''">({{user_data?.auto_charge_adyen_payment_method_id}})</span>
+                            <span
+                                *ngIf="user_data?.auto_charge_adyen_payment_method_id != ''">({{user_data?.auto_charge_adyen_payment_method_id}})</span>
                         </ion-label>
-                        <ion-toggle [disabled]="true" slot="end" [checked]="user_data.auto_charge_adyen_payment_method_id != ''"></ion-toggle>
+                        <ion-toggle [disabled]="true" slot="end"
+                            [checked]="user_data.auto_charge_adyen_payment_method_id != ''"></ion-toggle>
                     </ion-item>
                 </ion-col>
                 <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3"
