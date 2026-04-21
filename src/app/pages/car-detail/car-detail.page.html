@@ -475,8 +475,8 @@
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                 <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
-                  <ion-label class="ion-text-wrap">的士</ion-label>
-                  <ion-checkbox [disabled]="true" [checked]="car_data.taxi" slot="end">
+                  <ion-label class="ion-text-wrap">需持有執照號碼</ion-label>
+                  <ion-checkbox [disabled]="true" [checked]="car_data.required_class" slot="end">
                   </ion-checkbox>
                 </ion-item>
               </ion-col>

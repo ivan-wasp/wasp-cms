@@ -264,6 +264,9 @@ export class UserDetailPage implements OnInit {
             case 'driving_license_url':
               this.user_data.driving_license_url = upload_base64_to_server.data;
               break;
+            case 'taxi_driver_identity_plate_url':
+              this.user_data.taxi_driver_identity_plate_url = upload_base64_to_server.data;
+              break;
             case 'income_certificate_url':
               this.user_data.income_certificate_url = upload_base64_to_server.data;
               break;
@@ -419,7 +422,7 @@ export class UserDetailPage implements OnInit {
   }
 
 
-  add(event: MatChipInputEvent, type: 'email' | 'phone'): void {
+  add(event: MatChipInputEvent, type: 'email' | 'phone' | 'license'): void {
     const value = (event.value || '').trim();
     // Add our fruit
     if (value) {
@@ -431,7 +434,7 @@ export class UserDetailPage implements OnInit {
     }
   }
 
-  remove(value: string, type: 'email' | 'phone'): void {
+  remove(value: string, type: 'email' | 'phone' | 'license'): void {
     const index = this.user_data.full_classes.indexOf(value);
     if (index >= 0) {
       this.user_data.full_classes.splice(index, 1);

@@ -218,6 +218,7 @@ export interface UserData {
     bypass_face_matching: boolean;
     full_classes: string[];
     driving_license_expiry_date: string;
+    taxi_driver_identity_plate_url: string;
 }
 
 export interface FavoriteCarModel {
@@ -576,7 +577,7 @@ export interface CarData {
     price_per_hour: number;
     price_per_hour_daily_ceiling: number;
     hourly_rental_available: boolean;
-    taxi: boolean;
+    required_class: string;
 }
 
 export enum Engine {

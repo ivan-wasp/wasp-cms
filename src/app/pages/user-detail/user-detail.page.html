@@ -644,7 +644,27 @@
                         <ion-icon slot="start" name="cloud-download"></ion-icon>
                         下載
                     </ion-button>
-
+                </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
+                    <p>的士司機證</p>
+                    <ion-button
+                        [style.--background]="user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != '' ? ('url('+('media_url' | env)+user_data.taxi_driver_identity_plate_url+') no-repeat center center / cover') : '#c7c7c7'"
+                        class="big-upload-btn" (click)="triggerImgUpload('taxi_driver_identity_plate_url')" fill="clear">
+                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
+                        {{readonly ? '' : '上載'}}
+                    </ion-button>
+                    <ion-button
+                        *ngIf="!readonly && user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != ''"
+                        (click)="user_data.taxi_driver_identity_plate_url = ''" expand="block" fill="outline" shape="round"
+                        color="danger">
+                        移除的士司機證
+                    </ion-button>
+                    <ion-button *ngIf="user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != ''"
+                        class="default-ion-btn" download expand="full"
+                        (click)="commonService.downloadMedia(user_data.taxi_driver_identity_plate_url, true)" fill="clear">
+                        <ion-icon slot="start" name="cloud-download"></ion-icon>
+                        下載
+                    </ion-button>
                 </ion-col>
                 <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
                     <p>入息證明</p>
