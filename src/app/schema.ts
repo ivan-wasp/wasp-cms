@@ -708,6 +708,7 @@ export interface ParkingData {
     ace_parking_token: string;
     pickup_dropoff_remark: string;
     pickup_dropoff_img_url: string;
+    is_asgard_station: boolean;
 }
 
 export interface OrderData {
@@ -813,6 +814,9 @@ export interface PaymentData {
     invoice_url: string;
     payment_completed_datetime: Date | string;
     user_conduct_payment_email_sent: boolean;
+    hourly_rental: boolean;
+    price_per_hour: number;
+    price_per_hour_daily_ceiling: number;
 }
 
 

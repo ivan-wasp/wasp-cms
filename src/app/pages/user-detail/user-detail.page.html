@@ -153,17 +153,17 @@
                 </ion-col>
                 <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
                     <mat-form-field appearance="outline" style="display: none;">
-                        <input #driving_license_expiry_date matInput [matDatepicker]="picker"
+                        <input #driving_license_expiry_date matInput [matDatepicker]="picker2"
                             (dateChange)="selectionDateChanged('driving_license_expiry_date', driving_license_expiry_date)">
-                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-datepicker touchUi #picker></mat-datepicker>
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
                     </mat-form-field>
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label position="stacked">車牌到期日</ion-label>
                         <ion-input readonly [(ngModel)]="user_data.driving_license_expiry_date" type="text"></ion-input>
                         <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
-                            [for]="picker"></mat-datepicker-toggle>
+                            [for]="picker2"></mat-datepicker-toggle>
                     </ion-item>
                     <ion-text *ngIf="!readonly" class="hint">日期格式：yyyy-MM-dd (e.g. 1997-07-01)</ion-text>
                 </ion-col>
@@ -312,7 +312,7 @@
                     </mat-form-field>
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
-                        <ion-label position="stacked">出身日期</ion-label>
+                        <ion-label position="stacked">出生日期</ion-label>
                         <ion-input readonly [(ngModel)]="user_data.date_of_birth" type="text"></ion-input>
                         <mat-datepicker-toggle *ngIf="!readonly" slot="end" matSuffix
                             [for]="picker"></mat-datepicker-toggle>

@@ -101,7 +101,8 @@ export class ParkingDetailPage implements OnInit {
       is_coming_soon: false,
       ace_parking_token: "",
       pickup_dropoff_remark: "",
-      pickup_dropoff_img_url: ""
+      pickup_dropoff_img_url: "",
+      is_asgard_station: false
     };
   }
 

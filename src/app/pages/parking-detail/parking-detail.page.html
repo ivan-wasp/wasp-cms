@@ -98,6 +98,12 @@
             <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.poor_internet" slot="end"></ion-checkbox>
           </ion-item>
         </ion-col>
+        <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+          <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
+            <ion-label class="ion-text-wrap">Asgard超級充電站</ion-label>
+            <ion-checkbox [disabled]="readonly" [(ngModel)]="parking_data.is_asgard_station" slot="end"></ion-checkbox>
+          </ion-item>
+        </ion-col>
         <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
           <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none' button='false'>
             <ion-label class="ion-text-wrap" position="stacked">中文分類(ie.觀塘, 大角咀)</ion-label>

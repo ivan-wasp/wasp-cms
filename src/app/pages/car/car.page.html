@@ -51,7 +51,7 @@
 </ion-header>
 
 <ion-content class="bg-color">
-  <app-fleet-map></app-fleet-map>
+  <app-fleet-map *ngIf="(admin_data | async) != null && (admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.buyer"></app-fleet-map>
   <ng-container *ngIf="index_mode">
     <ion-row>
       <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
