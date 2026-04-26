@@ -4,6 +4,7 @@
     <!-- <ion-split-pane contentId="menu-content" when="md"> -->
     <ion-split-pane contentId="menu-content" when="lg">
         <ion-menu #menu swipeGesture="false" [style.display]="current_url.includes('login') ? 'none' : ''"
+            (ionWillOpen)="forceMenuScrollable()" (ionDidOpen)="forceMenuScrollable()"
             contentId="menu-content" type="reveal" side="start">
             <!-- <ion-menu swipeGesture="false" [ngStyle]="{display: commonService?.show_sidemenu ? '' : 'none'}"
       [style.display]="current_url.includes('login') ? 'none' : ''" contentId="menu-content" type="overlay" side="start" > -->

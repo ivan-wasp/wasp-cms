@@ -240,50 +240,54 @@ export class ApiService {
     return this.injector.get(AuthService);
   }
 
-  postFromServer(path: ApiPath, send_data: any | null, loadding?): Promise<Response> {
-    let body = new URLSearchParams();
+  postFromServer(path: ApiPath, send_data: any | null, loadding = false): Promise<Response> {
+    const body = new URLSearchParams();
     body.set(path, JSON.stringify(send_data));
 
-    if (environment.enable_api_log){
+    if (environment.enable_api_log) {
       console.log(`${path}: `, send_data);
     }
 
     return new Promise((resolve, reject) => {
-      if(loadding) this.commonService.isLoading = true;
-      this.http.post(environment.api_url, body.toString(), headers).subscribe(async (res: any) => {
-        console.log(res);
-        if(loadding) this.commonService.isLoading = false;
-        if (res != null){
-          const response: Response = res;
-          switch (response.result) {
-            case 'success':
-              resolve(response);
-              break;
-            case 'fail':
-              resolve(response);
-              break;
-            case 'error':
-              this.errorHandler(path, response);
-              reject(response)
-              break;
-  
-            default:
-              break;
-          }
-        }
-        else{
-          console.error(`API ${path} error: ${res}`);
-          this.errorHandler(path);
-          reject(null);
-        }
+      if (loadding) {
+        this.commonService.isLoading = true;
+      }
 
-      }),
-        async (error: any) => {
-          
+      this.http.post(environment.api_url, body.toString(), headers).subscribe(
+        (res: any) => {
+          if (loadding) {
+            this.commonService.isLoading = false;
+          }
+
+          if (environment.enable_api_log) {
+            console.log(res);
+          }
+
+          if (res == null) {
+            console.error(`API ${path} error: ${res}`);
+            this.errorHandler(path);
+            reject(null);
+            return;
+          }
+
+          const response: Response = res;
+          if (response.result === 'success' || response.result === 'fail') {
+            resolve(response);
+            return;
+          }
+
+          this.errorHandler(path, response);
+          reject(response);
+        },
+        (error: any) => {
+          if (loadding) {
+            this.commonService.isLoading = false;
+          }
           console.error(`API ${path} error: ${error}`);
           this.errorHandler(path, error);
           reject(error);
-        };
+        }
+      );
     });
   }
 

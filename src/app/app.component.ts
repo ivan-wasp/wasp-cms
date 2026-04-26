@@ -513,6 +513,11 @@ export class AppComponent implements OnInit {
 
       this.translateService.setDefaultLang('zh');
       this.translateService.use('zh');
+
+      // Fallback for Chromium menu scroll regression: force scroll styles on shadow scroll host.
+      setTimeout(() => {
+        this.forceMenuScrollable();
+      }, 0);
     });
   }
 
@@ -526,6 +531,31 @@ export class AppComponent implements OnInit {
 
   refresh() {
     location.reload();
+  }
+
+  async forceMenuScrollable() {
+    const menuElement = document.querySelector('ion-menu');
+    if (!menuElement) {
+      return;
+    }
+
+    const menuContent = menuElement.querySelector('ion-content') as HTMLIonContentElement | null;
+    if (!menuContent || typeof menuContent.getScrollElement !== 'function') {
+      return;
+    }
+
+    try {
+      const scrollElement = await menuContent.getScrollElement();
+      if (scrollElement) {
+        scrollElement.style.overflowY = 'auto';
+        scrollElement.style.overflowX = 'hidden';
+        (scrollElement.style as any).webkitOverflowScrolling = 'touch';
+        scrollElement.style.touchAction = 'pan-y';
+        scrollElement.style.maxHeight = '100%';
+      }
+    } catch (error) {
+      // no-op: keep app functional if menu content is not ready yet
+    }
   }
 
 }

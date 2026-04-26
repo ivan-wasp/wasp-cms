@@ -305,11 +305,33 @@ button {
 ion-menu {
   ion-content {
     --offset-bottom: auto !important;
-    --overflow: hidden;
-    overflow: auto;
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    --overflow: auto;
+    height: 100%;
+  }
+}
+
+/* Force menu scroll container behavior for newer Chrome versions */
+ion-menu ion-content::part(scroll) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+}
+
+ion-menu ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+
+ion-menu::part(container) {
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+@supports not (height: 100dvh) {
+  ion-menu::part(container) {
+    height: 100vh;
+    max-height: 100vh;
   }
 }
 

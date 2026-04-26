@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { throwError } from 'rxjs';
 import { AlertController } from '@ionic/angular';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { CommonService } from '../services/common.service';
-
-const TOKEN_KEY = 'USER_DATA';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -20,34 +18,20 @@ export class JwtInterceptor implements HttpInterceptor {
     ) { }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        // return from(this.storage.get(TOKEN_KEY))
-        return from(this.authService.adminToken.asObservable())
-        .pipe(
-            switchMap(token => {        
-                // console.log(token);
-                request = request.clone({ headers: request.headers.set('Content-Type', 'application/x-www-form-urlencoded') });
-                request = request.clone({ headers: request.headers.set('Authorization', `Bearer ${token}` ) });
-                request = request.clone({ url:request.url });
-                // console.log(request);
-                return next.handle(request).pipe(
-                    map((event: HttpEvent<any>) => {
-                        if (event instanceof HttpResponse) {
-                            // do nothing for now
-                        }
-                        return event;
-                    }),
-                    catchError((error: HttpErrorResponse) => {
-                        const status =  error.status;
-                        const reason = error && error.error.reason ? error.error.reason : '';
+        const token = this.authService.adminToken.value;
+        const requestWithHeaders = request.clone({
+            setHeaders: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Authorization: token ? `Bearer ${token}` : ''
+            }
+        });
 
-                        this.commonService.isLoading =false;
-                        // this.presentAlert(status, reason);
-                        return throwError(error);
-                    })
-                );
+        return next.handle(requestWithHeaders).pipe(
+            catchError((error: HttpErrorResponse) => {
+                this.commonService.isLoading = false;
+                return throwError(error);
             })
         );
-
 
     }
 
