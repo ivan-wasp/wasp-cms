@@ -6,7 +6,8 @@
 
         <ion-title class="hidden-xs-down">租務訂單</ion-title>
 
-        <ng-container *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
+        <ng-container
+            *ngIf="(admin_data | async)?.type != adminType.owner && (admin_data | async)?.type != adminType.pickup_dropoff">
             <ion-buttons slot="end">
                 <ion-button (click)="commonService?.openCMSPage('/admin-notification', 'root')" fill="clear">
                     <ion-icon slot="start" src="assets/icon/user.svg"></ion-icon>
@@ -104,7 +105,8 @@
                     <mat-datepicker-toggle slot="end" matSuffix [for]="picker2"></mat-datepicker-toggle>
                 </ion-item>
             </ion-col>
-            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center" *ngIf="(admin_data | async)?.type != adminType.owner">
+            <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4" class="ion-align-self-center"
+                *ngIf="(admin_data | async)?.type != adminType.owner">
                 <ion-item class="input-filter-item" mode="md" lines='none' button='false'>
                     <ion-label class="ion-text-wrap">
                         <ng-container *ngIf="!(user_id != null && user_id != '')">
@@ -257,7 +259,9 @@
         </ng-container>
 
         <ng-container *ngIf="dataService?.table_data_list != null">
-            <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+            <!-- <ion-row class="table_content full-width" [style.background]="item?.hourly_rental ? '#f8d95e5e' : ''" -->
+            <ion-row class="table_content full-width"
+                *ngFor="let item of dataService.table_data_list">
                 <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
                     <span class="hidden-md-up">ID：</span>
                     <span>{{item.id}}</span>
@@ -270,14 +274,16 @@
                     <span class="hidden-md-up">用戶名：</span>
                     <span class="clickable"
                         (click)="commonService.openCMSPage('/user-detail?user_id='+item.user_id, 'blank')">
-                        {{(admin_data | async)?.type == adminType.owner ? '*' + item?.user_data?.zh_full_name?.slice(-2) : item?.user_data?.zh_full_name}}
+                        {{(admin_data | async)?.type == adminType.owner ? '*' + item?.user_data?.zh_full_name?.slice(-2)
+                        : item?.user_data?.zh_full_name}}
                         <br>
-                        {{(admin_data | async)?.type == adminType.owner ? '****' + item?.user_data?.phone?.slice(-4) : item?.user_data?.phone}}
-                        <br>
+                        {{(admin_data | async)?.type == adminType.owner ? '****' + item?.user_data?.phone?.slice(-4) :
+                        item?.user_data?.phone}}
+                        <!-- <br>
                         <ion-chip color="dark" mode="ios" outline="true"
                             *ngIf="!('production' | env) || ((admin_data | async) && (admin_data | async).authority_list.includes(authority.credit_rating))">
                             <ion-label>信用評級：{{item?.user_data?.credit_rating}}</ion-label>
-                        </ion-chip>
+                        </ion-chip> -->
                     </span>
                 </ion-col>
                 <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
@@ -290,9 +296,23 @@
 
                 <ion-col size-xs="12" size-sm="12" size-md="1.5" size-lg="1.5">
                     <span class="hidden-md-up">租賃期：</span>
-                    <span>{{item?.booking_date_list?.length}}日<br>{{item?.start_date | date : 'yyyy-MM-dd'}} <br> 至 <br>
-                        {{item?.end_date |
-                        date : 'yyyy-MM-dd'}}</span>
+                    <span>
+                        <ng-container *ngIf="item?.hourly_rental != true">
+                            {{item?.booking_date_list?.length}}日<br>{{item?.start_date | date : 'yyyy-MM-dd'}} <br> 至
+                            <br>
+                            {{item?.end_date |
+                            date : 'yyyy-MM-dd'}}
+                        </ng-container>
+                        <ng-container *ngIf="item?.hourly_rental == true">
+                            <ion-chip color="tertiary" mode="ios" outline="true">
+                                <ion-label>時租</ion-label>
+                            </ion-chip>
+                            <br>
+                            {{item?.start_date+' '+item?.pick_up_data.time}} <br> 至 <br>
+                            {{item?.end_date+' '+item?.return_data.time }}
+                        </ng-container>
+                    </span>
+
                 </ion-col>
                 <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
                     <span class="hidden-md-up">狀態：</span>

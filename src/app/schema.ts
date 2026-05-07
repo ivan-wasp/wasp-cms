@@ -202,7 +202,9 @@ export interface UserData {
     bankrupt_record: Boolean;
     two_year_driving_experience: Boolean;
     dangerous_driving_record: Boolean;
+    injury_accident_record: Boolean;
     drug_driving_record: Boolean;
+    taxi_driver_offence_point_record: Boolean;
     other_doc_url_list: DocObject[];
     favorite_car_model_list: FavoriteCarModel[];
     credit_rating: string;
@@ -749,6 +751,8 @@ export interface OrderData {
     campaign_data: CampaignData | null;
     insurance_tier: number | null;
     hourly_rental: boolean;
+    price_per_hour: number;
+    price_per_hour_daily_ceiling: number;
 }
 
 export interface CartData {
@@ -817,6 +821,8 @@ export interface PaymentData {
     hourly_rental: boolean;
     price_per_hour: number;
     price_per_hour_daily_ceiling: number;
+    number_of_hour: number;
+    hourly_payment_settlement_done: number;
 }
 
 

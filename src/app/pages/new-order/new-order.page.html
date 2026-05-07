@@ -118,7 +118,8 @@
                                 </ion-item>
                             </ion-col>
                             <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
-                                <ion-item class="input-item" mode="md" lines='none' button='false' *ngIf="update_user_data.phone != '62337073'">
+                                <ion-item class="input-item" mode="md" lines='none' button='false'
+                                    *ngIf="update_user_data.phone != '62337073'">
                                     <ion-label position="stacked">香港身份證號碼</ion-label>
                                     <ion-input [(ngModel)]="update_user_data.identity_number" type="text"></ion-input>
                                 </ion-item>
@@ -184,26 +185,41 @@
                             <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
                                 <ion-item class="toggle-item" mode="md" lines='none' button='false'>
                                     <ion-label class="ion-text-wrap">年滿25歲？</ion-label>
-                                    <ion-toggle slot="end"
-                                        value="true"></ion-toggle>
+                                    <ion-toggle slot="end" value="true"></ion-toggle>
                                 </ion-item>
                                 <br>
                                 <ion-item class="toggle-item" mode="md" lines='none' button='false'>
-                                    <ion-label class="ion-text-wrap">危險駕駛記錄(三年內)？</ion-label>
-                                    <ion-toggle slot="end" [value]="update_user_data.dangerous_driving_record"></ion-toggle>
+                                    <ion-label class="ion-text-wrap">不小心及危險駕駛紀錄(三年內)？</ion-label>
+                                    <ion-toggle slot="end"
+                                        [value]="update_user_data.dangerous_driving_record"></ion-toggle>
                                 </ion-item>
                             </ion-col>
-
                             <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">任何傷人交通意外紀錄(三年內)？</ion-label>
+                                    <ion-toggle slot="end"
+                                        [value]="update_user_data.injury_accident_record"></ion-toggle>
+                                </ion-item>
+                                <br>
                                 <ion-item class="toggle-item" mode="md" lines='none' button='false'>
                                     <ion-label class="ion-text-wrap">酒精或毒品相關違例駕駛記錄(三年內)？</ion-label>
                                     <ion-toggle slot="end" [value]="update_user_data.drug_driving_record"></ion-toggle>
                                 </ion-item>
-                                <br>
+                            </ion-col>
+
+                            <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
+
+
                                 <ion-item class="toggle-item" mode="md" lines='none' button='false'>
                                     <ion-label class="ion-text-wrap">最少兩年「一年暫準執照（P牌）及最少 一年正式執照」</ion-label>
                                     <ion-toggle slot="end"
                                         [value]="update_user_data.two_year_driving_experience"></ion-toggle>
+                                </ion-item>
+                                <br>
+                                <ion-item class="toggle-item" mode="md" lines='none' button='false'>
+                                    <ion-label class="ion-text-wrap">任何的士司機違例記分紀錄(三年內)？</ion-label>
+                                    <ion-toggle slot="end"
+                                        [value]="update_user_data.taxi_driver_offence_point_record"></ion-toggle>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -475,7 +491,7 @@
                                         [(ngModel)]="temp_order_data.return_data.time" multiple="false" cancelText="取消"
                                         okText="確認">
                                         <ion-select-option *ngFor="let item of padTimeZero(selectable_return_hour_list)"
-                                        [value]="item">{{item}}
+                                            [value]="item">{{item}}
                                         </ion-select-option>
                                     </ion-select>
                                 </ion-item>
@@ -620,9 +636,14 @@
                             <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
                                 <ion-item class="input-item" mode="md" lines='none' button='false'>
                                     <ion-label position="stacked">保障方案</ion-label>
-                                    <ion-select (ionChange)="selectInsurancePlan($event)" multiple="false" cancelText="取消" okText="確認">
-                                        <ion-select-option *ngIf="insurance_price_tier_one_percentage != null" value="1">免賠償方案({{price_per_day*insurance_price_tier_one_percentage/100 | currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
-                                        <ion-select-option *ngIf="insurance_price_tier_two_percentage != null" value="2">自負額方案({{price_per_day*insurance_price_tier_two_percentage/100 | currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
+                                    <ion-select (ionChange)="selectInsurancePlan($event)" multiple="false"
+                                        cancelText="取消" okText="確認">
+                                        <ion-select-option *ngIf="insurance_price_tier_one_percentage != null"
+                                            value="1">免賠償方案({{price_per_day*insurance_price_tier_one_percentage/100 |
+                                            currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
+                                        <ion-select-option *ngIf="insurance_price_tier_two_percentage != null"
+                                            value="2">自負額方案({{price_per_day*insurance_price_tier_two_percentage/100 |
+                                            currency:'HKD':'symbol-narrow':'1.0-0'}}/日)</ion-select-option>
                                         <ion-select-option value="null">基本保障(免費)</ion-select-option>
                                     </ion-select>
                                 </ion-item>
@@ -740,9 +761,13 @@
                         <ion-col size="6" class="ion-text-left">
                             <ion-label class="amount-title">
                                 {{payment_data_list[0]?.booking_date_list.length}}日租金
-                                <br> 
-                                <span *ngIf="payment_data_list[0]?.booking_date_list.length > 1">({{payment_data_list[0]?.booking_date_list[0]}} - {{payment_data_list[0]?.booking_date_list[payment_data_list[0]?.booking_date_list.length-1]}})</span>
-                                <span *ngIf="payment_data_list[0]?.booking_date_list.length == 1">({{payment_data_list[0]?.booking_date_list[0]}})</span>
+                                <br>
+                                <span
+                                    *ngIf="payment_data_list[0]?.booking_date_list.length > 1">({{payment_data_list[0]?.booking_date_list[0]}}
+                                    -
+                                    {{payment_data_list[0]?.booking_date_list[payment_data_list[0]?.booking_date_list.length-1]}})</span>
+                                <span
+                                    *ngIf="payment_data_list[0]?.booking_date_list.length == 1">({{payment_data_list[0]?.booking_date_list[0]}})</span>
                                 <ng-container
                                     *ngIf="payment_data_list[0]?.campaign_type==undefined && payment_data_list[0]?.free_booking_days != null && payment_data_list[0]?.free_booking_days > 0">
                                     <br> 免租{{payment_data_list[0]?.free_booking_days}}日
@@ -810,7 +835,7 @@
                                 <ion-label>HK${{payment_data_list[0].insurance_amount | number}}</ion-label>
                             </ion-col>
                         </ng-container>
-        
+
 
                         <ion-col size="6" class="ion-text-left">
                             <ion-label class="amount-title">停車場租金</ion-label>

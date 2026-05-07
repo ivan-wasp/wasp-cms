@@ -333,7 +333,8 @@
                 <ion-col size="7.5" class="ion-text-left">
                     <ion-label class="amount-title">
                         <ng-container *ngIf="payment_data?.deposit_amount == 0">
-                            {{payment_data?.booking_date_list.length}}日租金
+                            <ng-container *ngIf="payment_data?.hourly_rental != true">{{payment_data?.booking_date_list.length}}日租金</ng-container>
+                            <ng-container *ngIf="payment_data?.hourly_rental == true">時租({{payment_data?.number_of_hour}}小時)(每小時HK${{payment_data?.price_per_hour | number}})</ng-container>
                             <br>
                             <span
                                 *ngIf="payment_data?.booking_date_list.length > 1">({{payment_data?.booking_date_list[0]}}
