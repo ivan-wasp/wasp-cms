@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { ApiPath, ApiService, Response } from 'src/app/services/api.service';
   selector: 'app-admin',
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminPage implements OnInit {
 
@@ -27,7 +28,8 @@ export class AdminPage implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     private location: Location,
-    public dataService: DataService
+    public dataService: DataService,
+    private cdr: ChangeDetectorRef
   ) {
     this.dataService.table_data_list = null;
 
@@ -72,8 +74,10 @@ export class AdminPage implements OnInit {
         this.dataService.table_data_list = res.data.item_list;
         this.dataService.table_data_total_number = res.data.total_number;
         this.dataService.table_data_number_of_page = Math.ceil(res.data.total_number / this.limit);
+        this.cdr.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
+        this.cdr.markForCheck();
       }
     });
 

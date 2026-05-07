@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NoPreloading, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { AdminGuard } from './guard/admin.guard';
 import { AuthGuard } from './guard/auth.guard';
 import { NonBuyerGuard } from './guard/non-buyer.guard';
@@ -7,6 +7,7 @@ import { NonMaintainerGuard } from './guard/non-maintainer.guard';
 import { NonPatrolGuard } from './guard/non-patrol.guard';
 import { NonOwnerGuard } from './guard/non-owner.guard';
 import { NonPickupDropoffGuard } from './guard/non-pickup-dropoff.guard';
+import { SelectivePreloadingStrategy } from './strategies/selective-preloading.strategy';
 
 const routes: Routes = [
   {
@@ -22,17 +23,20 @@ const routes: Routes = [
     path: 'home',
     loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule),
     // canActivate: [AuthGuard]
-    canActivate: [AuthGuard, NonMaintainerGuard, NonBuyerGuard, NonOwnerGuard]
+    canActivate: [AuthGuard, NonMaintainerGuard, NonBuyerGuard, NonOwnerGuard],
+    data: { preload: true }
   },
   {
     path: 'user',
     loadChildren: () => import('./pages/user/user.module').then(m => m.UserPageModule),
-    canActivate: [AuthGuard, AdminGuard]
+    canActivate: [AuthGuard, AdminGuard],
+    data: { preload: true }
   },
   {
     path: 'car',
     loadChildren: () => import('./pages/car/car.module').then(m => m.CarPageModule),
-    canActivate: [AuthGuard, NonPickupDropoffGuard]
+    canActivate: [AuthGuard, NonPickupDropoffGuard],
+    data: { preload: true }
   },
   {
     path: 'car-detail',
@@ -97,7 +101,8 @@ const routes: Routes = [
   {
     path: 'order',
     loadChildren: () => import('./pages/order/order.module').then(m => m.OrderPageModule),
-    canActivate: [AuthGuard, NonBuyerGuard, NonMaintainerGuard]
+    canActivate: [AuthGuard, NonBuyerGuard, NonMaintainerGuard],
+    data: { preload: true }
   },
   {
     path: 'order-detail',
@@ -172,7 +177,8 @@ const routes: Routes = [
   {
     path: 'new-order',
     loadChildren: () => import('./pages/new-order/new-order.module').then(m => m.NewOrderPageModule),
-    canActivate: [AuthGuard, AdminGuard]
+    canActivate: [AuthGuard, AdminGuard],
+    data: { preload: true }
   },
   {
     path: 'gift',
@@ -434,7 +440,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: NoPreloading, relativeLinkResolution: 'legacy' })
+    RouterModule.forRoot(routes, { preloadingStrategy: SelectivePreloadingStrategy, relativeLinkResolution: 'legacy' })
   ],
   exports: [RouterModule]
 })

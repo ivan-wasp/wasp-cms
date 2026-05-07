@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonicSelectableComponent } from 'ionic-selectable';
@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
   selector: 'app-coupon',
   templateUrl: './coupon.page.html',
   styleUrls: ['./coupon.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CouponPage implements OnInit {
 
@@ -48,7 +49,8 @@ export class CouponPage implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     private location: Location,
-    public dataService: DataService
+    public dataService: DataService,
+    private cdr: ChangeDetectorRef
   ) {
     this.dataService.table_data_list = null;
 
@@ -114,8 +116,10 @@ export class CouponPage implements OnInit {
         this.dataService.table_data_list = res.data.item_list;
         this.dataService.table_data_total_number = res.data.total_number;
         this.dataService.table_data_number_of_page = Math.ceil(res.data.total_number / this.limit);
+        this.cdr.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
+        this.cdr.markForCheck();
       }
     });
 

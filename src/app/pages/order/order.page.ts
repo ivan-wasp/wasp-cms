@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
@@ -17,6 +17,7 @@ import { Observable } from 'rxjs';
   selector: 'app-order',
   templateUrl: './order.page.html',
   styleUrls: ['./order.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     {
@@ -74,7 +75,8 @@ export class OrderPage implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     private location: Location,
-    public dataService: DataService
+    public dataService: DataService,
+    private cdr: ChangeDetectorRef
   ) {
     this.dataService.table_data_list = null;
 
@@ -174,8 +176,10 @@ export class OrderPage implements OnInit {
         this.dataService.table_data_list = res.data.item_list.sort((one, two) => (one.status == 'rendering' && two.status != 'rendering' ? -1 : 1));
         this.dataService.table_data_total_number = res.data.total_number;
         this.dataService.table_data_number_of_page = Math.ceil(res.data.total_number / this.limit);
+        this.cdr.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
+        this.cdr.markForCheck();
       }
     });
 
