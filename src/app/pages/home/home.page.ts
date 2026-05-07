@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -42,6 +42,7 @@ export const MY_FORMATS = {
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -211,6 +212,7 @@ export class HomePage implements OnInit {
 
     const generate_booking_date_list = await this.generateAllBookingDateToList(firstDay, lastDay);
     // console.log(this.this_month_date_list);
+    this.cdf.markForCheck();
   }
 
   generateAllBookingDateToList(firstDay, lastDay): Promise<any> {
@@ -277,6 +279,7 @@ export class HomePage implements OnInit {
 
 
         this.initPieChart();
+        this.cdf.markForCheck();
       } else {
         // this.commonService.openErrorSnackBar();
         this.getRefresh();
@@ -333,6 +336,7 @@ export class HomePage implements OnInit {
 
 
         this.initPieChart();
+        this.cdf.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
       }
@@ -398,13 +402,16 @@ export class HomePage implements OnInit {
 
         this.eventSource = this.AddEventToCalendar(calendar_data_list);
         this.commonService.isLoading = false;
+        this.cdf.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
         this.commonService.isLoading = false;
+        this.cdf.markForCheck();
       }
     }, err => {
       this.commonService.openErrorSnackBar();
       this.commonService.isLoading = false;
+      this.cdf.markForCheck();
     });
   }
 
@@ -704,6 +711,7 @@ export class HomePage implements OnInit {
         // console.log( this.original_car_data_list.filter(d => (d.today_status == 'booked' && !d.disabled && !d.sold)).length);
         // this.occupancy_rate = this.original_car_data_list.filter(d => (d.today_status == 'booked')).length / this.original_car_data_list.filter(d => (d.today_status != 'blocked_maintaining')).length;
 
+        this.cdf.markForCheck();
 
       } else {
         this.commonService.openErrorSnackBar();

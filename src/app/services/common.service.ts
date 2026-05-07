@@ -60,6 +60,14 @@ export class CommonService {
     })
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByIdOrIndex(index: number, item: any): any {
+    return item && item.id != null ? item.id : index;
+  }
+
   openSnackBar(message: string, button_text?: string, durantion?: number, horizontalPosition?, verticalPosition?) {
     this._snackBar.open(message, (button_text != undefined ? button_text : 'OK'), {
       duration: (durantion != undefined ? durantion : 2500),

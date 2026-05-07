@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
@@ -22,6 +22,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   selector: 'app-car-detail',
   templateUrl: './car-detail.page.html',
   styleUrls: ['./car-detail.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     {
@@ -126,7 +127,8 @@ export class CarDetailPage implements OnInit {
     public nav: NavController,
     private location: Location,
     private translateService: TranslateService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
   ) {
     this.route.queryParams.subscribe(params => {
       console.log(params);
@@ -301,11 +303,14 @@ export class CarDetailPage implements OnInit {
           console.log(123);
           this.openJimiSreaming(1);
         }
+        this.cdr.markForCheck();
       } else {
         this.commonService.openErrorSnackBar();
+        this.cdr.markForCheck();
       }
     }, err => {
       this.commonService.openErrorSnackBar();
+      this.cdr.markForCheck();
     });
   }
 
@@ -381,6 +386,7 @@ export class CarDetailPage implements OnInit {
           else {
             this.commonService.openErrorSnackBar("無法上載檔案");
           }
+          this.cdr.markForCheck();
         })
 
       });
@@ -478,11 +484,14 @@ export class CarDetailPage implements OnInit {
         this.car_data = JSON.parse(JSON.stringify(res.data));
         this.checking_car_data = JSON.parse(JSON.stringify(res.data));
         this.commonService.openSnackBar("已更新資料");
+        this.cdr.markForCheck();
       } else {
         this.commonService.openErrorSnackBar("未能更新資料");
+        this.cdr.markForCheck();
       }
     }, err => {
       this.commonService.openErrorSnackBar();
+      this.cdr.markForCheck();
     });
 
   }
@@ -545,7 +554,9 @@ export class CarDetailPage implements OnInit {
         setTimeout(() => {
           this.readonly = true;
           this.location.replaceState('/car-detail?car_id=' + res.data.id);
+          this.cdr.markForCheck();
         }, 1000);
+        this.cdr.markForCheck();
       } else {
         switch (true) {
           case res.data == 'invalid engine':
@@ -563,6 +574,7 @@ export class CarDetailPage implements OnInit {
       }
     }, err => {
       this.commonService.openErrorSnackBar();
+      this.cdr.markForCheck();
     });
 
   }
@@ -683,6 +695,7 @@ export class CarDetailPage implements OnInit {
       console.log("streaming_url: ", this.streaming_url);
       // this.isLiveStreamingModalOpen = true;
       // this.isHistoricalStreamingModalOpen = true;
+      this.cdr.markForCheck();
     }
   }
 
@@ -704,6 +717,7 @@ export class CarDetailPage implements OnInit {
     console.log(get_jimi_device_location_result);
     if (get_jimi_device_location_result.result == 'success') {
       this.jimi_device_location = get_jimi_device_location_result.data[0];
+      this.cdr.markForCheck();
     }
   }
 
@@ -711,7 +725,7 @@ export class CarDetailPage implements OnInit {
     this.isLiveStreamingModalOpen = false;
     this.isHistoricalStreamingModalOpen = false;
     this.streaming_url = '';
+    this.cdr.markForCheck();
   }
 
 }
-

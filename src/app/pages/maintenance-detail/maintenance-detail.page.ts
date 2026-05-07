@@ -296,7 +296,7 @@ export class MaintenanceDetailPage implements OnInit {
   }
 
   getFactoryDataById(id) {
-    return this.dataService.factory_data_list$.value != null ? this.dataService.factory_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getFactoryDataByIdCached(id);
   }
 
   getMaintenanceCategoryDataById(id) {

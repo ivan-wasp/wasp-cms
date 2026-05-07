@@ -182,7 +182,7 @@ export class CarViewingPage implements OnInit {
 
 
   getUserDataById(id) {
-    return this.dataService.user_data_list$.value != null ? this.dataService.user_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getUserDataByIdCached(id);
   }
 
   onUserOpen(event: { component: IonicSelectableComponent }) {
@@ -200,7 +200,7 @@ export class CarViewingPage implements OnInit {
 
 
   getCarDataById(id) {
-    return this.dataService.car_data_list$.value != null ? this.dataService.car_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getCarDataByIdCached(id);
   }
 
 

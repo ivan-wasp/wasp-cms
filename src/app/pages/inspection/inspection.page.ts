@@ -188,7 +188,7 @@ export class InspectionPage implements OnInit {
   }
 
   getCarDataById(id) {
-    return this.dataService.car_data_list$.value != null ? this.dataService.car_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getCarDataByIdCached(id);
   }
 
   onCarChange(event) {

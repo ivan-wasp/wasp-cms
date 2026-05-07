@@ -225,13 +225,13 @@ export class EmergencyDetailPage implements OnInit {
   }
 
   getUserDataById(id) {
-    return this.dataService.user_data_list$.value != null ? this.dataService.user_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getUserDataByIdCached(id);
   }
 
 
 
   getCarDataById(id) {
-    return this.dataService.car_data_list$.value != null ? this.dataService.car_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getCarDataByIdCached(id);
   }
 
 

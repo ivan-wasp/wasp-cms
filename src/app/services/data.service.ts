@@ -15,6 +15,12 @@ export interface UnavailableBookingDateListResult {
   providedIn: 'root'
 })
 export class DataService {
+  private userDataMapCache = new Map<number, UserData>();
+  private userDataMapSourceRef: UserData[] | null = null;
+  private carDataMapCache = new Map<number, CarData>();
+  private carDataMapSourceRef: CarData[] | null = null;
+  private factoryDataMapCache = new Map<number, FactoryData>();
+  private factoryDataMapSourceRef: FactoryData[] | null = null;
 
   table_data_list = null;
   table_data_total_number = null;
@@ -68,6 +74,69 @@ export class DataService {
     this.table_data_list = null;
     this.table_data_total_number = null;
     this.table_data_number_of_page = null;
+  }
+
+  private ensureUserDataMap() {
+    const source = this.user_data_list$.value;
+    if (!source) {
+      this.userDataMapCache.clear();
+      this.userDataMapSourceRef = null;
+      return;
+    }
+    if (this.userDataMapSourceRef !== source) {
+      this.userDataMapCache = new Map(source.map(item => [item.id, item]));
+      this.userDataMapSourceRef = source;
+    }
+  }
+
+  private ensureCarDataMap() {
+    const source = this.car_data_list$.value;
+    if (!source) {
+      this.carDataMapCache.clear();
+      this.carDataMapSourceRef = null;
+      return;
+    }
+    if (this.carDataMapSourceRef !== source) {
+      this.carDataMapCache = new Map(source.map(item => [item.id, item]));
+      this.carDataMapSourceRef = source;
+    }
+  }
+
+  private ensureFactoryDataMap() {
+    const source = this.factory_data_list$.value;
+    if (!source) {
+      this.factoryDataMapCache.clear();
+      this.factoryDataMapSourceRef = null;
+      return;
+    }
+    if (this.factoryDataMapSourceRef !== source) {
+      this.factoryDataMapCache = new Map(source.map(item => [item.id, item]));
+      this.factoryDataMapSourceRef = source;
+    }
+  }
+
+  getUserDataByIdCached(id: number | string): UserData | null {
+    if (id == null) {
+      return null;
+    }
+    this.ensureUserDataMap();
+    return this.userDataMapCache.get(Number(id)) || null;
+  }
+
+  getCarDataByIdCached(id: number | string): CarData | null {
+    if (id == null) {
+      return null;
+    }
+    this.ensureCarDataMap();
+    return this.carDataMapCache.get(Number(id)) || null;
+  }
+
+  getFactoryDataByIdCached(id: number | string): FactoryData | null {
+    if (id == null) {
+      return null;
+    }
+    this.ensureFactoryDataMap();
+    return this.factoryDataMapCache.get(Number(id)) || null;
   }
 
   getStaticPageUrlList() {

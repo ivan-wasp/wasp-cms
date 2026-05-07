@@ -210,7 +210,7 @@
               </ion-button>
             </ng-container>
           </ion-col>
-          <ion-col size-xs="12" size-sm="4" size-md="3" size-lg="3" *ngFor="let item of dataService.table_data_list">
+          <ion-col size-xs="12" size-sm="4" size-md="3" size-lg="3" *ngFor="let item of dataService.table_data_list; trackBy: commonService.trackByIdOrIndex">
             <div class="car-card ion-padding"
               [ngClass]="{'offline': item?.jimi_device_location?.status == '0', 'parked': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '0', 'idle': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '1' && item?.jimi_device_location?.speed == null, 'moving': item?.jimi_device_location?.status == '1' && item?.jimi_device_location?.accStatus == '1' && item?.jimi_device_location?.speed != null}"
               [class]="item?.today_status == 'removed' ? 'removed' : (item?.today_status == 'available' ? 'available' : (item?.today_status == 'blocked' ? 'blocked' : (item?.today_status == 'sold' ? 'sold' : (item?.today_status == 'for_sale' ? 'for_sale' : (item?.today_status == 'blocked_maintaining' ? 'blocked_maintaining' : '')))))"

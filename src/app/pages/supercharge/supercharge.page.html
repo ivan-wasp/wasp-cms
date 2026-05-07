@@ -112,7 +112,7 @@
     </ng-container>
 
     <ng-container *ngIf="dataService?.table_data_list != null">
-      <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list">
+      <ion-row class="table_content full-width" *ngFor="let item of dataService.table_data_list; trackBy: commonService.trackByIdOrIndex">
         <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">
           <span class="hidden-md-up">Session ID：</span>
           <span>{{item.sessionId}}</span>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -238,6 +238,7 @@ const google_map_style = [
   selector: 'app-fleet-map',
   templateUrl: './fleet-map.component.html',
   styleUrls: ['./fleet-map.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FleetMapComponent implements OnInit {
   admin_data: Observable<AdminData> = this.auth.adminData.pipe();
@@ -279,7 +280,8 @@ export class FleetMapComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public auth: AuthService,
-    public commonService: CommonService
+    public commonService: CommonService,
+    private cdr: ChangeDetectorRef
   ) {
   }
 
@@ -301,6 +303,7 @@ export class FleetMapComponent implements OnInit {
           }
         };
       });
+      this.cdr.markForCheck();
     }
   }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
@@ -21,6 +21,7 @@ import { map } from 'rxjs/operators';
   selector: 'app-new-order',
   templateUrl: './new-order.page.html',
   styleUrls: ['./new-order.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     {
@@ -161,10 +162,11 @@ export class NewOrderPage implements OnInit {
     }
 
     this.dataService.getAllAdminData();
+    this.cdf.markForCheck();
   }
 
   getUserDataById(id) {
-    return this.dataService.user_data_list$.value != null ? this.dataService.user_data_list$.value.filter(d => d.id == id)[0] : null;
+    return this.dataService.getUserDataByIdCached(id);
   }
 
   triggerImgUpload(type) {
@@ -221,6 +223,7 @@ export class NewOrderPage implements OnInit {
         else {
           this.commonService.openErrorSnackBar("無法上載檔案");
         }
+        this.cdf.markForCheck();
       })
     }
   }
@@ -229,6 +232,7 @@ export class NewOrderPage implements OnInit {
     const get_temp_order: Response = await this.dataService.getTempOrderDataByUserId();
     this.temp_order_data = get_temp_order.data;
     console.log("temp_order_data: ", this.temp_order_data);
+    this.cdf.markForCheck();
   }
 
   async getAvailableEquipmentDataList() {
@@ -320,6 +324,7 @@ export class NewOrderPage implements OnInit {
       this.dataService.selected_user_data$.next(get_user_data_result.data);
       console.log(get_user_data_result.data);
       console.log(this.dataService.available_equipment_data_list$.value);
+      this.cdf.markForCheck();
     }
   }
 
@@ -544,6 +549,7 @@ export class NewOrderPage implements OnInit {
       this.pickup_hour_list = pickup_and_return_hour_list.pickup_hour_list;
       this.return_hour_list = pickup_and_return_hour_list.return_hour_list;
       this.selectable_return_hour_list = pickup_and_return_hour_list.return_hour_list;
+      this.cdf.markForCheck();
     });
   }
 
@@ -575,6 +581,7 @@ export class NewOrderPage implements OnInit {
       if (res.result == "success") {
         this.car_rental_amount = res.data;
         console.log("car_rental_amount: ", this.car_rental_amount);
+        this.cdf.markForCheck();
       }
       else {
         this.commonService.openErrorSnackBar();
