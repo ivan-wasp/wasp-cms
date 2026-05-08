@@ -18,6 +18,12 @@ export interface Page {
   icon_selected: string;
 }
 
+interface MenuGroup {
+  key: string;
+  label: string;
+  pages: Page[];
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -25,6 +31,11 @@ export interface Page {
 })
 
 export class AppComponent implements OnInit {
+  private archivedMenuUrlList = new Set<string>([
+    'admin-notification',
+    'car-viewing',
+    'prerent-order'
+  ]);
   public selectedIndex = 0;
   public appPages: Page[] = [
     {
@@ -446,6 +457,14 @@ export class AppComponent implements OnInit {
 
   ]
 
+  menuGroups: MenuGroup[] = [];
+  salesMenuGroups: MenuGroup[] = [];
+  maintainerMenuGroups: MenuGroup[] = [];
+  ownerMenuGroups: MenuGroup[] = [];
+  buyerMenuGroups: MenuGroup[] = [];
+  pickupDropoffMenuGroups: MenuGroup[] = [];
+  openedMenuGroupKeys: string[] = [];
+
   current_url = "";
 
   dev = environment.production ? false : true;
@@ -486,8 +505,100 @@ export class AppComponent implements OnInit {
       if (location.path() != "") {
         this.current_url = this.router.url;
         this.selectedIndex = this.appPages.findIndex(d => d.url == location.path());
+        this.syncOpenedGroupWithRoute();
       }
     });
+  }
+
+  private createGroupedMenu(pages: Page[], groupConfig: { key: string; label: string; urls: string[] }[]): MenuGroup[] {
+    const activePages = pages.filter((p) => !this.archivedMenuUrlList.has(p.url));
+    const pageMap = new Map<string, Page>(activePages.map((p) => [p.url, p]));
+    const assignedUrlSet = new Set<string>();
+
+    const groups: MenuGroup[] = groupConfig.map((g) => {
+      const groupPages: Page[] = g.urls
+        .map((url) => pageMap.get(url))
+        .filter((p): p is Page => p != null);
+      groupPages.forEach((p) => assignedUrlSet.add(p.url));
+      return {
+        key: g.key,
+        label: g.label,
+        pages: groupPages
+      };
+    }).filter((g) => g.pages.length > 0);
+
+    const remainingPages = activePages.filter((p) => !assignedUrlSet.has(p.url));
+    if (remainingPages.length > 0) {
+      groups.push({
+        key: 'others',
+        label: '其他',
+        pages: remainingPages
+      });
+    }
+
+    return groups;
+  }
+
+  private buildMenuGroups() {
+    this.menuGroups = this.createGroupedMenu(this.appPages, [
+      { key: 'overview', label: '總覽', urls: ['home', 'order', 'user', 'admin-notification'] },
+      { key: 'rental', label: '租務與車務', urls: ['inspection', 'car-viewing', 'prerent-order', 'car', 'blocking', 'parking'] },
+      { key: 'risk', label: '費用與風險', urls: ['deposit', 'compensation-payment', 'violation', 'charge', 'supercharge', 'emergency'] },
+      { key: 'maintenance', label: '維修服務', urls: ['appointment', 'maintenance', 'factory'] },
+      { key: 'marketing', label: '通知與行銷', urls: ['notification', 'coupon', 'seven-coupon', 'campaign'] },
+      { key: 'system', label: '系統與設定', urls: ['admin', 'banner-setting', 'custom-page', 'faq', 'log', 'setting', 'form-list'] },
+      { key: 'product', label: '先租後買與商品', urls: ['rbb', 'rbb-equipment', 'plate', 'equipment', 'product', 'equipment-report', 'product-report'] },
+
+    ]);
+
+    this.salesMenuGroups = this.createGroupedMenu(this.sales_appPages, [
+      { key: 'overview', label: '總覽', urls: ['home', 'order', 'user', 'admin-notification'] },
+      { key: 'rental', label: '租務與車務', urls: ['car', 'blocking'] },
+      { key: 'risk', label: '費用與風險', urls: ['deposit', 'compensation-payment', 'violation', 'charge', 'supercharge', 'emergency'] },
+      { key: 'maintenance', label: '維修服務', urls: ['appointment', 'maintenance'] },
+      { key: 'marketing', label: '通知與行銷', urls: ['notification', 'coupon', 'seven-coupon', 'campaign'] },
+      { key: 'system', label: '設定', urls: ['setting'] },
+    ]);
+
+    this.maintainerMenuGroups = this.createGroupedMenu(this.maintainer_appPages, [
+      { key: 'overview', label: '維修總覽', urls: ['maintenance-dashboard'] },
+      { key: 'jobs', label: '工作與車輛', urls: ['appointment', 'compensation-payment', 'car', 'emergency'] },
+    ]);
+
+    this.ownerMenuGroups = this.createGroupedMenu(this.owner_appPages, [
+      { key: 'vehicle', label: '車輛管理', urls: ['car', 'maintenance-dashboard'] },
+    ]);
+
+    this.buyerMenuGroups = this.createGroupedMenu(this.buyer_appPages, [
+      { key: 'vehicle', label: '可售車輛', urls: ['car'] },
+    ]);
+
+    this.pickupDropoffMenuGroups = this.createGroupedMenu(this.pickup_dropoff_appPages, [
+      { key: 'vehicle', label: '取還車管理', urls: ['car', 'maintenance-dashboard'] },
+    ]);
+  }
+
+  isPageSelected(url: string): boolean {
+    if (!this.current_url) {
+      return false;
+    }
+    const target = this.current_url.split('/')[1]?.split('?')[0];
+    return target === url;
+  }
+
+  syncOpenedGroupWithRoute() {
+    const allGroups = [
+      ...this.menuGroups,
+      ...this.salesMenuGroups,
+      ...this.maintainerMenuGroups,
+      ...this.ownerMenuGroups,
+      ...this.buyerMenuGroups,
+      ...this.pickupDropoffMenuGroups
+    ];
+    const activeGroup = allGroups.find((g) => g.pages.some((p) => this.isPageSelected(p.url)));
+    if (activeGroup && !this.openedMenuGroupKeys.includes(activeGroup.key)) {
+      this.openedMenuGroupKeys = [...this.openedMenuGroupKeys, activeGroup.key];
+    }
   }
 
   pageClick(p: Page, index: number) {
@@ -522,6 +633,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.buildMenuGroups();
+    this.openedMenuGroupKeys = this.menuGroups.slice(0, 2).map((g) => g.key);
+    this.syncOpenedGroupWithRoute();
 
     // setTimeout(() => {
     //   console.log(123);

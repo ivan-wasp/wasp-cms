@@ -30,111 +30,53 @@
 
                 <ion-row class="row_div"
                     *ngIf="authService.adminData.value != null && authService.adminData.value?.type != adminType.maintainer && authService.adminData.value?.type != adminType.owner && authService.adminData.value?.type != adminType.buyer && authService.adminData.value?.type != adminType.sales && authService.adminData.value?.type != adminType.pickup_dropoff">
-                    <!-- <ion-accordion-group *ngFor="let item of appPages" value="{{item.title}}">
-                        <ion-accordion [value]="item.title">
-                            <ion-item slot="header">
-                                <ion-icon name="language" slot="start"></ion-icon>
-                                <ion-label>{{item?.title}}</ion-label>
-                            </ion-item>
-                            <div class="ion-padding" slot="content">
-         
-                                <ion-item *ngFor="let subItem of item.page_list">
-                                    <ion-label>{{subItem?.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of menuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
                                 </ion-item>
-     
-                            </div>
-                        </ion-accordion>
-                    </ion-accordion-group> -->
-                    <ng-container *ngFor="let p of appPages; let i = index">
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 3">
-                            <div class="divider">
-                                租務訂單
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 16">
-                            <div class="divider">
-                                先租後買
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 19">
-                            <div class="divider">
-                                加購品及設備
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 23">
-                            <div class="divider">
-                                維修
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 26">
-                            <div class="divider">
-                                通知
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 27">
-                            <div class="divider">
-                                優惠
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 30">
-                            <div class="divider">
-                                其他設定
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 36">
-                            <div class="divider">
-                                企業合作
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == appPages.length-1">
-                            <div class="divider">
-                                &nbsp;
-                            </div>
-                        </ion-col>
-                        <ion-col size="6" class="ion-no-padding" *ngIf="i == appPages.length-1">
-                            <div matRipple class="nav-btn" (click)="authService?.Logout()">
-                                <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
-                                <ion-label>登出</ion-label>
-                            </div>
-                        </ion-col>
-
-                    </ng-container>
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
+                            <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
+                            <ion-label>登出</ion-label>
+                        </div>
+                    </ion-col>
                 </ion-row>
 
                 <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.maintainer">
-                    <ng-container *ngFor="let p of maintainer_appPages; let i = index">
-                        <ion-col size="12" *ngIf="i == 0">
-                            <div class="divider">
-                                車隊管理
-                            </div>
-                        </ion-col>
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of maintainerMenuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
+                                </ion-item>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                    </ng-container>
-                    <ion-col size="6" class="ion-no-padding">
-                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
                             <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
                             <ion-label>登出</ion-label>
                         </div>
@@ -143,22 +85,26 @@
                 </ion-row>
 
                 <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.buyer">
-                    <ng-container *ngFor="let p of buyer_appPages; let i = index">
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of buyerMenuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
+                                </ion-item>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                    </ng-container>
-                    <ion-col size="6" class="ion-no-padding">
-                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
                             <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
                             <ion-label>登出</ion-label>
                         </div>
@@ -167,74 +113,54 @@
                 </ion-row>
 
                 <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.sales">
-                    <ng-container *ngFor="let p of sales_appPages; let i = index">
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of salesMenuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
+                                </ion-item>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 3">
-                            <div class="divider">
-                                租務訂單
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 11">
-                            <div class="divider">
-                                維修
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 13">
-                            <div class="divider">
-                                通知
-                            </div>
-                        </ion-col>
-                        <ion-col size="12" *ngIf="i == 15">
-                            <div class="divider">
-                                優惠
-                            </div>
-                        </ion-col>
-
-                    </ng-container>
-
-                    <ion-col size="6" class="ion-no-padding">
-                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
                             <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
                             <ion-label>登出</ion-label>
                         </div>
                     </ion-col>
-
                 </ion-row>
 
 
                 <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.owner">
-                    <ng-container *ngFor="let p of owner_appPages; let i = index">
-                        <ion-col size="12" *ngIf="i == 0">
-                            <div class="divider">
-                                車輛管理
-                            </div>
-                        </ion-col>
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of ownerMenuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
+                                </ion-item>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                    </ng-container>
-                    <ion-col size="6" class="ion-no-padding">
-                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
                             <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
                             <ion-label>登出</ion-label>
                         </div>
@@ -243,27 +169,26 @@
                 </ion-row>
 
                 <ion-row class="row_div" *ngIf="authService.adminData.value?.type == adminType.pickup_dropoff">
-                    <ng-container *ngFor="let p of pickup_dropoff_appPages; let i = index">
-                        <ion-col size="12" *ngIf="i == 0">
-                            <div class="divider">
-                                車輛管理
-                            </div>
-                        </ion-col>
-                        <ion-col size="6" class="ion-no-padding">
-                            <ion-menu-toggle auto-hide="false" *ngIf="p.title != null && p.title != '' ">
-                                <div matRipple class="nav-btn" (click)="pageClick(p, i)" routerDirection="root"
-                                    [routerLink]="[p.url]"
-                                    [class.selected]="current_url != '' && current_url.split('/')[1].split('?')[0] == (p.url)">
-                                    <ion-icon
-                                        [src]="current_url != '' &&  current_url.split('/')[1].split('?')[0] == (p.url) ? p.icon_selected : p.icon">
-                                    </ion-icon>
-                                    <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                    <ion-col size="12" class="ion-no-padding">
+                        <ion-accordion-group [multiple]="true" [value]="openedMenuGroupKeys" class="menu-accordion">
+                            <ion-accordion *ngFor="let group of pickupDropoffMenuGroups" [value]="group.key" toggleIcon="chevron-down">
+                                <ion-item slot="header" lines="none" class="menu-group-header">
+                                    <ion-label>{{group.label}}</ion-label>
+                                </ion-item>
+                                <div slot="content" class="submenu-grid">
+                                    <ion-menu-toggle auto-hide="false" *ngFor="let p of group.pages; let i = index">
+                                        <div matRipple class="nav-btn submenu-btn" (click)="pageClick(p, i)" routerDirection="root"
+                                            [routerLink]="[p.url]" [class.selected]="isPageSelected(p.url)">
+                                            <ion-icon [src]="isPageSelected(p.url) ? p.icon_selected : p.icon"></ion-icon>
+                                            <ion-label class="ion-text-center">{{p.title}}</ion-label>
+                                        </div>
+                                    </ion-menu-toggle>
                                 </div>
-                            </ion-menu-toggle>
-                        </ion-col>
-                    </ng-container>
-                    <ion-col size="6" class="ion-no-padding">
-                        <div matRipple class="nav-btn" (click)="authService?.Logout()">
+                            </ion-accordion>
+                        </ion-accordion-group>
+                    </ion-col>
+                    <ion-col size="12" class="ion-no-padding">
+                        <div matRipple class="nav-btn logout-btn" (click)="authService?.Logout()">
                             <ion-icon src="assets/icon/menu_logout.svg"></ion-icon>
                             <ion-label>登出</ion-label>
                         </div>

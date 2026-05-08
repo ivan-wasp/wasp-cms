@@ -35,3 +35,204 @@ ion-popover [popover]:not(:popover-open):not(dialog[open]) {
     --max-width: 90vw;
 
 }
+
+html, body, ion-app, ion-content {
+  color: var(--app-text);
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% -10%, rgba(var(--ion-color-wasp2-rgb), 0.2), transparent 36%),
+    radial-gradient(circle at 100% 0%, rgba(35, 50, 69, 0.14), transparent 32%),
+    var(--app-bg);
+}
+
+ion-toolbar {
+  --background: rgba(255, 255, 255, 0.92);
+  --color: var(--ion-color-secondary);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--app-border);
+}
+
+ion-title {
+  letter-spacing: 0.2px;
+  font-weight: 700;
+}
+
+ion-card,
+.default-container,
+.table_container,
+.coupon_container {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow) !important;
+  border-radius: var(--app-radius) !important;
+}
+
+.table_container .table_header,
+.table_container .table_content,
+.table_container .table_footer {
+  border-radius: var(--app-radius-sm);
+}
+
+.table_container .table_content,
+.input-item,
+.toggle-item,
+.input-item.with-icon,
+.default_searchbar,
+.input-filter-item,
+.filter-ion-select {
+  background: var(--app-surface-muted) !important;
+  --background: var(--app-surface-muted) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: var(--app-shadow-soft);
+  border-radius: var(--app-radius-sm) !important;
+}
+
+.input-item.readonly,
+.toggle-item.readonly {
+  background: #fff !important;
+  --background: #fff !important;
+  border: 1px dashed #d6dde7 !important;
+  box-shadow: none !important;
+}
+
+ion-button {
+  --border-radius: 10px;
+  --box-shadow: 0 8px 16px rgba(var(--ion-color-wasp2-rgb), 0.22);
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+ion-button[fill="solid"] {
+  --color: #132033;
+}
+
+ion-button[fill="outline"] {
+  --background: transparent;
+  --box-shadow: none;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 255, 255, 0.2);
+  --color: var(--app-text);
+}
+
+ion-button[fill="clear"] {
+  --background: transparent;
+  --box-shadow: none;
+  --color: var(--app-text);
+}
+
+ion-button[color="primary"] {
+  --background: var(--ion-color-wasp2);
+  --color: #132033;
+  --border-color: var(--ion-color-wasp2-shade);
+}
+
+ion-button[color="secondary"] {
+  --background: var(--ion-color-secondary);
+  --color: #ffffff;
+  --border-color: var(--ion-color-secondary-shade);
+}
+
+ion-button[color="tertiary"] {
+  --background: #3f5873;
+  --color: #ffffff;
+  --border-color: #4f6b8a;
+}
+
+ion-button[color="danger"] {
+  --background: #b94053;
+  --color: #fff;
+  --border-color: #d0566a;
+}
+
+ion-button[color="success"] {
+  --background: #2f8c5d;
+  --color: #fff;
+  --border-color: #42a371;
+}
+
+ion-button[color="warning"] {
+  --background: #b68f2f;
+  --color: #fffbe8;
+  --border-color: #d0a642;
+}
+
+ion-button[color="dark"] {
+  --background: #1f2b3a;
+  --color: #e4edf8;
+  --border-color: #2f4156;
+}
+
+ion-button[fill="outline"][color="primary"] {
+  --color: var(--ion-color-wasp2);
+  --border-color: rgba(var(--ion-color-wasp2-rgb), 0.75);
+}
+
+ion-button[fill="clear"][color="primary"] {
+  --color: var(--ion-color-wasp2);
+}
+
+ion-button[fill="clear"][color="danger"] {
+  --color: #ff8b9d;
+}
+
+ion-button.button-outline {
+  --box-shadow: none;
+}
+
+ion-button.default-ion-btn {
+  --border-radius: 10px;
+  min-height: 38px;
+}
+
+ion-button.sort_header_btn {
+  min-height: 34px;
+}
+
+ion-button.export-excel-btn {
+  --border-radius: 10px;
+  --background: rgba(var(--ion-color-wasp2-rgb), 0.14) !important;
+  --color: var(--ion-color-wasp2);
+}
+
+ion-button.big-upload-btn {
+  --border-radius: 14px;
+  --background: rgba(255, 255, 255, 0.05);
+  --color: var(--app-text-muted);
+}
+
+ion-button:disabled,
+ion-button[disabled] {
+  opacity: 0.46 !important;
+  filter: grayscale(0.18);
+}
+
+ion-button:disabled::part(native),
+ion-button[disabled]::part(native) {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+ion-item {
+  --background-focused: var(--app-surface);
+}
+
+ion-segment {
+  border-radius: 10px;
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  padding: 4px;
+}
+
+ion-segment-button {
+  --border-radius: 8px;
+  min-height: 36px;
+}
+
+.title-with-icon ion-label,
+.title-with-two-icon ion-label {
+  color: var(--ion-color-secondary);
+  letter-spacing: 0.2px;
+}
