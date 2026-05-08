@@ -354,8 +354,14 @@ ion-button {
 }
 
 .img-preview-modal{
+  --width: 100vw;
+  --height: 100vh;
+  --max-width: 100vw;
+  --max-height: 100vh;
+  --border-radius: 0;
   --background: rgba(0, 0, 0, 0.25);
-    --box-shadow: 0;
+  --box-shadow: 0;
+  --backdrop-opacity: 0.65;
 }
 
 .default_border {

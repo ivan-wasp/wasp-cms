@@ -1,6 +1,6 @@
 import { Injectable, Component, HostListener, NgZone, Injector } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NavController, MenuController, AlertController, ModalController } from '@ionic/angular';
+import { NavController, MenuController, AlertController, ModalController, createAnimation } from '@ionic/angular';
 import { ApiPath, ApiService, Response } from './api.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
@@ -43,7 +43,9 @@ export class CommonService {
     const modal = await this.modalCtrl.create({
       component: GallerySlidesComponent,
       componentProps: {'img_url_list' : img_url_list},
-      cssClass: 'img-preview-modal'
+      cssClass: 'img-preview-modal',
+      enterAnimation: this.modalEnterAnimation,
+      leaveAnimation: this.modalLeaveAnimation
     });
     modal.present();
 
@@ -53,6 +55,56 @@ export class CommonService {
     //   this.message = `Hello, ${data}!`;
     // }
   }
+
+  private modalEnterAnimation = (baseEl: any) => {
+    const root = baseEl?.shadowRoot ?? baseEl;
+    const backdropEl = root?.querySelector('ion-backdrop');
+    const wrapperEl = root?.querySelector('.modal-wrapper, .ion-overlay-wrapper');
+
+    const backdropAnimation = createAnimation()
+      .addElement(backdropEl ?? baseEl)
+      .fromTo('opacity', '0.01', 'var(--backdrop-opacity)');
+
+    const wrapperAnimation = createAnimation()
+      .addElement(wrapperEl ?? baseEl)
+      .beforeStyles({
+        opacity: '1',
+        transform: 'scale(0.97) translateY(8px)'
+      })
+      .keyframes([
+        { offset: 0, opacity: '0', transform: 'scale(0.97) translateY(8px)' },
+        { offset: 1, opacity: '1', transform: 'scale(1) translateY(0)' }
+      ]);
+
+    return createAnimation()
+      .addElement(baseEl)
+      .easing('cubic-bezier(0.22, 0.8, 0.24, 1)')
+      .duration(280)
+      .addAnimation([backdropAnimation, wrapperAnimation]);
+  };
+
+  private modalLeaveAnimation = (baseEl: any) => {
+    const root = baseEl?.shadowRoot ?? baseEl;
+    const backdropEl = root?.querySelector('ion-backdrop');
+    const wrapperEl = root?.querySelector('.modal-wrapper, .ion-overlay-wrapper');
+
+    const backdropAnimation = createAnimation()
+      .addElement(backdropEl ?? baseEl)
+      .fromTo('opacity', 'var(--backdrop-opacity)', '0');
+
+    const wrapperAnimation = createAnimation()
+      .addElement(wrapperEl ?? baseEl)
+      .keyframes([
+        { offset: 0, opacity: '1', transform: 'scale(1) translateY(0)' },
+        { offset: 1, opacity: '0', transform: 'scale(0.985) translateY(6px)' }
+      ]);
+
+    return createAnimation()
+      .addElement(baseEl)
+      .easing('cubic-bezier(0.4, 0, 1, 1)')
+      .duration(220)
+      .addAnimation([backdropAnimation, wrapperAnimation]);
+  };
 
   remove_duplicate_from_array(arr) {
     return arr.filter(function (elem, index, self) {

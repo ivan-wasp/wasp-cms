@@ -943,29 +943,28 @@
               <ion-text *ngIf="!readonly" class="hint">0.6/km</ion-text>
             </ion-col>
             <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
-              <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
-                <ion-label position="stacked">裝備</ion-label>
-                <!-- <ion-input [readonly]="readonly" [(ngModel)]="car_data.engine" type="text"></ion-input> -->
-                <ion-select [disabled]="readonly" [(ngModel)]="car_data.equipment_list" multiple="true" cancelText="取消"
-                  okText="確認">
-                  <ion-select-option value="手機充電">手機充電</ion-select-option>
-                  <ion-select-option value="泊車鏡頭">泊車鏡頭</ion-select-option>
-                  <ion-select-option value="行車紀錄儀">行車紀錄儀</ion-select-option>
-                  <ion-select-option value="安全汽袋">安全汽袋</ion-select-option>
-
-                  <ion-select-option value="Keyless Go">Keyless Go</ion-select-option>
-                  <ion-select-option value="巡航定速功能">巡航定速功能</ion-select-option>
-                  <ion-select-option value="藍芽語音功能">藍芽語音功能</ion-select-option>
-                  <ion-select-option value="LED日行燈">LED日行燈</ion-select-option>
-                  <ion-select-option value="電子恆溫冷氣">電子恆溫冷氣</ion-select-option>
-                  <ion-select-option value="雙電門">雙電門</ion-select-option>
-                  <ion-select-option value="電暖座">電暖座</ion-select-option>
-                  <ion-select-option value="電動記憶椅">電動記憶椅</ion-select-option>
-                  <ion-select-option value="電動天窗">電動天窗</ion-select-option>
-                  <ion-select-option value="自動泊車(輔助)">自動泊車(輔助)</ion-select-option>
-                  <ion-select-option value="泊車雷達感應">泊車雷達感應</ion-select-option>
-                </ion-select>
-              </ion-item>
+              <mat-form-field class="full-width input-mat-form" [ngClass]="{'readonly': readonly}" appearance="outline"
+                floatLabel="auto">
+                <mat-label>車輛設備</mat-label>
+                <mat-chip-list #equipmentChipList aria-label="Car equipment list">
+                  <mat-chip *ngFor="let item of car_data.equipment_list" [selectable]="!readonly" [removable]="!readonly"
+                    (removed)="removeEquipment(item)">
+                    {{item}}
+                    <button matChipRemove *ngIf="!readonly">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip>
+                  <input #equipmentInput placeholder="輸入後按Enter" [readonly]="readonly" [matChipInputFor]="equipmentChipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matAutocomplete]="equipmentAuto"
+                    (matChipInputTokenEnd)="addEquipmentFromInput($event)">
+                </mat-chip-list>
+                <mat-autocomplete #equipmentAuto="matAutocomplete"
+                  (optionSelected)="selectedEquipment($event, equipmentInput)">
+                  <mat-option *ngFor="let option of equipmentOptionList" [value]="option">
+                    {{option}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
             </ion-col>
             <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
               <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">

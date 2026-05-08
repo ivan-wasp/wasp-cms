@@ -1,10 +1,23 @@
-<div class="container" [style.max-width]="width == '' ? '' : width+'px'">
-  <ion-icon (click)="back()" class="back-btn" name="arrow-back-circle-outline"></ion-icon>
-  <ion-slides #slides mode="ios" pager="true" scrollbar="fales">
+<div class="gallery-shell">
+  <button class="close-btn" type="button" (click)="close()" aria-label="Close preview">
+    <ion-icon name="close"></ion-icon>
+  </button>
+
+  <div class="counter" *ngIf="(img_url_list?.length || 0) > 0">
+    {{currentIndex + 1}} / {{img_url_list.length}}
+  </div>
+
+  <button *ngIf="canGoBack" class="nav-btn nav-left" type="button" (click)="back()" aria-label="Previous image">
+    <ion-icon name="chevron-back"></ion-icon>
+  </button>
+  <ion-slides #slides mode="ios" pager="true" scrollbar="fales" (ionSlideDidChange)="onSlideDidChange()">
     <ion-slide *ngFor="let item of img_url_list; let i = index">
-      <!-- <img style="max-height: 500px;" [src]="('media_url' | env)+item"> -->
-      <img  [style.max-height]="height == '' ? '500px' : height+'px'"  style="max-height: 500px;" [src]="('media_url' | env)+item">
+      <div class="slide-card" [style.max-width]="width == '' ? '' : width+'px'">
+        <img [style.max-height]="height == '' ? '' : height+'px'" [src]="('media_url' | env)+item">
+      </div>
     </ion-slide>
   </ion-slides>
-  <ion-icon (click)="next()" class="next-btn" name="arrow-forward-circle-outline"></ion-icon>
+  <button *ngIf="canGoNext" class="nav-btn nav-right" type="button" (click)="next()" aria-label="Next image">
+    <ion-icon name="chevron-forward"></ion-icon>
+  </button>
 </div>

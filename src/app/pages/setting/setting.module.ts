@@ -8,6 +8,7 @@ import { SettingPageRoutingModule } from './setting-routing.module';
 
 import { SettingPage } from './setting.page';
 import { MaterialModule } from 'src/app/material.module';
+import { SharedComponentsModule } from 'src/app/components/shared-components.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { MaterialModule } from 'src/app/material.module';
     FormsModule,
     IonicModule,
     SettingPageRoutingModule,
-    MaterialModule
+    MaterialModule,
+    SharedComponentsModule
   ],
   declarations: [SettingPage]
 })

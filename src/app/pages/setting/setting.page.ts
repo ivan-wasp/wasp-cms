@@ -1,10 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
+import { ItemReorderEventDetail } from '@ionic/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommonService } from 'src/app/services/common.service';
 import { DataService } from 'src/app/services/data.service';
 import { ApiPath, ApiService, Response } from 'src/app/services/api.service';
+import { SystemData } from 'src/app/schema';
 
 @Component({
   selector: 'app-setting',
@@ -13,10 +15,12 @@ import { ApiPath, ApiService, Response } from 'src/app/services/api.service';
 })
 export class SettingPage implements OnInit {
 
-  system_data = null;
-  checking_system_data = null;
+  system_data: SystemData | any = null;
+  checking_system_data: SystemData | any = null;
 
   readonly = true;
+  @ViewChild('upload_cover_img', { static: false }) upload_cover_img: ElementRef;
+  @ViewChild('upload_background_img', { static: false }) upload_background_img: ElementRef;
 
   constructor(
     public auth: AuthService,
@@ -31,6 +35,18 @@ export class SettingPage implements OnInit {
     await this.dataService.getSystemData();
     this.system_data = JSON.parse(JSON.stringify(this.dataService.system_data$.value));
     this.checking_system_data = JSON.parse(JSON.stringify(this.dataService.system_data$.value));
+    if (!this.system_data.app_home_page_car_cover_list) {
+      this.system_data.app_home_page_car_cover_list = [];
+    }
+    if (!this.checking_system_data.app_home_page_car_cover_list) {
+      this.checking_system_data.app_home_page_car_cover_list = [];
+    }
+    if (!this.system_data.app_home_page_background_img) {
+      this.system_data.app_home_page_background_img = '';
+    }
+    if (!this.checking_system_data.app_home_page_background_img) {
+      this.checking_system_data.app_home_page_background_img = '';
+    }
   }
 
   // addNewBank() {
@@ -116,6 +132,66 @@ export class SettingPage implements OnInit {
 
   customTrackBy(index: number, obj: any): any {
     return index;
+  }
+
+  triggerImgUpload(type: 'cover' | 'background') {
+    const uploadRef = type == 'cover' ? this.upload_cover_img : this.upload_background_img;
+    if (uploadRef == null || this.readonly) {
+      return;
+    }
+    uploadRef.nativeElement.click();
+  }
+
+  uploadCoverImg() {
+    if (this.upload_cover_img == null || this.commonService.isLoading || this.readonly) {
+      return;
+    }
+    const fileList: FileList = this.upload_cover_img.nativeElement.files;
+    this.uploadImg(fileList, (imgUrl: string) => {
+      if (!this.system_data.app_home_page_car_cover_list) {
+        this.system_data.app_home_page_car_cover_list = [];
+      }
+      this.system_data.app_home_page_car_cover_list.push(imgUrl);
+    });
+  }
+
+  uploadBackgroundImg() {
+    if (this.upload_background_img == null || this.commonService.isLoading || this.readonly) {
+      return;
+    }
+    const fileList: FileList = this.upload_background_img.nativeElement.files;
+    this.uploadImg(fileList, (imgUrl: string) => {
+      this.system_data.app_home_page_background_img = imgUrl;
+    });
+  }
+
+  private uploadImg(fileList: FileList, onSuccess: (imgUrl: string) => void) {
+    if (fileList && fileList.length > 0) {
+      Array.from(fileList).forEach(file => {
+        if (file.size / 1024 / 1024 > 20) {
+          return this.commonService.openErrorSnackBar("不能上載大於20mb的案檔");
+        }
+        this.commonService.firstFileToBase64(file).then(async (base64: string) => {
+          const send_data = {
+            file_name: '',
+            file_type: this.commonService.getFileType(file.type),
+            base64: base64
+          };
+          this.commonService.isLoading = true;
+          const upload_base64_to_server = await this.apiService.postFromServer(ApiPath.upload_base64_file_to_server, send_data, true);
+          this.commonService.isLoading = false;
+          if (upload_base64_to_server.result == "success") {
+            onSuccess(upload_base64_to_server.data);
+          } else {
+            this.commonService.openErrorSnackBar("無法上載檔案");
+          }
+        });
+      });
+    }
+  }
+
+  doReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+    this.system_data.app_home_page_car_cover_list = ev.detail.complete(this.system_data.app_home_page_car_cover_list);
   }
 
   ionInput(type) {

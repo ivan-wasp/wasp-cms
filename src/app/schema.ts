@@ -111,6 +111,8 @@ export interface SystemData {
     minimun_hour_interval_between_pickup_return_for_car_viewing: number;
     minimum_car_viewing_time: string;
     maximum_car_viewing_time: string;
+    app_home_page_car_cover_list: string[];
+    app_home_page_background_img: string;
 }
 
 export interface Banner {
@@ -822,7 +824,7 @@ export interface PaymentData {
     price_per_hour: number;
     price_per_hour_daily_ceiling: number;
     number_of_hour: number;
-    hourly_payment_settlement_done: number;
+    hourly_payment_settlement_done: boolean;
 }
 
 

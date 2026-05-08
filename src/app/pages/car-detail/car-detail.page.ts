@@ -12,6 +12,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { AdminType, ParkingData, SystemData, CarDamage, DATA_TYPE, AdminData, Authority, CarData, Engine, OfferPlan, CarDamageCategory, CarDamageFrontSubcategory, CarDamageLeftSideSubcategory, CarDamageRightSideSubcategory, CarDamageRearSubcategory, InsuranceType } from 'src/app/schema';
 import { Observable } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Editor, Toolbar } from 'ngx-editor';
 import { map } from 'rxjs/operators';
@@ -42,6 +43,23 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class CarDetailPage implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
+  equipmentOptionList: string[] = [
+    '手機充電',
+    '泊車鏡頭',
+    '行車紀錄儀',
+    '安全汽袋',
+    'Keyless Go',
+    '巡航定速功能',
+    '藍牙語音功能',
+    'LED日行燈',
+    '電子恆溫冷氣',
+    '雙電門',
+    '電暖座',
+    '電動記憶椅',
+    '電動天窗',
+    '自動泊車(輔助)',
+    '泊車雷達感應'
+  ];
 
   car_id = null;
   car_data: CarData = null;
@@ -599,6 +617,50 @@ export class CarDetailPage implements OnInit {
 
   hasDuplicates(array) {
     return (new Set(array)).size !== array.length;
+  }
+
+  addEquipmentFromInput(event: MatChipInputEvent) {
+    if (this.readonly || this.car_data == null) {
+      return;
+    }
+    const value = (event.value || '').trim();
+    this.ensureEquipmentList();
+    if (value && !this.car_data.equipment_list.includes(value)) {
+      this.car_data.equipment_list.push(value);
+    }
+    if (event.chipInput) {
+      event.chipInput.clear();
+    }
+  }
+
+  removeEquipment(item: string) {
+    if (this.readonly || this.car_data == null || this.car_data.equipment_list == null) {
+      return;
+    }
+    const index = this.car_data.equipment_list.indexOf(item);
+    if (index >= 0) {
+      this.car_data.equipment_list.splice(index, 1);
+    }
+  }
+
+  selectedEquipment(event: MatAutocompleteSelectedEvent, input: HTMLInputElement) {
+    if (this.readonly || this.car_data == null) {
+      return;
+    }
+    const value = (event.option.value || '').trim();
+    this.ensureEquipmentList();
+    if (value && !this.car_data.equipment_list.includes(value)) {
+      this.car_data.equipment_list.push(value);
+    }
+    if (input) {
+      input.value = '';
+    }
+  }
+
+  private ensureEquipmentList() {
+    if (this.car_data.equipment_list == null) {
+      this.car_data.equipment_list = [];
+    }
   }
 
   doReorder(ev: CustomEvent<ItemReorderEventDetail>, type) {

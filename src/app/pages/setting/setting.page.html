@@ -131,6 +131,69 @@
                 </ion-col>
             </ion-row>
             <br>
+            <ion-row >
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+                    <ion-row class="default-container">
+                                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-label>App 首頁車圖</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size="12" *ngIf="!readonly">
+                    <ion-button color="secondary" fill="outline" shape="round" (click)="triggerImgUpload('cover')">
+                        上載圖片
+                    </ion-button>
+                    <input style="display: none" type="file" #upload_cover_img accept="image/x-png,image/png,image/jpeg"
+                        (change)="uploadCoverImg()" multiple />
+                </ion-col>
+                <ion-col size="12">
+                    <ion-reorder-group [disabled]="readonly" (ionItemReorder)="doReorder($event)">
+                        <ion-item class="input-item app-home-cover-item" lines="none"
+                            *ngFor="let item of system_data.app_home_page_car_cover_list; let i = index; trackBy: customTrackBy">
+                            <ion-thumbnail slot="start" class="clickable app-home-cover-thumb" (click)="commonService.openModal([item])">
+                                <img [src]="('media_url' | env)+item" />
+                            </ion-thumbnail>
+                            <ion-label class="ion-text-wrap app-home-cover-label">類別{{i + 1}}</ion-label>
+                            <ion-icon *ngIf="!readonly" slot="end" class="clickable app-home-cover-action" name="trash"
+                                (click)="system_data.app_home_page_car_cover_list.splice(i, 1)"></ion-icon>
+                            <ion-reorder slot="end" *ngIf="!readonly"></ion-reorder>
+                        </ion-item>
+                    </ion-reorder-group>
+                </ion-col>
+                    </ion-row>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
+          <ion-row class="default-container">
+                <ion-col size="12">
+                    <div class="title-with-icon">
+                        <ion-label>App welcome page背景圖(不要超過2MB)</ion-label>
+                    </div>
+                </ion-col>
+                <ion-col size="12" *ngIf="!readonly">
+                    <ion-button color="secondary" fill="outline" shape="round" (click)="triggerImgUpload('background')">
+                        上載背景圖
+                    </ion-button>
+                    <input style="display: none" type="file" #upload_background_img accept="image/x-png,image/png,image/jpeg"
+                        (change)="uploadBackgroundImg()" />
+                </ion-col>
+                <ion-col size="12" *ngIf="system_data.app_home_page_background_img">
+                    <ion-item class="input-item app-home-cover-item" lines="none">
+                        <ion-thumbnail slot="start" class="clickable app-home-bg-thumb"
+                            (click)="commonService.openModal([system_data.app_home_page_background_img])">
+                            <img [src]="('media_url' | env)+system_data.app_home_page_background_img" />
+                        </ion-thumbnail>
+                        <ion-label class="ion-text-wrap app-home-cover-label">背景圖預覽</ion-label>
+                        <ion-icon *ngIf="!readonly" slot="end" class="clickable app-home-cover-action" name="trash"
+                            (click)="system_data.app_home_page_background_img = ''"></ion-icon>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+                </ion-col>
+
+            </ion-row>
+            <br>
+  
+            <br>
 
             <ion-row class="default-container">
                 <ion-col size="12">
