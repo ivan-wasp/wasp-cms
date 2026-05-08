@@ -138,7 +138,7 @@
         </ion-col> -->
 
                 <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
-                    <ion-reorder-group (ionItemReorder)="doReorder($event)" disabled="false">
+                    <ion-reorder-group (ionItemReorder)="doReorder($event)" [disabled]="readonly">
                         <ion-item class="img-item" lines="none" *ngFor="let item of equipment_data.img_url_list; let i = index">
                             <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
                             <ion-img [src]="('media_url' | env)+item"></ion-img>

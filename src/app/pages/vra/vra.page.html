@@ -248,12 +248,13 @@
                                 </div>
                             </ion-col>
 
-                            <ion-slides mode="ios" [pager]="true" [scrollbar]="false"
+                            <ion-slides class="image-only-slides" mode="ios" [pager]="true" [scrollbar]="false"
                                 *ngIf="vehicle_rental_agreement.status_img_url_list?.length > 0" [options]="slideOpts">
                                 <ion-slide
                                     *ngFor="let item of vehicle_rental_agreement.status_img_url_list; let i = index;">
-                                    <div class="slider-img-container">
-                                        <img style="max-height: 400px;" [src]="('media_url' | env)+item" alt="">
+                                    <div class="slider-img-container image-only-slide clickable"
+                                        (click)="commonService.openModal(vehicle_rental_agreement.status_img_url_list)">
+                                        <img class="image-only-slide-img" [src]="('media_url' | env)+item" alt="">
                                     </div>
                                 </ion-slide>
                             </ion-slides>

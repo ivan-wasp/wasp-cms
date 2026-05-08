@@ -377,7 +377,7 @@
             </ion-col>
 
             <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
-              <ion-reorder-group (ionItemReorder)="doReorder($event, 'other_img_url_list')" disabled="false">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'other_img_url_list')" [disabled]="readonly">
                 <ion-item class="img-item" lines="none" *ngFor="let item of car_data.other_img_url_list; let i = index">
                   <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
                   <img [src]="('media_url' | env)+item" />
@@ -1114,7 +1114,7 @@
             </ion-col>
 
             <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
-              <ion-reorder-group (ionItemReorder)="doReorder($event, 'status_img_url_list')" disabled="false">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'status_img_url_list')" [disabled]="readonly">
                 <ion-item class="img-item" lines="none"
                   *ngFor="let item of car_data.status_img_url_list; let i = index">
                   <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
@@ -1141,15 +1141,20 @@
             </ion-col>
 
             <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
-              <ion-reorder-group (ionItemReorder)="doReorder($event, 'car_damage_list')" disabled="false">
+              <ion-reorder-group (ionItemReorder)="doReorder($event, 'car_damage_list')" [disabled]="readonly">
                 <ion-item class="img-item" lines="none" *ngFor="let item of car_data.car_damage_list; let i = index">
                   <ng-container *ngIf="item?.category != null && item?.subcategory != null">
                     <ion-reorder *ngIf="!readonly" slot="start"></ion-reorder>
                     <ion-label slot="start"
                       class="ion-text-wrap">{{item?.category_name}}-{{item?.subcategory_name}}</ion-label>
-                    <!-- <img  *ngFor="let img of item.img_url_list" [src]="('media_url' | env)+img"> -->
-                    <app-gallery-slides *ngIf="item.img_url_list.length > 0" slot="start" [height]="300" [width]="300"
-                      [img_url_list]="item.img_url_list"></app-gallery-slides>
+                    <ion-thumbnail *ngIf="item.img_url_list.length > 0" slot="start" class="damage-preview-thumb clickable"
+                      (click)="commonService.openModal(item.img_url_list)">
+                      <img [src]="('media_url' | env)+item.img_url_list[0]" />
+                    </ion-thumbnail>
+                    <ion-label *ngIf="item.img_url_list.length > 0" slot="start" class="clickable"
+                      (click)="commonService.openModal(item.img_url_list)">
+                      查看相片 ({{item.img_url_list.length}})
+                    </ion-label>
                     <ion-icon *ngIf="!readonly" slot="end" (click)="triggerImgUpload('car_damage_list', i)"
                       class="clickable" slot="start" name="cloud-upload"></ion-icon>
                     <ion-icon *ngIf="!readonly" slot="end" (click)="car_data.car_damage_list.splice(i, 1)"

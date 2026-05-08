@@ -29,6 +29,31 @@ canvas {
     border-radius: 50%;
   }
 }
+
+.image-only-slides {
+  width: 100%;
+  padding: 4px 0 12px;
+}
+
+.image-only-slide {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  background: #f6f8fb;
+}
+
+.image-only-slide-img {
+  width: 100%;
+  max-height: min(56vh, 420px);
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 576px) {
+  .image-only-slide-img {
+    max-height: 280px;
+  }
+}
 .not-submitted-blocking {
   position: absolute;
   height: 100%;

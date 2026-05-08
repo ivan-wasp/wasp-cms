@@ -268,7 +268,7 @@
               <ion-img style="max-width: 50%;" slot="start" [src]="('media_url' | env)+item"></ion-img>
               <ion-icon *ngIf="!readonly" class="clickable" (click)="parking_data.img_url_list.splice(i, 1)" slot="end"
                 name="trash-outline"></ion-icon>
-              <ion-reorder slot="end"></ion-reorder>
+              <ion-reorder *ngIf="!readonly" slot="end"></ion-reorder>
             </ion-item>
           </ion-reorder-group>
         </ion-col>

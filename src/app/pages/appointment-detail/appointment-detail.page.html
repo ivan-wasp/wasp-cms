@@ -249,9 +249,10 @@
           </ion-item>
         </ion-col>
         <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
-          <ion-slides mode="ios" pager="ios" scrollbar="ios">
+          <ion-slides class="image-only-slides" mode="ios" pager="ios" scrollbar="ios">
             <ion-slide *ngFor="let item of appointment_data.img_url_list; let i = index">
-              <ion-img [src]="('media_url' | env)+item">
+              <ion-img class="image-only-slide-img clickable" (click)="commonService.openModal(appointment_data.img_url_list)"
+                [src]="('media_url' | env)+item">
               </ion-img>
               <!-- <ion-button *ngIf="!readonly" color="danger" (click)="appointment_data.img_url_list.splice(i, 1)" fill="solid" expand="block">
                 刪除

@@ -57,11 +57,11 @@
       <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
         <div class="ion-margin table_container">
           <h3 class="ion-margin-bottom">混能車排序</h3>
-          <ion-reorder-group (ionItemReorder)="doReorder($event, 'hybrid')" disabled="false">
+          <ion-reorder-group (ionItemReorder)="doReorder($event, 'hybrid')" [disabled]="!index_mode">
             <ion-item class="img-item" lines="none" *ngFor="let item of hybrid_car_data_list; let i = index">
               <img class="ion-margin-end" style="width: 100px;" [src]="('media_url' | env)+item?.cover_img_url_list[0]">
               <ion-label>{{item?.brand}} {{item?.model}} ({{item?.plate}})</ion-label>
-              <ion-reorder slot="end"></ion-reorder>
+              <ion-reorder *ngIf="index_mode" slot="end"></ion-reorder>
             </ion-item>
           </ion-reorder-group>
         </div>
@@ -69,12 +69,12 @@
       <ion-col size-xs="12" size-sm="12" size-md="6" size-lg="6">
         <div class="ion-margin table_container">
           <h3 class="ion-margin-bottom">電動車排序</h3>
-          <ion-reorder-group (ionItemReorder)="doReorder($event, 'electric')" disabled="false">
+          <ion-reorder-group (ionItemReorder)="doReorder($event, 'electric')" [disabled]="!index_mode">
             <ion-item class="img-item" lines="none" *ngFor="let item of electric_car_data_list; let i = index">
 
               <img class="ion-margin-end" style="width: 100px;" [src]="('media_url' | env)+item?.cover_img_url_list[0]">
               <ion-label>{{item?.brand}} {{item?.model}} ({{item?.plate}})</ion-label>
-              <ion-reorder slot="end"></ion-reorder>
+              <ion-reorder *ngIf="index_mode" slot="end"></ion-reorder>
             </ion-item>
           </ion-reorder-group>
         </div>

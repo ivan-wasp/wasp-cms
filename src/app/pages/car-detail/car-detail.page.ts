@@ -159,6 +159,7 @@ export class CarDetailPage implements OnInit {
   }
 
   ngOnInit() {
+    this.commonService.dismissAllModals();
     this.editor = new Editor();
     if (this.car_id != null) {
       this.getCarData();

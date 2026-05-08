@@ -224,11 +224,23 @@
         </ion-col>
 
         <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="inspection_data.car_img_url_list.length > 0">
-          <app-gallery-slides [img_url_list]="inspection_data.car_img_url_list"></app-gallery-slides>
+          <ion-item class="input-item preview-item clickable" lines="none"
+            (click)="commonService.openModal(inspection_data.car_img_url_list)">
+            <ion-thumbnail slot="start" class="inspection-preview-thumb">
+              <img [src]="('media_url' | env) + inspection_data.car_img_url_list[0]" />
+            </ion-thumbnail>
+            <ion-label>車身相片 ({{inspection_data.car_img_url_list.length}})</ion-label>
+          </ion-item>
         </ion-col>
         <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6"
           *ngIf="inspection_data.car_inside_img_url_list.length > 0">
-          <app-gallery-slides [img_url_list]="inspection_data.car_inside_img_url_list"></app-gallery-slides>
+          <ion-item class="input-item preview-item clickable" lines="none"
+            (click)="commonService.openModal(inspection_data.car_inside_img_url_list)">
+            <ion-thumbnail slot="start" class="inspection-preview-thumb">
+              <img [src]="('media_url' | env) + inspection_data.car_inside_img_url_list[0]" />
+            </ion-thumbnail>
+            <ion-label>車廂相片 ({{inspection_data.car_inside_img_url_list.length}})</ion-label>
+          </ion-item>
         </ion-col>
       </ion-row>
       <br>
@@ -252,8 +264,13 @@
             <ion-label class="ion-text-wrap" position="stacked">備注</ion-label>
             <ion-input [readonly]="true" [(ngModel)]="item.remark" type="text"></ion-input>
           </ion-item>
-          <app-gallery-slides *ngIf="item.img_url_list.length > 0"
-            [img_url_list]="item.img_url_list"></app-gallery-slides>
+          <ion-item class="input-item preview-item clickable" lines="none" *ngIf="item.img_url_list.length > 0"
+            (click)="commonService.openModal(item.img_url_list)">
+            <ion-thumbnail slot="start" class="inspection-preview-thumb">
+              <img [src]="('media_url' | env) + item.img_url_list[0]" />
+            </ion-thumbnail>
+            <ion-label>損壞相片 ({{item.img_url_list.length}})</ion-label>
+          </ion-item>
 
         </ion-col>
       </ion-row>

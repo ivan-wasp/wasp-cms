@@ -40,6 +40,9 @@ export class CommonService {
   }
 
   async openModal(img_url_list: string[]) {
+    if (img_url_list == null || img_url_list.length == 0) {
+      return;
+    }
     const modal = await this.modalCtrl.create({
       component: GallerySlidesComponent,
       componentProps: {'img_url_list' : img_url_list},
@@ -54,6 +57,14 @@ export class CommonService {
     // if (role === 'confirm') {
     //   this.message = `Hello, ${data}!`;
     // }
+  }
+
+  async dismissAllModals() {
+    let top = await this.modalCtrl.getTop();
+    while (top) {
+      await this.modalCtrl.dismiss();
+      top = await this.modalCtrl.getTop();
+    }
   }
 
   private modalEnterAnimation = (baseEl: any) => {

@@ -158,9 +158,11 @@
         </ion-col>
 
         <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
-          <ion-slides mode="ios" pager="false" scrollbar="ios">
+          <ion-slides class="image-only-slides" mode="ios" pager="false" scrollbar="ios">
             <ion-slide *ngFor="let item of custom_page_data.banner_img_url_list; let i = index">
-              <ion-img [src]="('media_url' | env)+item">
+              <ion-img class="image-only-slide-img clickable"
+                (click)="commonService.openModal(custom_page_data.banner_img_url_list)"
+                [src]="('media_url' | env)+item">
               </ion-img>
             </ion-slide>
           </ion-slides>

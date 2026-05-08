@@ -10,7 +10,7 @@
   <button *ngIf="canGoBack" class="nav-btn nav-left" type="button" (click)="back()" aria-label="Previous image">
     <ion-icon name="chevron-back"></ion-icon>
   </button>
-  <ion-slides #slides mode="ios" pager="true" scrollbar="fales" (ionSlideDidChange)="onSlideDidChange()">
+  <ion-slides #slides mode="ios" pager="true" [scrollbar]="false" (ionSlideDidChange)="onSlideDidChange()">
     <ion-slide *ngFor="let item of img_url_list; let i = index">
       <div class="slide-card" [style.max-width]="width == '' ? '' : width+'px'">
         <img [style.max-height]="height == '' ? '' : height+'px'" [src]="('media_url' | env)+item">
