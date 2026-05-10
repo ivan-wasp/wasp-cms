@@ -115,7 +115,8 @@ export class OrderPage implements OnInit {
     if (this.dataService.car_data_list$.value == null) {
       this.dataService.getAllCarData(["id", "data_type", "disabled", "plate", "brand", "model", "car_cover_img_url"]);
     }
-    if (this.dataService.user_data_list$.value == null && this.auth.adminData.value.type != AdminType.owner) {
+    const adminType = this.auth.adminData?.value?.type;
+    if (this.dataService.user_data_list$.value == null && adminType != AdminType.owner) {
       this.dataService.getAllUserData();
     }
     if (this.dataService.parking_data_list$.value == null) {
@@ -148,8 +149,9 @@ export class OrderPage implements OnInit {
     console.log((send_data));
     // this.commonService.isLoading = true;
 
-    if (this.auth.adminData.value.type == AdminType.owner) {
-      send_data['car_id_list'] = this.auth.adminData.value.owner_car_id_list;
+    const adminType = this.auth.adminData?.value?.type;
+    if (adminType == AdminType.owner) {
+      send_data['car_id_list'] = this.auth.adminData?.value?.owner_car_id_list;
     }
     this.apiService.postFromServer(ApiPath.get_order_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
       if (send_data.export_to_excel) {

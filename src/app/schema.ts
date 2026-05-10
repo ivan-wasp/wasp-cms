@@ -1591,6 +1591,7 @@ export interface ReturnVehicleReport {
     contract_status: string;
     deposit_status: string;
     status_img_url_list: string[];
+    other_img_url_list: string[];
     car_damage_list: CarDamage[];
     oil_or_electricity_level: number;
     odometer: string;

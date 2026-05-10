@@ -91,6 +91,12 @@ export class RvrPage implements OnInit {
       if (get_return_vehicle_report_by_order_id.result == 'success') {
         if (get_return_vehicle_report_by_order_id.data != null) {
           this.return_vehicle_report = get_return_vehicle_report_by_order_id.data;
+          if (!Array.isArray(this.return_vehicle_report.status_img_url_list)) {
+            this.return_vehicle_report.status_img_url_list = [];
+          }
+          if (!Array.isArray(this.return_vehicle_report.other_img_url_list)) {
+            this.return_vehicle_report.other_img_url_list = [];
+          }
           this.return_vehicle_report.car_id = this.order_data.car_data.id;
           this.return_vehicle_report.car_data = this.order_data.car_data;
           this.return_vehicle_report.user_id = this.order_data.user_data.id;
