@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>OBD 實時地圖</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">離開</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="obd-map-content">
+  <div class="obd-map-wrapper">
+    <google-map class="obd-google-map" height="100%" width="100%" [zoom]="zoom" [center]="center" [options]="options">
+      <map-marker *ngIf="currentPosition != null" [position]="currentPosition" [options]="markerOptions" [title]="'點擊打開 Google Maps'"
+        (mapClick)="openExactLocation()">
+      </map-marker>
+      <map-polyline *ngIf="routePath.length > 1" [path]="routePath" [options]="routeOptions"></map-polyline>
+    </google-map>
+  </div>
+</ion-content>

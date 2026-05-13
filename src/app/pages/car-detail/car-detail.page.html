@@ -113,7 +113,7 @@
         </ion-col>
 
         <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-          <ion-button [disabled]="car_data?.dashcam_imei == ''" class="top-btn2" expand="block" fill="clear"
+          <ion-button [disabled]="car_data?.obd_device_id == '' && car_data?.dashcam_imei == ''" class="top-btn2" expand="block" fill="clear"
             (click)="openJimiMap()">
             <ion-icon slot="start" name="map-sharp"></ion-icon>
             實時地圖
@@ -1196,6 +1196,13 @@
     </ion-grid>
   </div>
 </ion-content>
+
+<ion-modal [isOpen]="isObdMapModalOpen" cssClass="obd-map-modal" (didDismiss)="closeObdMapModal()">
+  <ng-template>
+    <app-car-obd-map-modal *ngIf="isObdMapModalOpen" [obdDeviceId]="car_data?.obd_device_id"
+      (close)="closeObdMapModal()"></app-car-obd-map-modal>
+  </ng-template>
+</ion-modal>
 
 <!-- <ion-modal [isOpen]="isLiveStreamingModalOpen" (didDismiss)="onDidDismiss($event)" class="liveStreamingModal">
   <ng-template>

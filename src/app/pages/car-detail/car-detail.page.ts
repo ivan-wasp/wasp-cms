@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/services/auth.service';
 import { CommonService } from 'src/app/services/common.service';
 import { DataService } from 'src/app/services/data.service';
@@ -98,6 +98,7 @@ export class CarDetailPage implements OnInit {
   subcategory_list: any = this.carDamageFrontSubcategory;
 
   jimi_device_location: any = null;
+  isObdMapModalOpen: boolean = false;
 
   editor: Editor;
   toolbar: Toolbar = [
@@ -146,7 +147,8 @@ export class CarDetailPage implements OnInit {
     private location: Location,
     private translateService: TranslateService,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertController: AlertController
   ) {
     this.route.queryParams.subscribe(params => {
       console.log(params);
@@ -766,13 +768,68 @@ export class CarDetailPage implements OnInit {
     if (!this.commonService.isWeb){
       return this.commonService.openErrorSnackBar("只支援desktop");
     }
-    const get_live_map_url_result: Response = await this.dataService.getJimiDeviceLiveMap(this.car_id);
-    if (get_live_map_url_result.result == 'success') {
-      if (get_live_map_url_result.data == '') {
-        return this.commonService.openErrorSnackBar();
-      }
-      window.open(get_live_map_url_result.data, '_blank');
+    const hasObd = this.car_data?.obd_device_id != null && this.car_data?.obd_device_id != '';
+    const hasJimi = this.car_data?.dashcam_imei != null && this.car_data?.dashcam_imei != '';
+
+    if (!hasObd && !hasJimi) {
+      return this.commonService.openErrorSnackBar("沒有可用地圖資料");
     }
+
+    const selectedSource = hasJimi ? 'jimi' : 'obd';
+    const alert = await this.alertController.create({
+      cssClass: 'jimi-map-source-alert',
+      header: '選擇地圖來源',
+      subHeader: '請選擇要打開的實時地圖',
+      inputs: [
+        {
+          type: 'radio',
+          name: 'map-source',
+          label: `Jimi 實時地圖${hasJimi ? '' : '（未連接）'}`,
+          value: 'jimi',
+          checked: selectedSource === 'jimi',
+          disabled: !hasJimi
+        },
+        {
+          type: 'radio',
+          name: 'map-source',
+          label: `OBD 實時地圖${hasObd ? '' : '（未連接）'}`,
+          value: 'obd',
+          checked: selectedSource === 'obd',
+          disabled: !hasObd
+        }
+      ],
+      buttons: [
+        {
+          text: '取消',
+          role: 'cancel',
+          cssClass: 'jimi-map-source-alert-cancel-btn'
+        },
+        {
+          text: '打開地圖',
+          cssClass: 'jimi-map-source-alert-open-btn',
+          handler: async (value) => {
+            if (value === 'jimi') {
+              const get_live_map_url_result: Response = await this.dataService.getJimiDeviceLiveMap(this.car_id);
+              if (get_live_map_url_result.result == 'success' && get_live_map_url_result.data != '') {
+                window.open(get_live_map_url_result.data, '_blank');
+              } else {
+                this.commonService.openErrorSnackBar("未能打開Jimi地圖");
+              }
+              return;
+            }
+
+            this.isObdMapModalOpen = true;
+            this.cdr.markForCheck();
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  closeObdMapModal() {
+    this.isObdMapModalOpen = false;
+    this.cdr.markForCheck();
   }
 
   async getJimiDeviceLocation() {

@@ -1276,6 +1276,20 @@ export class DataService {
     });
   }
 
+  getObdGpsDataByDeviceId(obd_device_id: string): Promise<Response> {
+    let send_data = {
+      obd_device_id: obd_device_id
+    }
+    return new Promise((resolve, reject) => {
+      this.apiService.postFromServer(ApiPath.get_obd_gps_by_device_id, send_data, true).then((res: Response) => {
+        resolve(res);
+      }).catch(err => {
+        console.error(err);
+        reject(err);
+      })
+    });
+  }
+
   lockUnlockObdByDeviceId(obd_device_id: string, action: 'lock' | 'unlock'): Promise<Response> {
     let send_data = {
       obd_device_id: obd_device_id,

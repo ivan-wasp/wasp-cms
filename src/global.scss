@@ -219,6 +219,38 @@ ion-item {
   --background-focused: var(--app-surface);
 }
 
+ion-modal.obd-map-modal {
+  --width: 100vw;
+  --height: 100vh;
+  --height: 100dvh;
+  --max-width: 100vw;
+  --max-height: 100vh;
+  --max-height: 100dvh;
+  --border-radius: 0;
+}
+
+ion-modal.obd-map-modal::part(content) {
+  height: 100dvh;
+}
+
+ion-modal.obd-map-modal .obd-map-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+ion-modal.obd-map-modal .obd-map-wrapper,
+ion-modal.obd-map-modal google-map,
+ion-modal.obd-map-modal .obd-google-map {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 56px);
+  min-height: calc(100vh - 56px);
+  height: calc(100dvh - 56px);
+  min-height: calc(100dvh - 56px);
+}
+
 ion-segment {
   border-radius: 10px;
   background: var(--app-surface-muted);
@@ -235,4 +267,57 @@ ion-segment-button {
 .title-with-two-icon ion-label {
   color: var(--ion-color-secondary);
   letter-spacing: 0.2px;
+}
+
+ion-alert.jimi-map-source-alert {
+  --min-width: 320px;
+  --max-width: 92vw;
+}
+
+ion-alert.jimi-map-source-alert .alert-wrapper {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+ion-alert.jimi-map-source-alert .alert-head {
+  padding-bottom: 8px;
+}
+
+ion-alert.jimi-map-source-alert .alert-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ion-color-secondary);
+}
+
+ion-alert.jimi-map-source-alert .alert-sub-title {
+  margin-top: 6px;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+}
+
+ion-alert.jimi-map-source-alert .alert-radio-group {
+  padding-top: 6px;
+}
+
+ion-alert.jimi-map-source-alert .alert-radio-label {
+  font-size: 0.96rem;
+  color: var(--app-text);
+}
+
+ion-alert.jimi-map-source-alert .alert-radio-icon {
+  border-width: 2px;
+}
+
+ion-alert.jimi-map-source-alert .alert-button-group {
+  padding: 10px 12px 12px;
+}
+
+ion-alert.jimi-map-source-alert .alert-button {
+  border-radius: 10px;
+  min-height: 40px;
+}
+
+ion-alert.jimi-map-source-alert .alert-button.jimi-map-source-alert-open-btn {
+  color: var(--ion-color-wasp2);
+  font-weight: 700;
 }

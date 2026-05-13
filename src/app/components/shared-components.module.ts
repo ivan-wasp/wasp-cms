@@ -9,6 +9,7 @@ import { EnvPipe } from '../pipes/env.pipe';
 import { GallerySlidesComponent } from './gallery-slides/gallery-slides.component';
 import { FleetMapComponent } from './fleet-map/fleet-map.component';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { CarObdMapModalComponent } from '../pages/car-detail/components/car-obd-map-modal/car-obd-map-modal.component';
 
 
 
@@ -26,7 +27,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
     RbbPaymentComponent,
     StatusChipComponent,
     GallerySlidesComponent,
-    FleetMapComponent
+    FleetMapComponent,
+    CarObdMapModalComponent
   ],
   declarations: [
     EnvPipe,
@@ -34,7 +36,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
     RbbPaymentComponent,
     StatusChipComponent,
     GallerySlidesComponent,
-    FleetMapComponent
+    FleetMapComponent,
+    CarObdMapModalComponent
   ],
 })
 export class SharedComponentsModule { }

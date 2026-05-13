@@ -12,6 +12,7 @@ import { MaterialModule } from 'src/app/material.module';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { NgxEditorModule } from 'ngx-editor';
 import { TranslateModule } from '@ngx-translate/core';
+import { CarObdMapModalComponent } from './components/car-obd-map-modal/car-obd-map-modal.component';
 
 @NgModule({
   imports: [
@@ -25,6 +26,6 @@ import { TranslateModule } from '@ngx-translate/core';
     NgxEditorModule,
     TranslateModule
   ],
-  declarations: [CarDetailPage]
+  declarations: [CarDetailPage],
 })
 export class CarDetailPageModule {}
