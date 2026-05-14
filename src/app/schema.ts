@@ -582,6 +582,7 @@ export interface CarData {
     price_per_hour_daily_ceiling: number;
     hourly_rental_available: boolean;
     required_class: string;
+    must_read_pdf_url_list: string[];
 }
 
 export enum Engine {

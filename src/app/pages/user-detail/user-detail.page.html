@@ -538,6 +538,14 @@
                 <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
                     <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
+                        <ion-label class="ion-text-wrap">傷人交通意外紀錄(三年內)</ion-label>
+                        <ion-toggle [disabled]="readonly" slot="end"
+                            [(ngModel)]="user_data.injury_accident_record"></ion-toggle>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
                         <ion-label class="ion-text-wrap">酒精或毒品相關違例駕駛記錄(三年內)</ion-label>
                         <ion-toggle [disabled]="readonly" slot="end"
                             [(ngModel)]="user_data.drug_driving_record"></ion-toggle>
@@ -549,6 +557,15 @@
                         <ion-label class="ion-text-wrap">最少兩年「一年暫準執照（P牌）及最少 一年正式執照」</ion-label>
                         <ion-toggle [disabled]="readonly" slot="end"
                             [(ngModel)]="user_data.two_year_driving_experience">
+                        </ion-toggle>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                    <ion-item class="toggle-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap">的士司機違例記分紀錄(三年內)</ion-label>
+                        <ion-toggle [disabled]="readonly" slot="end"
+                            [(ngModel)]="user_data.taxi_driver_offence_point_record">
                         </ion-toggle>
                     </ion-item>
                 </ion-col>

@@ -291,7 +291,8 @@ export class CarDetailPage implements OnInit {
       "price_per_hour": null,
       "price_per_hour_daily_ceiling": null,
       "hourly_rental_available": false,
-      'required_class': ''
+      'required_class': '',
+      "must_read_pdf_url_list": []
     };
   }
 
