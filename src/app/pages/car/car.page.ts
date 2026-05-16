@@ -61,6 +61,7 @@ export class CarPage implements OnInit {
   all_brand_list = null;
 
   keyless_type: KeylessType = null;
+  hourly_rental_available: boolean | any = null;
   brand = null;
   target_start_day = null;
   target_end_day = null;
@@ -108,6 +109,10 @@ export class CarPage implements OnInit {
       this.limit = (params && params.limit ? (params.limit) : 500);
       this.sorting = (params && params.sorting ? (params.sorting) : "create_date");
       this.direction = (params && params.direction && params.direction != null ? (params.direction) : "DESC");
+      this.keyless_type = (params && params.keyless_type ? params.keyless_type : null);
+      this.hourly_rental_available = (params && params.hourly_rental_available ? (params.hourly_rental_available == 'true' ? true : false) : null);
+      this.brand = (params && params.brand ? params.brand : null);
+      this.current_location = (params && params.current_location ? params.current_location : null);
     });
   }
 
@@ -141,6 +146,7 @@ export class CarPage implements OnInit {
       // filter_vip: '',
       brand: this.brand,
       keyless_type: this.keyless_type,
+      hourly_rental_available: this.hourly_rental_available == 'true' ? true : (this.hourly_rental_available == 'false' ? false : null),
       today_status: true,
       target_date_list: this.target_start_day != null ? this.commonService.getDatesInRange(new Date(this.target_start_day), new Date(this.target_end_day)).map(d => d.split('T')[0]) : [],
       get_coming_order: true,
@@ -153,6 +159,7 @@ export class CarPage implements OnInit {
       send_data['car_id_list'] = this.auth.adminData.value.owner_car_id_list;
     }
 
+    console.log(send_data);
     this.apiService.postFromServer(ApiPath.get_car_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
       console.log(res);
       if (send_data.export_to_excel) {
@@ -169,7 +176,7 @@ export class CarPage implements OnInit {
         }
       }
 
-      let new_path = `/car?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&brand=${this.brand}&keyless_type=${this.keyless_type}&current_location=${this.current_location}`;
+      let new_path = `/car?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&brand=${this.brand || ''}&keyless_type=${this.keyless_type || ''}&hourly_rental_available=${this.hourly_rental_available || ''}&current_location=${this.current_location || ''}`;
       if (this.location.path() != new_path) {
         this.location.replaceState(new_path);
       }
