@@ -1,4 +1,4 @@
-const isProduction = false;
+const isProduction = true;
 
 export const environment = {
   appVersion: require('../../package.json').version + (!isProduction ? '-development' : '-production'),
