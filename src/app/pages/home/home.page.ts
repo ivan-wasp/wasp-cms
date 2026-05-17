@@ -140,6 +140,7 @@ export class HomePage implements OnInit {
 
   original_car_data_list = null;
   display_car_data_list = null;
+  inspection_search_keyword = '';
 
   pie_data_list: any[];
   gradient: boolean = true;
@@ -342,6 +343,18 @@ export class HomePage implements OnInit {
       }
     }, err => {
       this.commonService.openErrorSnackBar();
+    });
+  }
+
+  filterInspectionCarList(list: any[]) {
+    if (!Array.isArray(list)) return [];
+    const keyword = (this.inspection_search_keyword || '').trim().toLowerCase();
+    if (!keyword) return list;
+    return list.filter(item => {
+      const plate = (item?.plate || '').toString().toLowerCase();
+      const model = (item?.model || '').toString().toLowerCase();
+      const brand = (item?.brand || '').toString().toLowerCase();
+      return plate.includes(keyword) || model.includes(keyword) || brand.includes(keyword);
     });
   }
 
