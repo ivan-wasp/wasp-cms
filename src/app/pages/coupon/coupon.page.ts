@@ -24,7 +24,7 @@ export class CouponPage implements OnInit {
   limit = null;
   page = null;
 
-  key_word = null;
+  code = null;
 
   searchControl = new UntypedFormControl();
 
@@ -59,7 +59,7 @@ export class CouponPage implements OnInit {
       this.limit = (params && params.limit ? (params.limit) : 10);
       this.sorting = (params && params.sorting ? (params.sorting) : "create_date");
       this.direction = (params && params.direction && params.direction != null ? (params.direction) : "DESC");
-      this.key_word = (params && params.key_word ? (params.key_word) : "");
+      this.code = (params && params.code ? (params.code) : "");
 
       this.is_generated_by_system = (params && params.is_generated_by_system ? (params.is_generated_by_system == 'true' ? true : false) : false);
       this.reusable = (params && params.reusable ? (params.reusable == 'true' ? true : false) : "");
@@ -80,7 +80,7 @@ export class CouponPage implements OnInit {
           this.direction = null;
           this.page = 1;
         }
-        this.key_word = term;
+        this.code = term;
         this.getCouponDataList();
       });
   }
@@ -100,13 +100,13 @@ export class CouponPage implements OnInit {
       user_id: this.user_id,
       get_number_of_usage: true
     }
-    if (this.key_word != null && this.key_word != '') {
-      send_data['key_word'] = this.key_word;
+    if (this.code != null && this.code != '') {
+      send_data['code'] = this.code;
     }
     console.log(JSON.stringify(send_data));
 
     this.apiService.postFromServer(ApiPath.get_coupon_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
-      let new_path = `/coupon?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&key_word=${this.key_word}&is_generated_by_system=${this.is_generated_by_system||''}&reusable=${this.reusable||''}&used=${this.used||''}&user_id=${this.user_id||''}`;
+      let new_path = `/coupon?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&code=${this.code || ''}&is_generated_by_system=${this.is_generated_by_system||''}&reusable=${this.reusable||''}&used=${this.used||''}&user_id=${this.user_id||''}`;
       if (this.location.path() != new_path) {
         this.location.replaceState(new_path);
       }
@@ -172,7 +172,7 @@ export class CouponPage implements OnInit {
   }
 
   clearSearch(ev) {
-    this.key_word = '';
+    this.code = '';
     this.sorting = null;
     this.direction = null;
     this.page = 1;
@@ -200,7 +200,7 @@ export class CouponPage implements OnInit {
     this.sorting = null;
     this.direction = null;
     this.page = 1;
-    this.key_word = "";
+    this.code = "";
     this.getCouponDataList();
   }
 

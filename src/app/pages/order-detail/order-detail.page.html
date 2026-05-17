@@ -277,75 +277,116 @@
                                     </ion-col>
                                     <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
                                     </ion-col>
-                                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+                                    <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
                                         *ngIf="order_data.user_data.call == 'Company'">
-                                        <ion-button
-                                            *ngIf="order_data.user_data.br_url != null && order_data.user_data.br_url != ''"
-                                            (click)="show_br_url = !show_br_url" expand="block" fill="outline" shape=""
-                                            color="secondary">
-                                            {{!show_br_url ? '查看' : '隱藏'}}Br副本
-                                        </ion-button>
-                                        <ion-img *ngIf="show_br_url"
-                                            [src]="commonService.media_url()+order_data.user_data.br_url"></ion-img>
-                                        <ion-button
-                                            *ngIf="show_br_url && order_data.user_data.br_url != null && order_data.user_data.br_url != ''"
-                                            (click)="commonService.downloadMedia(order_data.user_data.br_url, true)"
-                                            expand="block" fill="outline" shape="" color="secondary">
-                                            下載Br副本
-                                        </ion-button>
-
+                                        <div class="upload-card">
+                                            <div class="upload-card-header">
+                                                <p class="upload-card-title">商業登記證（BR）</p>
+                                                <ion-chip [outline]="true"
+                                                    [color]="order_data.user_data.br_url ? 'success' : 'medium'">
+                                                    <ion-label>{{order_data.user_data.br_url ? '已上載' : '未上載'}}</ion-label>
+                                                </ion-chip>
+                                            </div>
+                                            <div class="preview-wrap" *ngIf="order_data.user_data.br_url">
+                                                <ion-button class="preview-btn" fill="outline" size="small"
+                                                    (click)="commonService.downloadMedia(order_data.user_data.br_url, true)">
+                                                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                                    懸停預覽 / 下載
+                                                </ion-button>
+                                                <div class="preview-popover"
+                                                    [style.background-image]="'url('+commonService.media_url()+order_data.user_data.br_url+')'">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </ion-col>
-                                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4"
+
+                                    <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4"
                                         *ngIf="order_data.user_data.phone != '62337073'">
-                                        <ion-button
-                                            *ngIf="order_data.user_data.identity_card_url != null && order_data.user_data.identity_card_url != ''"
-                                            (click)="show_identity_card_url = !show_identity_card_url" expand="block"
-                                            fill="outline" shape="" color="secondary">
-                                            {{!show_identity_card_url ? '查看' : '隱藏'}}身份證副本
-                                        </ion-button>
-                                        <ion-img *ngIf="show_identity_card_url"
-                                            [src]="commonService.media_url()+order_data.user_data.identity_card_url"></ion-img>
-                                        <ion-button
-                                            *ngIf="show_identity_card_url && order_data.user_data.identity_card_url != null && order_data.user_data.identity_card_url != ''"
-                                            (click)="commonService.downloadMedia(order_data.user_data.identity_card_url, true)"
-                                            expand="block" fill="outline" shape="" color="secondary">
-                                            下載身份證副本
-                                        </ion-button>
-
+                                        <div class="upload-card">
+                                            <div class="upload-card-header">
+                                                <p class="upload-card-title">香港身份證</p>
+                                                <ion-chip [outline]="true"
+                                                    [color]="order_data.user_data.identity_card_url ? 'success' : 'medium'">
+                                                    <ion-label>{{order_data.user_data.identity_card_url ? '已上載' : '未上載'}}</ion-label>
+                                                </ion-chip>
+                                            </div>
+                                            <div class="preview-wrap" *ngIf="order_data.user_data.identity_card_url">
+                                                <ion-button class="preview-btn" fill="outline" size="small"
+                                                    (click)="commonService.downloadMedia(order_data.user_data.identity_card_url, true)">
+                                                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                                    懸停預覽 / 下載
+                                                </ion-button>
+                                                <div class="preview-popover"
+                                                    [style.background-image]="'url('+commonService.media_url()+order_data.user_data.identity_card_url+')'">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </ion-col>
-                                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
-                                        <ion-button
-                                            *ngIf="order_data.user_data.driving_license_url != null && order_data.user_data.driving_license_url != ''"
-                                            (click)="show_driving_license_url = !show_driving_license_url"
-                                            expand="block" fill="outline" shape="" color="secondary">
-                                            {{!show_driving_license_url ? '查看' : '隱藏'}}駕駛執照
-                                        </ion-button>
-                                        <ion-img *ngIf="show_driving_license_url"
-                                            [src]="commonService.media_url()+order_data.user_data.driving_license_url"></ion-img>
-                                        <ion-button
-                                            *ngIf="show_driving_license_url && order_data.user_data.driving_license_url != null && order_data.user_data.driving_license_url != ''"
-                                            (click)="commonService.downloadMedia(order_data.user_data.driving_license_url, true)"
-                                            expand="block" fill="outline" shape="" color="secondary">
-                                            下載駕駛執照
-                                        </ion-button>
 
+                                    <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                        <div class="upload-card">
+                                            <div class="upload-card-header">
+                                                <p class="upload-card-title">駕駛執照</p>
+                                                <ion-chip [outline]="true"
+                                                    [color]="order_data.user_data.driving_license_url ? 'success' : 'medium'">
+                                                    <ion-label>{{order_data.user_data.driving_license_url ? '已上載' : '未上載'}}</ion-label>
+                                                </ion-chip>
+                                            </div>
+                                            <div class="preview-wrap" *ngIf="order_data.user_data.driving_license_url">
+                                                <ion-button class="preview-btn" fill="outline" size="small"
+                                                    (click)="commonService.downloadMedia(order_data.user_data.driving_license_url, true)">
+                                                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                                    懸停預覽 / 下載
+                                                </ion-button>
+                                                <div class="preview-popover"
+                                                    [style.background-image]="'url('+commonService.media_url()+order_data.user_data.driving_license_url+')'">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </ion-col>
-                                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
-                                        <ion-button
-                                            *ngIf="order_data.user_data.address_proof_url != null && order_data.user_data.address_proof_url != ''"
-                                            (click)="show_address_proof_url = !show_address_proof_url" expand="block"
-                                            fill="outline" shape="" color="secondary">
-                                            {{!show_address_proof_url ? '查看' : '隱藏'}}住址證明
-                                        </ion-button>
-                                        <ion-img *ngIf="show_address_proof_url"
-                                            [src]="commonService.media_url()+order_data.user_data.address_proof_url"></ion-img>
-                                        <ion-button
-                                            *ngIf="show_address_proof_url && order_data.user_data.address_proof_url != null && order_data.user_data.address_proof_url != ''"
-                                            (click)="commonService.downloadMedia(order_data.user_data.address_proof_url, true)"
-                                            expand="block" fill="outline" shape="" color="secondary">
-                                            下載住址證明
-                                        </ion-button>
 
+                                    <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                        <div class="upload-card">
+                                            <div class="upload-card-header">
+                                                <p class="upload-card-title">的士司機證</p>
+                                                <ion-chip [outline]="true"
+                                                    [color]="order_data.user_data.taxi_driver_identity_plate_url ? 'success' : 'medium'">
+                                                    <ion-label>{{order_data.user_data.taxi_driver_identity_plate_url ? '已上載' : '未上載'}}</ion-label>
+                                                </ion-chip>
+                                            </div>
+                                            <div class="preview-wrap" *ngIf="order_data.user_data.taxi_driver_identity_plate_url">
+                                                <ion-button class="preview-btn" fill="outline" size="small"
+                                                    (click)="commonService.downloadMedia(order_data.user_data.taxi_driver_identity_plate_url, true)">
+                                                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                                    懸停預覽 / 下載
+                                                </ion-button>
+                                                <div class="preview-popover"
+                                                    [style.background-image]="'url('+commonService.media_url()+order_data.user_data.taxi_driver_identity_plate_url+')'">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ion-col>
+
+                                    <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                                        <div class="upload-card">
+                                            <div class="upload-card-header">
+                                                <p class="upload-card-title">住址證明</p>
+                                                <ion-chip [outline]="true"
+                                                    [color]="order_data.user_data.address_proof_url ? 'success' : 'medium'">
+                                                    <ion-label>{{order_data.user_data.address_proof_url ? '已上載' : '未上載'}}</ion-label>
+                                                </ion-chip>
+                                            </div>
+                                            <div class="preview-wrap" *ngIf="order_data.user_data.address_proof_url">
+                                                <ion-button class="preview-btn" fill="outline" size="small"
+                                                    (click)="commonService.downloadMedia(order_data.user_data.address_proof_url, true)">
+                                                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                                    懸停預覽 / 下載
+                                                </ion-button>
+                                                <div class="preview-popover"
+                                                    [style.background-image]="'url('+commonService.media_url()+order_data.user_data.address_proof_url+')'">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </ion-col>
                                 </ion-row>
 
@@ -618,7 +659,7 @@
                                 <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                                         <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
-                                        <ion-input readonly value="{{order_data.create_date | date: 'yyyy-MM-dd'}}"
+                                        <ion-input readonly value="{{order_data.create_date | date: 'yyyy-MM-dd HH:mm:ss'}}"
                                             type="text"></ion-input>
                                     </ion-item>
                                 </ion-col>

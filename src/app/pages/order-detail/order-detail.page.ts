@@ -72,6 +72,7 @@ export class OrderDetailPage implements OnInit {
   show_identity_card_url: boolean = false;
   show_driving_license_url: boolean = false;
   show_address_proof_url: boolean = false;
+  show_taxi_driver_identity_plate_url: boolean = false;
 
   second_driver_phone = new FormControl('', [Validators.required, Validators.minLength(8), Validators.pattern('[23456789][0-9]{7}')]);
 

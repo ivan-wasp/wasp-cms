@@ -27,3 +27,67 @@
 .payment-next-icon {
     right: 0;
 }
+
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #e2e5ea;
+    border-radius: 12px;
+    background: #f8fafc;
+    height: 100%;
+}
+
+.upload-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 32px;
+}
+
+.upload-card-title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #2f3640;
+}
+
+.preview-wrap {
+    position: relative;
+    width: fit-content;
+}
+
+.preview-btn {
+    --border-radius: 8px;
+    --color: #4b5563;
+    font-size: 0.78rem;
+    height: 30px;
+}
+
+.preview-popover {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    width: 220px;
+    height: 140px;
+    border-radius: 10px;
+    border: 1px solid #d7dde7;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 20;
+}
+
+.preview-wrap:hover .preview-popover,
+.preview-wrap:focus-within .preview-popover {
+    opacity: 1;
+    transform: translateY(0);
+}

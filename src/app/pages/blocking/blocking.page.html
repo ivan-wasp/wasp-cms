@@ -154,55 +154,51 @@
 
       </ion-row>
       <br>
-      <ion-row class="default-container">
-        <ion-col size="12" class="ion-text-right">
-          <ion-button (click)="showAll()" fill="outline">
+      <ion-row class="default-container blocking-list-container">
+        <ion-col size="12" class="blocking-list-toolbar">
+          <ion-chip color="primary" outline="true">
+            <ion-label>共 {{display_blocking_data_list?.length || 0}} 項</ion-label>
+          </ion-chip>
+          <ion-button (click)="showAll()" fill="outline" size="small">
             {{disabled == false ? '顯示全部' : '取消顯示全部'}}
           </ion-button>
         </ion-col>
-        <ion-col size="12">
-          <ion-row>
-            <ion-col size="1">
-              ID
-            </ion-col>
-            <ion-col size="2">
-              車輛 - 備注
-            </ion-col>
-            <ion-col size="1">
-              停用
-            </ion-col>
-            <ion-col size="1">
-              維修
-            </ion-col>
-            <ion-col size="4">
-              日期
-            </ion-col>
-            <ion-col size="2">
-              可預約用戶
-            </ion-col>
-            <ion-col size="1">
 
-            </ion-col>
+        <ion-col size="12" *ngIf="(display_blocking_data_list?.length || 0) == 0">
+          <div class="blocking-empty-state">暫時沒有禁止預約資料</div>
+        </ion-col>
+
+        <ion-col size="12" *ngIf="(display_blocking_data_list?.length || 0) > 0">
+          <ion-row class="blocking-header-row">
+            <ion-col size="1">ID</ion-col>
+            <ion-col size="2">車輛 / 備注</ion-col>
+            <ion-col size="1">停用</ion-col>
+            <ion-col size="1">維修</ion-col>
+            <ion-col size="4">日期</ion-col>
+            <ion-col size="2">可預約用戶</ion-col>
+            <ion-col size="1" class="ion-text-right">操作</ion-col>
           </ion-row>
-          <ion-row *ngFor="let item of display_blocking_data_list" class="item-row"
-            [style.background]="item.disabled == true ? 'var(--ion-color-medium)' : ''">
-            <ion-col size="1">
-              {{item?.id}}
+
+          <ion-row *ngFor="let item of display_blocking_data_list" class="item-row blocking-data-row"
+            [ngClass]="{'is-disabled-row': item.disabled == true}">
+            <ion-col size="1" class="font-600">
+              #{{item?.id}}
             </ion-col>
             <ion-col size="2">
-              {{getCarDataById(item.car_id)?.plate}} ({{getCarDataById(item.car_id)?.model}})
-              <br><br>
-              {{item?.remark}}
+              <div class="font-600">{{getCarDataById(item.car_id)?.plate}} ({{getCarDataById(item.car_id)?.model}})</div>
+              <div class="blocking-remark">{{item?.remark || '-'}}</div>
             </ion-col>
             <ion-col size="1" class="ion-align-self-center">
               <ion-chip *ngIf="item?.disabled" color="danger" mode="ios" outline="true">
                 <ion-label>停用</ion-label>
               </ion-chip>
+              <span *ngIf="!item?.disabled" class="muted-text">-</span>
             </ion-col>
             <ion-col size="1" class="ion-align-self-center">
-              <ion-chip *ngIf="item?.is_maintaining" color="danger" mode="ios" outline="true">
+              <ion-chip *ngIf="item?.is_maintaining" color="warning" mode="ios" outline="true">
                 <ion-label>維修</ion-label>
               </ion-chip>
+              <span *ngIf="!item?.is_maintaining" class="muted-text">-</span>
             </ion-col>
             <ion-col size="4">
               <div
@@ -219,7 +215,6 @@
                   </ion-chip>
                 </div>
               </ng-template>
-
             </ion-col>
             <ion-col size="2" class="ion-align-self-center">
               <ion-chip *ngFor="let user_id of item.excluded_user_id_list"
@@ -228,21 +223,15 @@
                 <ion-label>{{getUserDataById(user_id)?.zh_full_name || getUserDataById(user_id)?.username}} -
                   {{getUserDataById(user_id)?.phone}}</ion-label>
               </ion-chip>
+              <span *ngIf="!item.excluded_user_id_list?.length" class="muted-text">沒有</span>
             </ion-col>
-            <ion-col size="1" class="ion-align-self-center">
-              <ion-button (click)="editBlocking(item)" class="default-ion-btn" fill="clear" expand="block">
+            <ion-col size="1" class="ion-align-self-center ion-text-right">
+              <ion-button (click)="editBlocking(item)" class="default-ion-btn" fill="outline" size="small">
                 修改
               </ion-button>
-              <!-- <ion-button (click)="commonService?.deleteDataAlert(item)" class="default-ion-btn" color="danger"
-                fill="clear">
-                刪除
-              </ion-button> -->
-
             </ion-col>
           </ion-row>
         </ion-col>
-
-
       </ion-row>
 
     </ion-grid>

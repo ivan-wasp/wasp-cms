@@ -108,6 +108,13 @@
                     </ion-item>
                 </ion-col>
                 <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
+                    <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
+                        <ion-input readonly value="{{user_data.create_date | date: 'yyyy-MM-dd HH:mm:ss'}}"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
+                <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
                         button='false'>
                         <ion-label position="stacked">用戶名稱</ion-label>
@@ -151,7 +158,7 @@
                     </mat-form-field>
 
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="4">
+                      <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                     <mat-form-field appearance="outline" style="display: none;">
                         <input #driving_license_expiry_date matInput [matDatepicker]="picker2"
                             (dateChange)="selectionDateChanged('driving_license_expiry_date', driving_license_expiry_date)">
@@ -572,144 +579,164 @@
             </ion-row>
 
             <br>
-            <ion-row class="default-container">
+            <ion-row class="default-container upload-section">
                 <ion-col size="12">
                     <div class="title-with-icon">
                         <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
                         <ion-label>上載文件</ion-label>
                     </div>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-                    <p>Br</p>
-                    <ion-button
-                        [style.--background]="user_data.br_url != null && user_data.br_url != '' ? ('url('+('media_url' | env)+user_data.br_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('br_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button *ngIf="!readonly && user_data.br_url != null && user_data.br_url != ''"
-                        (click)="user_data.br_url = ''" expand="block" fill="outline" shape="round" color="danger">
-                        移除Br副本
-                    </ion-button>
-                    <ion-button *ngIf="user_data.br_url != null && user_data.br_url != ''" class="default-ion-btn"
-                        download expand="full" (click)="commonService.downloadMedia(user_data.br_url, true)"
-                        fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
-                </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3" *ngIf="user_data?.phone != '62337073'">
-                    <p>香港身份證</p>
-                    <ion-button
-                        [style.--background]="user_data.identity_card_url != null && user_data.identity_card_url != '' ? ('url('+('media_url' | env)+user_data.identity_card_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('identity_card_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button
-                        *ngIf="!readonly && user_data.identity_card_url != null && user_data.identity_card_url != ''"
-                        (click)="user_data.identity_card_url = ''" expand="block" fill="outline" shape="round"
-                        color="danger">
-                        移除身份證副本
-                    </ion-button>
-                    <ion-button *ngIf="user_data.identity_card_url != null && user_data.identity_card_url != ''"
-                        class="default-ion-btn" download expand="full"
-                        (click)="commonService.downloadMedia(user_data.identity_card_url, true)" fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
-                </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-                    <p>住址證明</p>
-                    <ion-button
-                        [style.--background]="user_data.address_proof_url != null && user_data.address_proof_url != '' ? ('url('+('media_url' | env)+user_data.address_proof_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('address_proof_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button
-                        *ngIf="!readonly && user_data.address_proof_url != null && user_data.address_proof_url != ''"
-                        (click)="user_data.address_proof_url = ''" expand="block" fill="outline" shape="round"
-                        color="danger">
-                        移除住址證明
-                    </ion-button>
-                    <ion-button *ngIf="user_data.address_proof_url != null && user_data.address_proof_url != ''"
-                        class="default-ion-btn" download expand="full"
-                        (click)="commonService.downloadMedia(user_data.address_proof_url, true)" fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
 
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">商業登記證（BR）</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.br_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.br_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.br_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.br_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('br_url')" fill="outline" expand="block">
+                            <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
+                            {{user_data.br_url ? '重新上載檔案' : '上載檔案'}}
+                        </ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.br_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.br_url, true)">
+                                <ion-icon slot="start" name="eye-outline"></ion-icon>
+                                懸停預覽 / 下載
+                            </ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.br_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-                    <p>駕駛執照</p>
-                    <ion-button
-                        [style.--background]="user_data.driving_license_url != null && user_data.driving_license_url != '' ? ('url('+('media_url' | env)+user_data.driving_license_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('driving_license_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button
-                        *ngIf="!readonly && user_data.driving_license_url != null && user_data.driving_license_url != ''"
-                        (click)="user_data.driving_license_url = ''" expand="block" fill="outline" shape="round"
-                        color="danger">
-                        移除駕駛執照
-                    </ion-button>
-                    <ion-button *ngIf="user_data.driving_license_url != null && user_data.driving_license_url != ''"
-                        class="default-ion-btn" download expand="full"
-                        (click)="commonService.downloadMedia(user_data.driving_license_url, true)" fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
-                </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-                    <p>的士司機證</p>
-                    <ion-button
-                        [style.--background]="user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != '' ? ('url('+('media_url' | env)+user_data.taxi_driver_identity_plate_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('taxi_driver_identity_plate_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button
-                        *ngIf="!readonly && user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != ''"
-                        (click)="user_data.taxi_driver_identity_plate_url = ''" expand="block" fill="outline" shape="round"
-                        color="danger">
-                        移除的士司機證
-                    </ion-button>
-                    <ion-button *ngIf="user_data.taxi_driver_identity_plate_url != null && user_data.taxi_driver_identity_plate_url != ''"
-                        class="default-ion-btn" download expand="full"
-                        (click)="commonService.downloadMedia(user_data.taxi_driver_identity_plate_url, true)" fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
-                </ion-col>
-                <ion-col size-xs="12" size-sm="12" size-md="3" size-lg="3">
-                    <p>入息證明</p>
-                    <ion-button
-                        [style.--background]="user_data.income_certificate_url != null && user_data.income_certificate_url != '' ? ('url('+('media_url' | env)+user_data.income_certificate_url+') no-repeat center center / cover') : '#c7c7c7'"
-                        class="big-upload-btn" (click)="triggerImgUpload('income_certificate_url')" fill="clear">
-                        <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
-                        {{readonly ? '' : '上載'}}
-                    </ion-button>
-                    <ion-button
-                        *ngIf="!readonly && user_data.income_certificate_url != null && user_data.income_certificate_url != ''"
-                        (click)="user_data.income_certificate_url = ''" expand="block" fill="outline" shape="round"
-                        color="danger">
-                        移除入息證明
-                    </ion-button>
-                    <ion-button
-                        *ngIf="user_data.income_certificate_url != null && user_data.income_certificate_url != ''"
-                        class="default-ion-btn" download expand="full"
-                        (click)="commonService.downloadMedia(user_data.income_certificate_url, true)" fill="clear">
-                        <ion-icon slot="start" name="cloud-download"></ion-icon>
-                        下載
-                    </ion-button>
 
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3" *ngIf="user_data?.phone != '62337073'">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">香港身份證</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.identity_card_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.identity_card_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.identity_card_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.identity_card_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('identity_card_url')" fill="outline" expand="block">
+                            <ion-icon *ngIf="!readonly" slot="start" name="cloud-upload"></ion-icon>
+                            {{user_data.identity_card_url ? '重新上載檔案' : '上載檔案'}}
+                        </ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.identity_card_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.identity_card_url, true)"><ion-icon slot="start" name="eye-outline"></ion-icon>懸停預覽 / 下載</ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.identity_card_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">住址證明</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.address_proof_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.address_proof_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.address_proof_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.address_proof_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('address_proof_url')" fill="outline" expand="block"><ion-icon slot="start" name="cloud-upload"></ion-icon>{{user_data.address_proof_url ? '重新上載檔案' : '上載檔案'}}</ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.address_proof_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.address_proof_url, true)"><ion-icon slot="start" name="eye-outline"></ion-icon>懸停預覽 / 下載</ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.address_proof_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">駕駛執照</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.driving_license_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.driving_license_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.driving_license_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.driving_license_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('driving_license_url')" fill="outline" expand="block"><ion-icon slot="start" name="cloud-upload"></ion-icon>{{user_data.driving_license_url ? '重新上載檔案' : '上載檔案'}}</ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.driving_license_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.driving_license_url, true)"><ion-icon slot="start" name="eye-outline"></ion-icon>懸停預覽 / 下載</ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.driving_license_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">的士司機證</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.taxi_driver_identity_plate_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.taxi_driver_identity_plate_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.taxi_driver_identity_plate_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.taxi_driver_identity_plate_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('taxi_driver_identity_plate_url')" fill="outline" expand="block"><ion-icon slot="start" name="cloud-upload"></ion-icon>{{user_data.taxi_driver_identity_plate_url ? '重新上載檔案' : '上載檔案'}}</ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.taxi_driver_identity_plate_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.taxi_driver_identity_plate_url, true)"><ion-icon slot="start" name="eye-outline"></ion-icon>懸停預覽 / 下載</ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.taxi_driver_identity_plate_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
+                </ion-col>
+
+                <ion-col size-xs="12" size-sm="6" size-md="4" size-lg="3">
+                    <div class="upload-card">
+                        <div class="upload-card-header">
+                            <p class="upload-card-title">入息證明</p>
+                            <div class="upload-card-header-right">
+                                <ion-chip [outline]="true" [color]="user_data.income_certificate_url ? 'success' : 'medium'">
+                                    <ion-label>{{user_data.income_certificate_url ? '已上載' : '未上載'}}</ion-label>
+                                </ion-chip>
+                                <ion-button *ngIf="!readonly && user_data.income_certificate_url" class="delete-mini-btn" fill="clear"
+                                    (click)="user_data.income_certificate_url = ''">
+                                    <ion-icon name="trash-outline"></ion-icon>
+                                </ion-button>
+                            </div>
+                        </div>
+                        <ion-button *ngIf="!readonly" class="big-upload-btn" (click)="triggerImgUpload('income_certificate_url')" fill="outline" expand="block"><ion-icon slot="start" name="cloud-upload"></ion-icon>{{user_data.income_certificate_url ? '重新上載檔案' : '上載檔案'}}</ion-button>
+                        <div class="preview-wrap" *ngIf="user_data.income_certificate_url">
+                            <ion-button class="preview-btn" fill="outline" size="small" (click)="commonService.downloadMedia(user_data.income_certificate_url, true)"><ion-icon slot="start" name="eye-outline"></ion-icon>懸停預覽 / 下載</ion-button>
+                            <div class="preview-popover" [style.background-image]="'url('+('media_url' | env)+user_data.income_certificate_url+')'"></div>
+                        </div>
+                        <div class="upload-actions"></div>
+                    </div>
                 </ion-col>
             </ion-row>
 
             <br>
-            <ion-row class="default-container">
+            <ion-row class="default-container upload-section">
                 <ion-col size="12">
                     <div class="title-with-icon">
                         <ion-icon slot="start" src="assets/icon/upload.svg"></ion-icon>
@@ -723,30 +750,23 @@
                         </ion-item>
                         <ion-button *ngIf="!readonly" (click)="triggerImgUpload('other_doc_url_list')" slot="end"
                             class="default-ion-btn" fill="clear">
-                            <ion-icon slot="start" name="cloud-download"></ion-icon>
+                            <ion-icon slot="start" name="cloud-upload"></ion-icon>
                             上載文件
                         </ion-button>
                     </div>
                     <br><br>
                     <ion-item class="other-doc-item input-item" [ngClass]="{'readonly': readonly}" lines="none"
                         *ngFor="let item of user_data.other_doc_url_list; let i = index;">
-                        <!-- <ion-label>{{item.name}}</ion-label> -->
-                        <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name"></ion-input>
-                        <ion-icon *ngIf="!readonly" class="delete-icon"
-                            (click)="user_data.other_doc_url_list.splice(i, 1)" name="trash" slot="end">
+                        <ion-input type="text" [readonly]="readonly" [(ngModel)]="item.name" placeholder="文件名稱"></ion-input>
+                        <ion-icon *ngIf="!readonly" class="delete-icon" (click)="user_data.other_doc_url_list.splice(i, 1)"
+                            name="trash" slot="end">
                         </ion-icon>
                         <ion-icon class="download-icon"
                             (click)="commonService.downloadMedia(user_data.other_doc_url_list[i].url, true)"
                             name="cloud-download" slot="end"></ion-icon>
-
                     </ion-item>
-
                 </ion-col>
-
             </ion-row>
-
-
-            <br>
             <ion-row class="default-container"
                 *ngIf="(admin_data | async) != null && (admin_data | async)?.authority_list?.includes(authority.credit_rating)">
                 <ion-col size="12">

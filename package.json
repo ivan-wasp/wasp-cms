@@ -1,6 +1,10 @@
 {
   "name": "ionic_cms_template",
+<<<<<<< HEAD
   "version": "3.0.261",
+=======
+  "version": "3.0.264",
+>>>>>>> develop
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {

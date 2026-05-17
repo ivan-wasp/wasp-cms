@@ -22,7 +22,7 @@ export class SevenCouponPage implements OnInit {
   limit = null;
   page = null;
 
-  key_word = null;
+  code = null;
 
   searchControl = new UntypedFormControl();
 
@@ -53,7 +53,7 @@ export class SevenCouponPage implements OnInit {
       this.limit = (params && params.limit ? (params.limit) : 10);
       this.sorting = (params && params.sorting ? (params.sorting) : "create_date");
       this.direction = (params && params.direction && params.direction != null ? (params.direction) : "DESC");
-      this.key_word = (params && params.key_word ? (params.key_word) : "");
+      this.code = (params && params.code ? (params.code) : "");
       this.seven_coupon_type = (params && params.seven_coupon_type ? (params.seven_coupon_type) : "");
 
       this.used = (params && params.used ? (params.used == 'true' ? true : false) : "");
@@ -74,7 +74,7 @@ export class SevenCouponPage implements OnInit {
           this.direction = null;
           this.page = 1;
         }
-        this.key_word = term;
+        this.code = term;
         this.getSevenCouponDataList();
       });
     if (this.dataService.user_data_list$.value == null) {
@@ -99,8 +99,8 @@ export class SevenCouponPage implements OnInit {
       seven_coupon_type: this.seven_coupon_type,
       export_to_excel: export_to_excel ?? false
     }
-    if (this.key_word != null && this.key_word != '') {
-      send_data['key_word'] = this.key_word;
+    if (this.code != null && this.code != '') {
+      send_data['code'] = this.code;
     }
 
     this.apiService.postFromServer(ApiPath.get_seven_coupon_data_and_total_number_by_sorting_and_limit_or_search, send_data, true).then((res: Response) => {
@@ -119,7 +119,7 @@ export class SevenCouponPage implements OnInit {
         }
       }
 
-      let new_path = `/seven-coupon?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&key_word=${this.key_word}&used=${this.used || ''}&user_id=${this.user_id || ''}&assigned=${this.assigned || ''}&seven_coupon_type=${this.seven_coupon_type || ''}`;
+      let new_path = `/seven-coupon?page=${this.page}&limit=${this.limit}&sorting=${this.sorting}&direction=${this.direction}&code=${this.code || ''}&used=${this.used || ''}&user_id=${this.user_id || ''}&assigned=${this.assigned || ''}&seven_coupon_type=${this.seven_coupon_type || ''}`;
       if (this.location.path() != new_path) {
         this.location.replaceState(new_path);
       }
@@ -174,7 +174,7 @@ export class SevenCouponPage implements OnInit {
   }
 
   clearSearch(ev) {
-    this.key_word = '';
+    this.code = '';
     this.sorting = null;
     this.direction = null;
     this.page = 1;
@@ -202,7 +202,7 @@ export class SevenCouponPage implements OnInit {
     this.sorting = null;
     this.direction = null;
     this.page = 1;
-    this.key_word = "";
+    this.code = "";
     this.getSevenCouponDataList();
   }
 
