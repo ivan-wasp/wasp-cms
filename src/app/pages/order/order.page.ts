@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
@@ -11,7 +11,7 @@ import { CommonService } from 'src/app/services/common.service';
 import { DataService } from 'src/app/services/data.service';
 import { ApiPath, ApiService, Response } from 'src/app/services/api.service';
 import { AdminData, AdminType, Authority, CarData, ParkingData, UserData } from 'src/app/schema';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-order',
@@ -35,7 +35,7 @@ import { Observable } from 'rxjs';
     },
   ]
 })
-export class OrderPage implements OnInit {
+export class OrderPage implements OnInit, OnDestroy {
 
   admin_data: Observable<AdminData> = this.auth.adminData.pipe();
 
@@ -62,6 +62,8 @@ export class OrderPage implements OnInit {
   );
 
   @ViewChild('ionSelectable') ionSelectable: IonicSelectableComponent;
+  nowTs = Date.now();
+  private liveDurationSub?: Subscription;
   public get authority(): typeof Authority {
     return Authority;
   }
@@ -122,6 +124,15 @@ export class OrderPage implements OnInit {
     if (this.dataService.parking_data_list$.value == null) {
       this.dataService.getAllParkingData();
     }
+
+    this.liveDurationSub = interval(60000).subscribe(() => {
+      this.nowTs = Date.now();
+      this.cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy() {
+    this.liveDurationSub?.unsubscribe();
   }
 
   async getOrderDataList(export_to_excel?: boolean) {
@@ -301,6 +312,42 @@ export class OrderPage implements OnInit {
 
   hideLoading() {
     this.ionSelectable.hideLoading();
+  }
+
+  getHourlyRentalLiveDuration(item): string {
+    if (!item?.start_date || !item?.pick_up_data?.time) {
+      return '00小時00分鐘';
+    }
+
+    const datePart = String(item.start_date).slice(0, 10);
+    const timePart = String(item.pick_up_data.time).slice(0, 5);
+    const start = new Date(`${datePart}T${timePart}:00`).getTime();
+
+    if (Number.isNaN(start)) {
+      return '00小時00分鐘';
+    }
+
+    const elapsedMinutes = Math.max(0, Math.floor((this.nowTs - start) / 60000));
+    const hours = Math.floor(elapsedMinutes / 60);
+    const minutes = elapsedMinutes % 60;
+
+    return `${String(hours).padStart(2, '0')}小時${String(minutes).padStart(2, '0')}分鐘`;
+  }
+
+  getAwaitingPickupCancelRemaining(item): string {
+    if (!item?.create_date) {
+      return '0分鐘後';
+    }
+
+    const createdAt = new Date(item.create_date).getTime();
+    if (Number.isNaN(createdAt)) {
+      return '0分鐘後';
+    }
+
+    const cancelAfterMinutes = 60;
+    const elapsedMinutes = Math.floor((this.nowTs - createdAt) / 60000);
+    const remainingMinutes = Math.max(0, cancelAfterMinutes - elapsedMinutes);
+    return `約${remainingMinutes}分鐘後`;
   }
 
 }

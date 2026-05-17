@@ -332,6 +332,23 @@
                                     </ion-col>
                                     <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
                                         <ion-button
+                                            *ngIf="order_data.user_data.taxi_driver_identity_plate_url != null && order_data.user_data.taxi_driver_identity_plate_url != ''"
+                                            (click)="show_taxi_driver_identity_plate_url = !show_taxi_driver_identity_plate_url"
+                                            expand="block" fill="outline" shape="" color="secondary">
+                                            {{!show_taxi_driver_identity_plate_url ? '查看' : '隱藏'}}的士司機證
+                                        </ion-button>
+                                        <ion-img *ngIf="show_taxi_driver_identity_plate_url"
+                                            [src]="commonService.media_url()+order_data.user_data.taxi_driver_identity_plate_url"></ion-img>
+                                        <ion-button
+                                            *ngIf="show_taxi_driver_identity_plate_url && order_data.user_data.taxi_driver_identity_plate_url != null && order_data.user_data.taxi_driver_identity_plate_url != ''"
+                                            (click)="commonService.downloadMedia(order_data.user_data.taxi_driver_identity_plate_url, true)"
+                                            expand="block" fill="outline" shape="" color="secondary">
+                                            下載的士司機證
+                                        </ion-button>
+
+                                    </ion-col>
+                                    <ion-col size-xs="12" size-sm="12" size-md="4" size-lg="4">
+                                        <ion-button
                                             *ngIf="order_data.user_data.address_proof_url != null && order_data.user_data.address_proof_url != ''"
                                             (click)="show_address_proof_url = !show_address_proof_url" expand="block"
                                             fill="outline" shape="" color="secondary">
@@ -618,7 +635,7 @@
                                 <ion-col size-xs="12" size-sm="6" size-md="3" size-lg="3">
                                     <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                                         <ion-label class="ion-text-wrap" position="stacked">建立日期</ion-label>
-                                        <ion-input readonly value="{{order_data.create_date | date: 'yyyy-MM-dd'}}"
+                                        <ion-input readonly value="{{order_data.create_date | date: 'yyyy-MM-dd HH:mm:ss'}}"
                                             type="text"></ion-input>
                                     </ion-item>
                                 </ion-col>

@@ -228,7 +228,8 @@
         </ion-row>
 
         <ng-container *ngIf="dataService?.table_data_list == null">
-            <ion-row class="table_content full-width ske_table_content" *ngFor="let item of [].constructor(10); trackBy: commonService.trackByIndex">
+            <ion-row class="table_content full-width ske_table_content"
+                *ngFor="let item of [].constructor(10); trackBy: commonService.trackByIndex">
                 <ion-col size="1">
                 </ion-col>
                 <ion-col size="1.5">
@@ -308,8 +309,18 @@
                                 <ion-label>時租</ion-label>
                             </ion-chip>
                             <br>
-                            {{item?.start_date+' '+item?.pick_up_data.time}} <br> 至 <br>
-                            {{item?.end_date+' '+item?.return_data.time }}
+                            {{item?.start_date+' '+item?.pick_up_data.time}}
+                            <ng-container *ngIf="item?.end_date != ''">
+                                <br> 至 <br>
+                                {{item?.end_date+' '+item?.return_data.time }}
+                            </ng-container>
+                            <ng-container *ngIf="item?.status == 'rendering'">
+                                <br> 已租用: {{getHourlyRentalLiveDuration(item)}}
+                            </ng-container>
+                            <ng-container *ngIf="item?.status == 'awaiting_pick_up'">
+                                <br> 取消倒數: {{getAwaitingPickupCancelRemaining(item)}}
+                            </ng-container>
+
                         </ng-container>
                     </span>
 
