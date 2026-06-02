@@ -82,7 +82,7 @@ export class BannerSettingPage implements OnInit {
 
     let send_data = {
       data_type:"custom_page_data",
-      field_list: ['id', "title"]
+      field_list: ['id', "zh_title"]
     }
 
     this.apiService.postFromServer(ApiPath.get_all_data_by_data_type, send_data, true).then((res: Response) => {
