@@ -310,6 +310,15 @@
                         <ion-input readonly [value]="violation_data?.payment_order_data?.id" type="text"></ion-input>
                     </ion-item>
                 </ion-col>
+                <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines='none'
+                        button='false'>
+                        <ion-label class="ion-text-wrap" position="stacked">付款日期</ion-label>
+                        <ion-input readonly
+                            [value]="violation_data.payment_completed_datetime  | date : 'yyyy-MM-dd HH:mm'"
+                            type="text"></ion-input>
+                    </ion-item>
+                </ion-col>
 
             </ion-row>
 
