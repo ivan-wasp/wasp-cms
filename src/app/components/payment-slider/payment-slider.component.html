@@ -165,7 +165,7 @@
                     </ion-item>
                 </ion-col>
                 <ng-container
-                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && (payment_data.payment_method == 'fps' || payment_data.payment_method == 'alipayhk') && !payment_data.payment_order_data.hasOwnProperty('pspReference')">
+                    *ngIf="payment_data.payment_method != null && payment_data.payment_method != '' && (payment_data.payment_method == 'fps' || payment_data.payment_method == 'alipayhk') && !payment_data.payment_order_data?.hasOwnProperty('pspReference')">
                     <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                         <ion-item class="input-item readonly" mode="md" lines='none' button='false'>
                             <ion-label class="ion-text-wrap" position="stacked">AirWallex參考編號</ion-label>
