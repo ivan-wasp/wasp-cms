@@ -1102,11 +1102,12 @@ export class DataService {
     });
   }
 
-  secondDriverValidation(phone, second_driver_phone): Promise<any> {
+  secondDriverValidation(phone, second_driver_phone, required_class): Promise<any> {
     return new Promise((resolve, reject) => {
       let send_data = {
         phone: phone,
-        second_driver_phone: second_driver_phone
+        second_driver_phone: second_driver_phone,
+        required_class: required_class,
       }
 
       this.apiService.postFromServer(ApiPath.second_driver_validation, send_data, true).then((res: Response) => {
