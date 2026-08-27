@@ -450,7 +450,7 @@ export class OrderDetailPage implements OnInit {
     if (this.second_driver_phone.invalid || this.order_data.user_data == null){
       return this.commonService.openErrorSnackBar();
     }
-    const validate_second_driver: Response = await this.dataService.secondDriverValidation(this.order_data.user_data.phone, this.second_driver_phone.value);
+    const validate_second_driver: Response = await this.dataService.secondDriverValidation(this.order_data.user_data.phone, this.second_driver_phone.value, this.order_data.car_data.required_class);
     if (validate_second_driver.result == 'success'){
       this.order_data.second_driver_user_id = validate_second_driver.data.user_id;
       this.getSecondDriverUserData();

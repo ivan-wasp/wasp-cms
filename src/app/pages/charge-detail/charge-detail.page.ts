@@ -60,7 +60,7 @@ export class ChargeDetailPage implements OnInit {
     return AdminType;
   }
   @ViewChild('upload_img', { static: false }) upload_img: ElementRef;
-  public get chargeTypeList(){
+  public get chargeTypeList() {
     return Object.keys(ChargeType);
   }
   public get chargeType(): typeof ChargeType {
@@ -93,7 +93,7 @@ export class ChargeDetailPage implements OnInit {
       this.readonly = false;
       this.setNewChargeyDataTemplate();
     }
-    if (this.dataService.car_data_list$.value == null){
+    if (this.dataService.car_data_list$.value == null) {
       this.dataService.getAllCarData();
     }
     if (this.dataService.user_data_list$.value == null) {
@@ -169,6 +169,9 @@ export class ChargeDetailPage implements OnInit {
     if (this.charge_data.user_id == undefined || this.charge_data.user_id == null || this.charge_data.user_id == '') {
       return this.commonService.openErrorSnackBar("必須選用戶");
     }
+    if (this.charge_data.type == ChargeType.other && (this.charge_data.description == null || this.charge_data.description == '')) {
+      return this.commonService.openErrorSnackBar("必須填寫其他類型的描述");
+    }
     send_data = this.commonService.updateDataChecker(send_data, this.charge_data, this.checking_charge_data);
 
 
@@ -203,14 +206,17 @@ export class ChargeDetailPage implements OnInit {
     if (this.charge_data.payment_deadline_date != null && this.charge_data.payment_deadline_date != '' && !this.commonService.validateYYYYmmddFormat(this.charge_data.payment_deadline_date)) {
       return this.commonService.openErrorSnackBar("繳款到期日格式不正確");
     }
-    if (this.charge_data.type == null || this.charge_data.type == ''){
+    if (this.charge_data.type == null || this.charge_data.type == '') {
       return this.commonService.openErrorSnackBar("必須選擇類型");
     }
-    if (this.charge_data.status == null || this.charge_data.status == ''){
+    if (this.charge_data.status == null || this.charge_data.status == '') {
       return this.commonService.openErrorSnackBar("必須選擇狀態");
     }
-    if (this.charge_data.total_amount == null || this.charge_data.total_amount <= 0){
+    if (this.charge_data.total_amount == null || this.charge_data.total_amount <= 0) {
       return this.commonService.openErrorSnackBar("總額必須多於0");
+    }
+    if (this.charge_data.type == ChargeType.other && (this.charge_data.description == null || this.charge_data.description == '')) {
+      return this.commonService.openErrorSnackBar("必須填寫其他類型的描述");
     }
 
     this.apiService.postFromServer(ApiPath.new_charge, this.charge_data, true).then((res: Response) => {
@@ -315,10 +321,10 @@ export class ChargeDetailPage implements OnInit {
     this.charge_data.date = '';
   }
 
-  amountChange(e){
+  amountChange(e) {
     // console.log(e);
     setTimeout(() => {
-      this.charge_data.total_amount = this.charge_data.amount+this.charge_data.penalty;
+      this.charge_data.total_amount = this.charge_data.amount + this.charge_data.penalty;
     }, 100);
 
   }

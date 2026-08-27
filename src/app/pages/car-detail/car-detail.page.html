@@ -489,11 +489,59 @@
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                 <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
-                  <ion-label position="stacked">時租價錢</ion-label>
+                  <ion-label position="stacked">基本時租價錢</ion-label>
                   <ion-input
                     [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
                     [readonly]="readonly" [(ngModel)]="car_data.price_per_hour" type="number" min="1"></ion-input>
                 </ion-item>
+              </ion-col>
+              <ion-col size-xs="12" size-sm="12" size-md="12" size-lg="12">
+                <ion-row *ngFor="let item of car_data.hourly_price_list; let i = index;">
+                  <ion-col size-xs="12" size-sm="4" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label position="stacked">自定時租開始時間</ion-label>
+                      <ion-select
+                        [disabled]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                        [(ngModel)]="item.from" multiple="false" interface="popover" cancelText="取消" okText="確認">
+                        <ion-select-option *ngFor="let time of hourlyTimeOptionList" [value]="time">
+                          {{ time }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="4" size-md="4" size-lg="4">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label position="stacked">自定時租結束時間</ion-label>
+                      <ion-select
+                        [disabled]="readonly || (('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount))"
+                        [(ngModel)]="item.to" multiple="false" interface="popover" cancelText="取消" okText="確認">
+                        <ion-select-option *ngFor="let time of hourlyTimeOptionList" [value]="time">
+                          {{ time }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="3" size-md="3" size-lg="3">
+                    <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none"
+                      button="false">
+                      <ion-label position="stacked">時租價錢</ion-label>
+                      <ion-input
+                        [disabled]="('production' | env) && (admin_data | async) && !(admin_data | async)?.authority_list.includes(authority.offer_discount)"
+                        [readonly]="readonly" [(ngModel)]="item.price_per_hour" type="number" min="1"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="1" size-md="1" size-lg="1" class="ion-align-self-center">
+                    <ion-button *ngIf="!readonly" fill="clear" (click)="removeHourlyPrice(i)">
+                      <ion-icon color="danger" slot="icon-only" name="trash"></ion-icon>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+                <ion-button *ngIf="!readonly" (click)="addHourlyPrice()" color="secondary" expand="block" fill="clear"
+                  shape="round">
+                  新增自定時租價錢
+                </ion-button>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                 <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">

@@ -85,6 +85,7 @@
                         <ng-container *ngIf="item == chargeType.insufficient_battery_or_oil_penalty">電/油量不足罰款</ng-container>
                         <ng-container *ngIf="item == chargeType.incorrect_drop_off_location_penalty">非正確地點還車罰款</ng-container>
                         <ng-container *ngIf="item == chargeType.super_charge_idle_fee">超級充電站超時佔用費</ng-container>
+                        <ng-container *ngIf="item == chargeType.other">其他</ng-container>
                     </ion-select-option>
                 </ion-select>
             </ion-col>
@@ -249,6 +250,7 @@
                         <ng-container *ngIf="item?.type == chargeType.insufficient_battery_or_oil_penalty">電/油量不足罰款</ng-container>
                         <ng-container *ngIf="item?.type == chargeType.incorrect_drop_off_location_penalty">非正確地點還車罰款</ng-container>
                         <ng-container *ngIf="item?.type == chargeType.super_charge_idle_fee">超級充電站超時佔用費</ng-container>
+                        <ng-container *ngIf="item?.type == chargeType.other">其他</ng-container>
                     </span>
                 </ion-col>
                 <ion-col size-xs="12" size-sm="12" size-md="1" size-lg="1">

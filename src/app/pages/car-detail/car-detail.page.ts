@@ -9,7 +9,7 @@ import { ItemReorderEventDetail } from '@ionic/core';
 import { Location } from '@angular/common';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import { AdminType, ParkingData, SystemData, CarDamage, DATA_TYPE, AdminData, Authority, CarData, Engine, OfferPlan, CarDamageCategory, CarDamageFrontSubcategory, CarDamageLeftSideSubcategory, CarDamageRightSideSubcategory, CarDamageRearSubcategory, InsuranceType } from 'src/app/schema';
+import { AdminType, ParkingData, SystemData, CarDamage, DATA_TYPE, AdminData, Authority, CarData, Engine, OfferPlan, HourlyPrice, CarDamageCategory, CarDamageFrontSubcategory, CarDamageLeftSideSubcategory, CarDamageRightSideSubcategory, CarDamageRearSubcategory, InsuranceType } from 'src/app/schema';
 import { Observable } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -60,6 +60,10 @@ export class CarDetailPage implements OnInit {
     '自動泊車(輔助)',
     '泊車雷達感應'
   ];
+  hourlyTimeOptionList: string[] = Array.from({ length: 24 }, (_, index) => {
+    const hour = index.toString().padStart(2, '0');
+    return index === 23 ? `${hour}:59:59` : `${hour}:00:00`;
+  });
 
   car_id = null;
   car_data: CarData = null;
@@ -289,6 +293,7 @@ export class CarDetailPage implements OnInit {
       "keyless_tutorial_video_url": "",
       "keyless_tutorial_website_url": "",
       "price_per_hour": null,
+      "hourly_price_list": [],
       "price_per_hour_daily_ceiling": null,
       "hourly_rental_available": false,
       'required_class': '',
@@ -308,6 +313,12 @@ export class CarDetailPage implements OnInit {
       if (res.result == "success") {
         this.car_data = JSON.parse(JSON.stringify(res.data));
         this.checking_car_data = JSON.parse(JSON.stringify(res.data));
+        if (this.car_data.hourly_price_list == null) {
+          this.car_data.hourly_price_list = [];
+        }
+        if (this.checking_car_data.hourly_price_list == null) {
+          this.checking_car_data.hourly_price_list = [];
+        }
         if (this.auth.adminData.value != null && this.auth.adminData.value.type == 'buyer' && !this.car_data.for_sale) {
           return this.nav.navigateRoot('');
         }
@@ -458,6 +469,13 @@ export class CarDetailPage implements OnInit {
     if ((this.car_data.price_per_day == null)) {
       return this.commonService.openErrorSnackBar("必須填寫日租價錢");
     }
+    if (JSON.stringify(this.car_data.hourly_price_list) != JSON.stringify(this.checking_car_data.hourly_price_list)) {
+      const hourlyPriceError = this.validateHourlyPriceList(this.car_data.hourly_price_list);
+      if (hourlyPriceError != null) {
+        return this.commonService.openErrorSnackBar(hourlyPriceError);
+      }
+      send_data['hourly_price_list'] = this.sortHourlyPriceList(this.car_data.hourly_price_list);
+    }
     if (JSON.stringify(this.car_data.offer_plan_list) != JSON.stringify(this.checking_car_data.offer_plan_list)) {
       if (this.car_data.offer_plan_list.filter(d => d.minimum_rental_days == null).length > 0) {
         return this.commonService.openErrorSnackBar("必須填寫所有計劃日數");
@@ -547,6 +565,10 @@ export class CarDetailPage implements OnInit {
     if ((this.car_data.price_per_day == null)) {
       return this.commonService.openErrorSnackBar("必須填寫日租價錢");
     }
+    const hourlyPriceError = this.validateHourlyPriceList(this.car_data.hourly_price_list);
+    if (hourlyPriceError != null) {
+      return this.commonService.openErrorSnackBar(hourlyPriceError);
+    }
     if (this.car_data.offer_plan_list.filter(d => d.minimum_rental_days == null).length > 0) {
       return this.commonService.openErrorSnackBar("必須填寫所有計劃日數");
     }
@@ -612,6 +634,61 @@ export class CarDetailPage implements OnInit {
       insurance_price_tier_two_percentage: null
     };
     this.car_data.offer_plan_list.push(offer_plan);
+  }
+
+  addHourlyPrice() {
+    const hourly_price: HourlyPrice = {
+      from: '',
+      to: '',
+      price_per_hour: null
+    };
+    this.car_data.hourly_price_list.push(hourly_price);
+  }
+
+  removeHourlyPrice(index: number) {
+    this.car_data.hourly_price_list.splice(index, 1);
+  }
+
+  private validateHourlyPriceList(hourlyPriceList: HourlyPrice[]) {
+    if (hourlyPriceList == null) {
+      return null;
+    }
+    if (hourlyPriceList.filter(d => d.from == null || d.from == '').length > 0) {
+      return "必須填寫所有時租開始時間";
+    }
+    if (hourlyPriceList.filter(d => d.to == null || d.to == '').length > 0) {
+      return "必須填寫所有時租結束時間";
+    }
+    if (hourlyPriceList.filter(d => d.price_per_hour == null).length > 0) {
+      return "必須填寫所有時租價錢";
+    }
+    if (hourlyPriceList.filter(d => !this.commonService.validateHourMinuteSecondStringFormat(d.from) || !this.commonService.validateHourMinuteSecondStringFormat(d.to)).length > 0) {
+      return "時租時間格式必須為 HH:mm:ss";
+    }
+    if (hourlyPriceList.filter(d => this.hourlyPriceToSeconds(d.from) >= this.hourlyPriceToSeconds(d.to)).length > 0) {
+      return "時租開始時間必須早於結束時間";
+    }
+
+    const sortedHourlyPriceList = this.sortHourlyPriceList(hourlyPriceList);
+    for (let i = 1; i < sortedHourlyPriceList.length; i++) {
+      if (this.hourlyPriceToSeconds(sortedHourlyPriceList[i].from) < this.hourlyPriceToSeconds(sortedHourlyPriceList[i - 1].to)) {
+        return "時租時間區間不能重疊";
+      }
+    }
+
+    return null;
+  }
+
+  private sortHourlyPriceList(hourlyPriceList: HourlyPrice[]) {
+    return hourlyPriceList.slice().sort((a, b) => this.hourlyPriceToSeconds(a.from) - this.hourlyPriceToSeconds(b.from) || this.hourlyPriceToSeconds(a.to) - this.hourlyPriceToSeconds(b.to));
+  }
+
+  private hourlyPriceToSeconds(time: string) {
+    if (!this.commonService.validateHourMinuteSecondStringFormat(time)) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    const [hour, minute, second] = time.split(':').map(value => parseInt(value, 10));
+    return (hour * 60 * 60) + (minute * 60) + second;
   }
 
   disabledChange(ev) {

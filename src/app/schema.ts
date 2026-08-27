@@ -579,11 +579,19 @@ export interface CarData {
     keyless_tutorial_video_url: string;
     keyless_tutorial_website_url: string;
     price_per_hour: number;
+    hourly_price_list: HourlyPrice[];
     price_per_hour_daily_ceiling: number;
     hourly_rental_available: boolean;
     required_class: string;
     must_read_pdf_url_list: string[];
 }
+
+export interface HourlyPrice {
+    from: string;
+    to: string;
+    price_per_hour: number;
+}
+
 
 export enum Engine {
     diesel = "diesel",
@@ -755,6 +763,7 @@ export interface OrderData {
     insurance_tier: number | null;
     hourly_rental: boolean;
     price_per_hour: number;
+    hourly_price_list: HourlyPrice[];
     price_per_hour_daily_ceiling: number;
 }
 
@@ -823,11 +832,11 @@ export interface PaymentData {
     user_conduct_payment_email_sent: boolean;
     hourly_rental: boolean;
     price_per_hour: number;
+    hourly_price_list: HourlyPrice[];
     price_per_hour_daily_ceiling: number;
     number_of_hour: number;
     hourly_payment_settlement_done: boolean;
 }
-
 
 export enum DiscountType {
     coupon = "coupon",
@@ -1652,7 +1661,8 @@ export enum ChargeType {
     late_drop_off_penalty = "late_drop_off_penalty",
     insufficient_battery_or_oil_penalty = "insufficient_battery_or_oil_penalty",
     incorrect_drop_off_location_penalty = "incorrect_drop_off_location_penalty",
-    super_charge_idle_fee = "super_charge_idle_fee"
+    super_charge_idle_fee = "super_charge_idle_fee",
+    other = "other"
 }
 
 
