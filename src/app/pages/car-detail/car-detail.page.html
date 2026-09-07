@@ -717,7 +717,7 @@
                   <ion-input [readonly]="true" [(ngModel)]="car_data.vin" type="text"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6" *ngIf="(admin_data | async)?.couchbase_username == 'Ivan'">
+              <ion-col size-xs="12" size-sm="6" size-md="6" size-lg="6">
                 <ion-item class="input-item" [ngClass]="{'readonly': readonly}" mode="md" lines="none" button="false">
                   <ion-label position="stacked">OBD number</ion-label>
                   <ion-input [readonly]="readonly" [(ngModel)]="car_data.obd_number" type="text"></ion-input>
